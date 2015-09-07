@@ -1,0 +1,10 @@
+{
+  "author": "<%= conf.author %>",
+  "name": "<%= conf.widgetName %>",
+  "module": "<%= conf.modName %>",
+  "date": "<%= conf.date %>",
+  "description": "<%= conf.description %>",
+  "data": {
+
+  }
+}

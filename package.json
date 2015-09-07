@@ -1,0 +1,58 @@
+{
+  "name": "athena-html",
+  "version": "0.0.1",
+  "description": "JDC-FD前端流程工具",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JDC-FD/athena-html.git"
+  },
+  "keywords": [
+    "build"
+  ],
+  "author": "luckyadam",
+  "license": "MIT",
+  "bin": {
+    "athena": "index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/JDC-FD/athena-html/issues"
+  },
+  "homepage": "https://github.com/JDC-FD/athena-html#readme",
+  "dependencies": {
+    "athena-mate": "latest",
+    "autoprefixer": "^6.0.1",
+    "browser-sync": "^2.9.1",
+    "chalk": "^1.1.1",
+    "commander": "^2.8.1",
+    "event-stream": "^3.3.1",
+    "gulp": "^3.9.0",
+    "gulp-csso": "^1.0.0",
+    "gulp-flatten": "^0.2.0",
+    "gulp-ftp": "^1.0.4",
+    "gulp-if": "^1.2.5",
+    "gulp-imagemin": "^2.3.0",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-postcss": "^6.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-ssh": "^0.5.2",
+    "gulp-util": "^3.0.6",
+    "imagemin-pngquant": "^4.2.0",
+    "inquirer": "^0.9.0",
+    "istextorbinary": "^1.0.2",
+    "lodash": "^3.10.1",
+    "mem-fs": "^1.1.0",
+    "mem-fs-editor": "^2.0.4",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "path-exists": "^2.0.0",
+    "path-is-absolute": "^1.0.0",
+    "postcss-pxtorem": "^3.0.0",
+    "read-chunk": "^1.0.1",
+    "require-dir": "^0.3.0",
+    "vinyl-fs": "^1.0.0"
+  }
+}
