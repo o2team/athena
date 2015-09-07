@@ -16,7 +16,7 @@
   "author": "luckyadam",
   "license": "MIT",
   "bin": {
-    "athena": "index.js"
+    "ath": "index.js"
   },
   "bugs": {
     "url": "https://github.com/JDC-FD/athena-html/issues"
