@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "JDC-FD前端流程工具",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
   "author": "luckyadam",
   "license": "MIT",
   "bin": {
-    "ath": "index.js"
+    "ath": "index.js",
+    "athena": "index.js"
   },
   "bugs": {
     "url": "https://github.com/JDC-FD/athena-html/issues"
