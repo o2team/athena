@@ -210,7 +210,7 @@ program
   .description('部署项目or模块，部署到qiang.it机器上')
   .option('-a, --app [appName]', '部署项目')
   .option('-m, --module [moduleName]', '部署模块')
-  .option('--verbose')
+  .option('--verbose', '部署详细信息')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -239,6 +239,7 @@ program
   .description('发布项目or模块，发布到tencent/jd开发机')
   .option('-a, --app [appName]', '发布项目')
   .option('-m, --module [moduleName]', '发布模块')
+  .option('--verbose', '发布详细信息')
   .action(function (option) {
     var app = null;
     var mod = null;
