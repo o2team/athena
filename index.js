@@ -1,5 +1,9 @@
 #! /usr/bin/env node --harmony
 
+/**
+ * 主入口，程序控制
+ */
+
 'use strict';
 
 var fs = require('fs');
@@ -291,6 +295,12 @@ program
     console.log('    $ athena clone widgetName --from moduleName');
     console.log('    $ athena clone widgetName --from moduleName --to moduleName');
     console.log();
+  });
+
+program
+  .command('*')
+  .action(function () {
+    console.log('    ' + chalk.red('没有该命令哟，请通过 athena -h 查看帮助！'));
   });
 
 program.parse(process.argv);

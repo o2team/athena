@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "JDC-FD前端流程工具",
   "main": "index.js",
   "scripts": {
