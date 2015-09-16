@@ -8,6 +8,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var request = require('request');
 var inquirer = require('inquirer');
 var program = require('commander');
 var chalk = require('chalk');
@@ -22,6 +23,39 @@ var builder = require('./lib/build');
 
 var rootPath = __dirname;
 
+var reportPath = '/api/commands';
+var userHome = Util.homedir();
+var userName = process.env.USER || path.basename(userHome);
+var config = fs.readFileSync(path.join(rootPath, '.config.json'));
+config = JSON.parse(String(config));
+
+// 数据上报
+function report (command, args, processParams, cb) {
+  var requestParams = {
+    cmd: command,
+    time: new Date().getTime(),
+    user: userName,
+    args: args
+  };
+  processParams && processParams(requestParams);
+
+  request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      try {
+        body = JSON.parse(body);
+        cb && cb(body);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
+}
+var athenaText = fs.readFileSync(path.join(__dirname, 'athena.txt'));
+console.log(gutil.colors.blue(String(athenaText)));
 program
   .version('0.0.1');
 
@@ -29,8 +63,6 @@ program
   .command('init [url]')
   .description('初始化一个工作目录')
   .action(function (url) {
-    var userHome = Util.homedir();
-    var userName = path.basename(userHome);
     console.log(chalk.magenta('  Allo ' + userName + '! 开始愉快工作吧~'));
     if (!url) {
       url = process.cwd();
@@ -38,8 +70,6 @@ program
     } else {
       console.log('  即将设置工作目录为：', url);
     }
-    var config = fs.readFileSync(path.join(rootPath, '.config.json'));
-    config = JSON.parse(String(config));
     console.log();
     if (!config.work_space) {
       config.work_space = url;
@@ -76,7 +106,19 @@ program
     var app = new App({
       appName: appName
     });
-    app.create();
+    app.create(function () {
+      var argv = [].slice.call(arguments);
+      report('app', argv, function (params) {
+        params.appName = argv[0];
+        var appConfPath = app.destinationPath(argv[0], 'app-conf.js');
+        params.appId = require(appConfPath).appId;
+      }, function (body) {
+        if (body.no === 0) {
+          console.log('success');
+        }
+      });
+    });
+
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -98,7 +140,23 @@ program
       console.log(chalk.red('  出错了，当前目录没有app-conf.js，请检查当前目录是否是一个项目目录！'));
       return;
     }
-    mmodule.create();
+    mmodule.create(function () {
+      var argv = [].slice.call(arguments);
+      var appConf = require(appConfPath);
+      if (appConf) {
+        report('module', argv, function (params) {
+          var moduleConfPath = mmodule.destinationPath(argv[0], 'module-conf.js');
+          params.moduleName = argv[0];
+          params.moduleId = require(moduleConfPath).moduleId;
+          params.appName = appConf.app;
+          params.appId = appConf.appId;
+        }, function (body) {
+          if (body.no === 0) {
+            console.log('success');
+          }
+        });
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -116,11 +174,29 @@ program
       pageName: pageName
     });
     var moduleConfPath = page.destinationPath('module-conf.js');
+    var appConfPath = path.join(path.resolve(page.destinationRoot(), '..'), 'app-conf.js');
     if (!fs.existsSync(moduleConfPath)) {
       console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
       return;
     }
-    page.create();
+    page.create(function () {
+      var argv = [].slice.call(arguments);
+      var appConf = require(appConfPath);
+      var moduleConf = require(moduleConfPath);
+      if (appConf) {
+        report('page', argv, function (params) {
+          params.moduleName = moduleConf.module;
+          params.moduleId = moduleConf.moduleId;
+          params.appName = appConf.app;
+          params.appId = appConf.appId;
+          params.page = argv[0];
+        }, function (body) {
+          if (body.no === 0) {
+            console.log('success');
+          }
+        });
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -138,11 +214,29 @@ program
       widgetName: widgetName
     });
     var moduleConfPath = widget.destinationPath('module-conf.js');
+    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
     if (!fs.existsSync(moduleConfPath)) {
       console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
       return;
     }
-    widget.create();
+    widget.create(function () {
+      var argv = [].slice.call(arguments);
+      var appConf = require(appConfPath);
+      var moduleConf = require(moduleConfPath);
+      if (appConf) {
+        report('widget', argv, function (params) {
+          params.moduleName = moduleConf.module;
+          params.moduleId = moduleConf.moduleId;
+          params.appName = appConf.app;
+          params.appId = appConf.appId;
+          params.widget = argv[0];
+        }, function (body) {
+          if (body.no === 0) {
+            console.log('success');
+          }
+        });
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -227,7 +321,16 @@ program
         mod = option.module;
       }
     }
-    builder.deploy(app, mod);
+    builder.deploy(app, mod).then(function (argv) {
+      var args = argv.mods;
+      if (argv.appConf) {
+        report('deploy', args, function (params) {
+          params.app = argv.appConf.appId;
+        });
+      }
+    }).catch(function (e) {
+      console.log(e.stack);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -256,7 +359,16 @@ program
         mod = option.module;
       }
     }
-    builder.publish(app, mod);
+    builder.publish(app, mod).then(function (argv) {
+      var args = argv.files;
+      if (argv.appConf) {
+        report('publish', args, function (params) {
+          params.app = argv.appConf.appId;
+        });
+      }
+    }).catch(function (e) {
+      console.log(e.stack);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
