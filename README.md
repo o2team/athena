@@ -1,5 +1,8 @@
 athena-html
 ===
+[![npm version](https://badge.fury.io/js/athena-html.svg)](http://badge.fury.io/js/athena-html)
+[![Code Climate](https://codeclimate.com/github/JDC-FD/athena-html/badges/gpa.svg)](https://codeclimate.com/github/JDC-FD/athena-html)
+[![Dependency Status](https://david-dm.org/JDC-FD/athena-html.svg)](https://david-dm.org/JDC-FD/athena-html)
 
 > JDC构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
 
