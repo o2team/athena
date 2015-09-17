@@ -37,8 +37,9 @@ function report (command, args, processParams, cb) {
     user: userName,
     args: args
   };
-  processParams && processParams(requestParams);
-
+  if (typeof processParams === 'function') {
+    processParams(requestParams);
+  }
   request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
     if (err) {
       console.log(err);
@@ -47,7 +48,9 @@ function report (command, args, processParams, cb) {
     if (res.statusCode === 200 || res.statusCode === 201) {
       try {
         body = JSON.parse(body);
-        cb && cb(body);
+        if (typeof cb === 'function') {
+          cb(body);
+        }
       } catch (e) {
         console.log(e);
       }
