@@ -42,7 +42,6 @@ function report (command, args, processParams, cb) {
   }
   request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
     if (err) {
-      console.log(err);
       return;
     }
     if (res.statusCode === 200 || res.statusCode === 201) {

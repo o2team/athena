@@ -120,7 +120,7 @@ ath widget [组件名]
 
 通过阅读设计稿，我们可以将页面拆分成不同``widget``，而一些可以通用的``widget``我们可以放到一个公共模块中去统一管理，通过这样的页面组件化方式，我们可以很好地避开复制代码的问题，同时让我们的代码更好管理。
 
-在执行``yo athena:page [pageName]``命令生成页面后，可以发现在模块的``page``目录下多了一个以刚刚输入的页面名称``pageName``作为名字的目录，这个目录下面包含 **html/js/css** 三个文件。在``html``文件中一般通过加载各个``widget``的方式来进行开发，具体代码如下：
+在执行``athena page [pageName]``命令生成页面后，可以发现在模块的``page``目录下多了一个以刚刚输入的页面名称``pageName``作为名字的目录，这个目录下面包含 **html/js/css** 三个文件。在``html``文件中一般通过加载各个``widget``的方式来进行开发，具体代码如下：
 
 ```
 <%= widget.load('user') %>
@@ -177,7 +177,7 @@ ath widget [组件名]
 module.exports = {
   app: 'qwd', // 项目名称
   common: 'gb', // 公共模块
-  moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过yo athena:module命令生成模块时会自动往此处添加新模块名
+  moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过athena module命令生成模块时会自动往此处添加新模块名
   deploy: {  // 需要发布时的配置
     qiang: {
       host: 'labs.qiang.it', // 机器host
