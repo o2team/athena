@@ -35,7 +35,7 @@
     "gulp-csso": "^1.0.0",
     "gulp-flatten": "^0.2.0",
     "gulp-ftp": "^1.0.4",
-    "gulp-if": "^1.2.5",
+    "gulp-if": "^2.0.0",
     "gulp-imagemin": "^2.3.0",
     "gulp-load-plugins": "^0.10.0",
     "gulp-postcss": "^6.0.0",
@@ -61,6 +61,6 @@
     "through-gulp": "^0.3.8",
     "through2": "^2.0.0",
     "uuid": "^2.0.1",
-    "vinyl-fs": "^1.0.0"
+    "vinyl-fs": "^2.1.1"
   }
 }
