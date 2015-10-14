@@ -18,6 +18,12 @@ athena-html
 [sudo] npm install -g athena-html
 ```
 
+由于国外源实在太慢，建议使用国内源来安装
+
+```
+[sudi] npm i -g athena-html —registry=http://registry.npm.taobao.org —disturl=http://npm.taobao.org/mirrors/node
+```
+
 ## 项目结构
 
 一个项目对应一个目录，项目中可以包含多个模块，项目将由以下结构组成
