@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JDC-FD/athena-html.git"
+    "url": "git+https://github.com/o2team/athena-html.git"
   },
   "keywords": [
     "build"
@@ -20,9 +20,9 @@
     "athena": "index.js"
   },
   "bugs": {
-    "url": "https://github.com/JDC-FD/athena-html/issues"
+    "url": "https://github.com/o2team/athena-html/issues"
   },
-  "homepage": "https://github.com/JDC-FD/athena-html#readme",
+  "homepage": "https://github.com/o2team/athena-html#readme",
   "dependencies": {
     "autoprefixer": "^6.0.1",
     "browser-sync": "^2.9.1",
@@ -61,6 +61,6 @@
     "through-gulp": "^0.3.8",
     "through2": "^2.0.0",
     "uuid": "^2.0.1",
-    "vinyl-fs": "^2.1.1"
+    "vinyl-fs": "^0.3.0"
   }
 }
