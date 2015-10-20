@@ -348,6 +348,7 @@ program
   .description('发布项目or模块，发布到tencent/jd开发机')
   .option('-a, --app [appName]', '发布项目')
   .option('-m, --module [moduleName]', '发布模块')
+  .option('-n, --noImage', '不发布图片')
   .option('--verbose', '发布详细信息')
   .action(function (option) {
     var app = null;
@@ -361,7 +362,7 @@ program
         mod = option.module;
       }
     }
-    builder.publish(app, mod).then(function (argv) {
+    builder.publish(app, mod, option).then(function (argv) {
       var args = argv.files;
       if (argv.appConf) {
         report('publish', args, function (params) {
