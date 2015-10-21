@@ -21,7 +21,7 @@ athena-html
 由于国外源实在太慢，建议使用国内源来安装
 
 ```
-[sudo] npm i -g athena-html —registry=http://registry.npm.taobao.org —disturl=http://npm.taobao.org/mirrors/node
+[sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node
 ```
 
 ## 项目结构

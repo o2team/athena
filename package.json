@@ -1,7 +1,7 @@
 {
   "name": "athena-html",
   "version": "0.0.7",
-  "description": "JDC-FD前端流程工具",
+  "description": "O2前端流程工具",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
