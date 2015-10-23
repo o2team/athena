@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/o2team/athena-html#readme",
   "dependencies": {
+    "archiver": "^0.16.0",
     "autoprefixer": "^6.0.1",
     "browser-sync": "^2.9.1",
     "chalk": "^1.1.1",

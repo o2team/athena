@@ -26,8 +26,7 @@ var rootPath = __dirname;
 var reportPath = '/api/commands';
 var userHome = Util.homedir();
 var userName = process.env.USER || path.basename(userHome);
-var config = fs.readFileSync(path.join(rootPath, '.config.json'));
-config = JSON.parse(String(config));
+var config = Util.getConfig();
 
 // 数据上报
 function report (command, args, processParams, cb) {
@@ -111,9 +110,13 @@ program
     app.create(function () {
       var argv = [].slice.call(arguments);
       report('app', argv, function (params) {
-        params.appName = argv[0];
         var appConfPath = app.destinationPath(argv[0], 'app-conf.js');
+        var commonModuleConfPath = app.destinationPath(argv[0], 'gb', 'module-conf.js');
+        var commonModuleConf = require(commonModuleConfPath);
+        params.appName = argv[0];
         params.appId = require(appConfPath).appId;
+        params.commonModuleId = commonModuleConf.moduleId;
+        params.commonModuleName = commonModuleConf.module;
       }, function (body) {
         if (body.no === 0) {
           console.log('success');
