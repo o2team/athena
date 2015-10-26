@@ -284,7 +284,7 @@ program
   .description('预览项目or模块')
   .option('-a, --app [appName]', '预览项目')
   .option('-m, --module [moduleName]', '预览模块')
-  .option('--page')
+  .option('-p, --page [pageName]', '预览的页面')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -297,7 +297,7 @@ program
         mod = option.module;
       }
     }
-    builder.serve(app, mod);
+    builder.serve(app, mod, option);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
