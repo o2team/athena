@@ -1,7 +1,7 @@
 #! /usr/bin/env node --harmony
-
 /**
  * 主入口，程序控制
+ * test
  */
 
 'use strict';
@@ -279,12 +279,11 @@ program
   });
 
 program
-  .command('serve')
-  .alias('s')
-  .description('预览项目or模块')
-  .option('-a, --app [appName]', '预览项目')
-  .option('-m, --module [moduleName]', '预览模块')
-  .option('-p, --page [pageName]', '预览的页面')
+  .command('font')
+  .alias('font')
+  .description('压缩项目or模块中的字体')
+  .option('-a, --app [appName]', '项目')
+  .option('-m, --module [moduleName]', '模块')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -297,7 +296,36 @@ program
         mod = option.module;
       }
     }
-    builder.serve(app, mod, option);
+    builder.font(app, mod);
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena font');
+    console.log('    $ athena font -a cx');
+    console.log('    $ athena font -m tz');
+    console.log();
+  });
+
+program
+  .command('serve')
+  .alias('s')
+  .description('预览项目or模块')
+  .option('-a, --app [appName]', '预览项目')
+  .option('-m, --module [moduleName]', '预览模块')
+  .option('--page')
+  .action(function (option) {
+    var app = null;
+    var mod = null;
+    // 带参数
+    if (option) {
+      if (typeof option.app === 'string') {
+        app = option.app;
+      }
+      if (typeof option.module === 'string') {
+        mod = option.module;
+      }
+    }
+    builder.serve(app, mod);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
