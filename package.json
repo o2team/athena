@@ -62,7 +62,6 @@
     "through2": "^2.0.0",
     "uuid": "^2.0.1",
     "vinyl-fs": "^0.3.0",
-    "cheerio": "^0.18.0",
     "commander": "^2.6.0",
     "cssom": "^0.3.0",
     "fontmin": "^0.9.0-alpha-3",
