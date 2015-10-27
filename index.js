@@ -279,34 +279,6 @@ program
   });
 
 program
-  .command('font')
-  .alias('font')
-  .description('压缩项目or模块中的字体')
-  .option('-a, --app [appName]', '项目')
-  .option('-m, --module [moduleName]', '模块')
-  .action(function (option) {
-    var app = null;
-    var mod = null;
-    // 带参数
-    if (option) {
-      if (typeof option.app === 'string') {
-        app = option.app;
-      }
-      if (typeof option.module === 'string') {
-        mod = option.module;
-      }
-    }
-    builder.font(app, mod);
-  }).on('--help', function() {
-    console.log('  Examples:');
-    console.log('');
-    console.log('    $ athena font');
-    console.log('    $ athena font -a cx');
-    console.log('    $ athena font -m tz');
-    console.log();
-  });
-
-program
   .command('serve')
   .alias('s')
   .description('预览项目or模块')
