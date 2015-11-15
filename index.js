@@ -256,6 +256,7 @@ program
   .description('编译项目or模块')
   .option('-a, --app [appName]', '编译项目')
   .option('-m, --module [moduleName]', '编译模块')
+  .option('--verbose')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -285,6 +286,7 @@ program
   .option('-a, --app [appName]', '预览项目')
   .option('-m, --module [moduleName]', '预览模块')
   .option('--page')
+  .option('--verbose')
   .action(function (option) {
     var app = null;
     var mod = null;
