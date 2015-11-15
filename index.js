@@ -39,21 +39,21 @@ function report (command, args, processParams, cb) {
   if (typeof processParams === 'function') {
     processParams(requestParams);
   }
-  request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
-    if (err) {
-      return;
-    }
-    if (res.statusCode === 200 || res.statusCode === 201) {
-      try {
-        body = JSON.parse(body);
-        if (typeof cb === 'function') {
-          cb(body);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  });
+  // request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
+  //   if (err) {
+  //     return;
+  //   }
+  //   if (res.statusCode === 200 || res.statusCode === 201) {
+  //     try {
+  //       body = JSON.parse(body);
+  //       if (typeof cb === 'function') {
+  //         cb(body);
+  //       }
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   }
+  // });
 }
 var athenaText = fs.readFileSync(path.join(__dirname, 'athena.txt'));
 console.log(gutil.colors.blue(String(athenaText)));

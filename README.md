@@ -5,23 +5,40 @@ athena-html
 [![Dependency Status](https://david-dm.org/o2team/athena-html.svg)](https://david-dm.org/o2team/athena-html)
 
 > JDC构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
-
 > 一次安装，到处运行
 
 ## 安装
 
-基于``node``，请确保已具备较新的node环境
+基于``node``，请确保已具备较新的node环境（>=0.12.0），推荐使用node版本管理工具[nvm](https://github.com/creationix/nvm)，这样不仅可以很方便地切换node版本，而且全局安装时候也不用加sudo了。
 
 安装本项目 **athena-html**
 
 ```
-[sudo] npm install -g athena-html
+$ [sudo] npm install -g athena-html
 ```
 
 由于国外源实在太慢，建议使用国内源来安装
 
 ```
-[sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node
+$ [sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node
+```
+
+目前已支持**sass/less**文件的编译，使用**sass**需要使用ruby安装**sass**和**compass**
+
+```
+$ [sudo] gem install sass
+$ [sudo] gem install compass
+```
+由于墙的缘故（你懂的），原始的gen源[https://rubygems.org/](https://rubygems.org/)几乎无法使用，建议将gem源替换成淘宝的源
+
+```
+$ gem sources --add https://ruby.taobao.org/ --remove https://rubygems.org/
+$ gem sources -l
+*** CURRENT SOURCES ***
+
+https://ruby.taobao.org
+# 请确保只有 ruby.taobao.org
+$ gem install rails
 ```
 
 ## 项目结构
@@ -77,7 +94,7 @@ athena-html
 生成一个新的项目目录
 
 ```
-ath app [项目名称]
+$ ath app [项目名称]
 ```
 
 或者使用简写 ``ath a [项目名称]``,``ath app -h``可以看到该命令的使用方式
@@ -89,7 +106,7 @@ ath app [项目名称]
 在某一项目中新增一个模块，比如在项目 **wd** 中新增一个 **open** 模块，需要在项目根目录下执行
 
 ```
-ath module [模块名]
+$ ath module [模块名]
 ```
 
 或者使用简写 ``ath m [模块名]``,``ath module -h``可以看到该命令的使用方式
@@ -101,7 +118,7 @@ ath module [模块名]
 在某一模块下新增一个页面，**进入到该模块** 下，执行
 
 ```
-ath page [页面名]
+$ ath page [页面名]
 ```
 
 或者使用简写 ``ath pa [页面名]``,``ath page -h``可以看到该命令的使用方式
@@ -113,7 +130,7 @@ ath page [页面名]
 在某一模块下新增一个widget组件，**进入到该模块** 下，执行
 
 ```
-ath widget [组件名]
+$ ath widget [组件名]
 ```
 
 或者使用简写 ``ath w [组件名]``,``ath widget -h``可以看到该命令的使用方式
@@ -338,13 +355,13 @@ module.exports = {
 同时你可以通过传入参数来决定你需要编译的模块，[模块名]参数指定模块，可以包含多个模块，多模块间使用 **,** 进行分隔
 
 ```
-athena build --module [模块名]
+$ athena build --module [模块名]
 ```
 
 命令简写
 
 ```
-ath b -m [模块名]
+$ ath b -m [模块名]
 ```
 使用``ath b -h`` 查看帮助。
 
@@ -356,17 +373,17 @@ ath b -m [模块名]
 
 如果在项目根目录下，可以通过携带参数来决定要浏览的页面：
 ```
-athena serve --module [模块名] --page [页面名]
+$ athena serve --module [模块名] --page [页面名]
 ```
 
 如果在模块目录下，可以通过携带参数来决定要浏览的页面：
 ```
-athena serve --page [页面名]
+$ athena serve --page [页面名]
 ```
 命令简写
 
 ```
-ath s -m [模块名] --page [页面名]
+$ ath s -m [模块名] --page [页面名]
 ```
 
 ### athena deploy
@@ -378,7 +395,7 @@ ath s -m [模块名] --page [页面名]
 通过传入参数来观察文件传输情况：
 
 ```
-athena deploy --verbose
+$ athena deploy --verbose
 ```
 可以选择只发布一个模块的内容
 
@@ -387,7 +404,7 @@ athena deploy --verbose
 命令简写
 
 ```
-ath d
+$ ath d
 ```
 
 ### athena publish
@@ -402,12 +419,12 @@ ath d
 在项目根目录下执行，可以通过传参来决定将发布哪些模块。[模块名]参数指定模块，可以包含多个模块，多模块间使用 **,** 进行分隔
 
 ```
-athena publish --module [模块名]
+$ athena publish --module [模块名]
 ```
 命令简写
 
 ```
-ath pu -m [模块名]
+$ ath pu -m [模块名]
 ```
 
 ### athena clone
@@ -415,5 +432,5 @@ ath pu -m [模块名]
 进入到某一模块下，通过``athena clone`` 命令可以复制另一个模块的**widget**到当前模块。
 
 ```
-athena clone --from [来源模块] --widget [widget名字]
+$ athena clone --from [来源模块] --widget [widget名字]
 ```
