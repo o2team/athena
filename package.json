@@ -56,7 +56,6 @@
     "mem-fs": "^1.1.0",
     "mem-fs-editor": "^2.0.4",
     "mkdirp": "^0.5.1",
-    "mocha": "=2.2.5",
     "path-exists": "^2.0.0",
     "path-is-absolute": "^1.0.0",
     "postcss-pxtorem": "^3.0.0",
