@@ -39,21 +39,21 @@ function report (command, args, processParams, cb) {
   if (typeof processParams === 'function') {
     processParams(requestParams);
   }
-  // request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
-  //   if (err) {
-  //     return;
-  //   }
-  //   if (res.statusCode === 200 || res.statusCode === 201) {
-  //     try {
-  //       body = JSON.parse(body);
-  //       if (typeof cb === 'function') {
-  //         cb(body);
-  //       }
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //   }
-  // });
+  request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
+    if (err) {
+      return;
+    }
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      try {
+        body = JSON.parse(body);
+        if (typeof cb === 'function') {
+          cb(body);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
 }
 var athenaText = fs.readFileSync(path.join(__dirname, 'athena.txt'));
 console.log(gutil.colors.blue(String(athenaText)));
@@ -256,7 +256,8 @@ program
   .description('编译项目or模块')
   .option('-a, --app [appName]', '编译项目')
   .option('-m, --module [moduleName]', '编译模块')
-  .option('--verbose')
+  .option('--verbose', '编译详细信息')
+  .option('--pack', '打包功能，输出静态稿')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -269,7 +270,7 @@ program
         mod = option.module;
       }
     }
-    builder.build(app, mod);
+    builder.build(app, mod, option);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -299,7 +300,7 @@ program
         mod = option.module;
       }
     }
-    builder.serve(app, mod);
+    builder.serve(app, mod, option);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
