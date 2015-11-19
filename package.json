@@ -59,6 +59,7 @@
     "path-exists": "^2.0.0",
     "path-is-absolute": "^1.0.0",
     "postcss-pxtorem": "^3.0.0",
+    "postcss-sprites": "^2.0.2",
     "read-chunk": "^1.0.1",
     "request": "^2.61.0",
     "require-dir": "^0.3.0",
