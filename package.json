@@ -58,7 +58,7 @@
     "mkdirp": "^0.5.1",
     "path-exists": "^2.0.0",
     "path-is-absolute": "^1.0.0",
-    "postcss-athena-spritesmith": "0.0.1",
+    "postcss-athena-spritesmith": "0.0.3",
     "postcss-pxtorem": "^3.0.0",
     "read-chunk": "^1.0.1",
     "request": "^2.61.0",
