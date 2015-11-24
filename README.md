@@ -43,7 +43,7 @@ $ gem install rails
 
 ## 项目结构
 
-一个项目对应一个目录，项目中可以包含多个模块，项目将由以下结构组成
+一个项目对应一个目录，项目中可以包含多个 **模块** ，项目将由以下结构组成
 
 
     ├── module1                 - 模块1
@@ -54,27 +54,29 @@ $ gem install rails
 项目中模块将由以下结构组成
 
     ├── dist                    - 通过编译生成的目录
-    │   ├── combofile           - publish时用来存放生成页面和页面片文件的目录
-    │   ├── css                 - 通过编译生成的css文件
-    │   ├── js                  - 通过编译生成的js文件
-    │   ├── image               - 通过编译压缩后的image文件
-    │   ├── page1.html          - 通过编译生成的页面html
-    │   ├── map.json            - 通过gulp编译后生成页面依赖widget列表
+    │   ├── output              - 真正用来上线的目录
+    │       ├── combofile       - publish时用来存放生成页面和页面片文件的目录
+    │       ├── css             - 通过编译生成的css文件
+    │       ├── js              - 通过编译生成的js文件
+    │       ├── images          - 通过编译压缩后的images文件
+    │       ├── page1.html      - 通过编译生成的页面html
+    │   ├── map.json            - 通过编译后生成页面/widget依赖关系已经页面引用资源、资源md5对应表
     |
     ├── page                    - 所有页面目录
     │   ├── page                - 某一页面目录
+    │       ├── images          - 页面的图片目录
     │       ├── page.css        - 页面级css
     │       ├── page.js         - 页面级js
     │       ├── page.html       - 页面html
     │
-    ├── static
+    ├── static                  - static目录一般用来存放需要引用的第三方的资源文件，需要配合``static-conf.js``来使用
     │   ├── css                 - 额外的css文件
     │   ├── js                  - 额外的js文件
-    │   ├── image               - 额外的image文件
+    │   ├── images              - 额外的image文件
     │  
     ├── widget                  - 所有widget目录
     │   ├── widget              - 某一widget目录
-    │       ├── image           - widget的图片目录
+    │       ├── images          - widget的图片目录
     │       ├── widget.css      - widget的css
     │       ├── widget.js       - widget的js
     │       ├── widget.html     - widget的html
@@ -83,7 +85,7 @@ $ gem install rails
     │
     └── module-conf.js          - 模块的配置信息
 
-在这种项目组织方式中，将页面拆分成各个widget组件，在页面中通过加载各个widget的方式来拼装页面，再经过gulp编译，生成正常页面。
+在这种项目组织方式中，将页面拆分成各个widget组件，在页面中通过加载各个widget的方式来拼装页面，再经过编译，生成正常页面。
 
 ## 快速开始
 
@@ -304,15 +306,15 @@ module.exports = {
 
 ### map.json
 
-**map.json** 文件是通过执行gulp任务后生成一个标识依赖关系的文件，文件中包含了当前模块所有页面所依赖的**widget**组件的信息，同时还有页面引用静态资源的信息，它的文件结构如下
+**map.json** 文件是通过执行编译任务后生成一个标识依赖关系的文件，文件中包含了当前模块所有页面所依赖的 **widget** 组件的信息，同时还有页面引用静态资源的信息，资源md5后资源名称的对应关系，它的文件结构如下
 
 ```javascript
 {
   "dependency": {
   	"find.html": [],
- 	"index.html": [],
- 	"open.html": [],
- 	"open1.html": [],
+ 	  "index.html": [],
+ 	  "open.html": [],
+ 	  "open1.html": [],
   	"open3.html": [],
   	"shop.html": [
    	 {
@@ -377,6 +379,8 @@ $ ath b -m [模块名]
 
 携带参数``--remote``将根据输入的机器名来生成对应机器所需要的可上线文件，包括页面片，执行后所有可上线文件均在模块 **dist/output** 目录下，机器名和 **app-conf.js** 中配置的机器名一致
 
+注意``--pack``和``--remote``不要同时使用
+
 使用``ath b -h`` 查看帮助。
 
 **每次对公共模块gb编辑完后，都需要重新编译gb模块，第一次获取项目后也需要编译一次公共模块gb**
@@ -429,8 +433,8 @@ $ ath d
 
 ### athena publish
 
-``athena publish`` 会将模块重新编译后发布到开发机上，同时会将压缩并重命名后的css文件和动态生成的页面片文件发布到机器的对应目录下。而在每次执行 ``gulp publish`` 后页面片中的时间戳将会自动更新。目前支持发布到腾讯和京东域的开发机，机器代号分别是 *tencent*
-*jsTest*。在 ``athena publish`` 的过程中，你可以自行选择需要发布到开发机上的页面和对应静态资源。
+``athena publish`` 会将模块重新编译后发布到开发机上，同时会将压缩并重命名后的css文件和动态生成的页面片文件发布到机器的对应目录下。而在每次执行 ``athena publish`` 后页面片中的时间戳将会自动更新。目前支持发布到腾讯和京东域的开发机，机器代号分别是 *tencent*
+*jdTest*。在 ``athena publish`` 的过程中，你可以自行选择需要发布到开发机上的页面和对应静态资源。
 
 ``publish`` 可简写成 ``pu``。
 
@@ -519,7 +523,7 @@ support : {
 
 ```css
 body {
-  background: url('images/ball.png?__sprite') no-repeat 0 0; 
+  background: url('images/ball.png?__sprite') no-repeat 0 0;
 }
 
 h1 {
