@@ -366,7 +366,9 @@ $ ath b -m [模块名]
 
 携带参数``--verbose``可以看到编译过程中的一些详细信息
 
-携带参数``--pack``将进入打包模式，只输出静态稿到**.temp**目录下，如果只是制作静态稿，可以使用这种模式
+携带参数``--pack``将进入打包模式，只输出静态稿到 **.temp** 目录下，如果只是制作静态稿，可以使用这种模式
+
+携带参数``--remote``将根据输入的机器名来生成对应机器所需要的可上线文件，包括页面片，执行后所有可上线文件均在模块 **dist/output** 目录下，机器名和 **app-conf.js** 中配置的机器名一致
 
 使用``ath b -h`` 查看帮助。
 
@@ -392,6 +394,9 @@ $ athena serve --page [页面名]
 ```
 $ ath s -m [模块名] --page [页面名]
 ```
+
+携带参数``--dist``将可以预览经过完整编译流程后生成的文件
+
 **建议只serve当前正在修改的模块，因为只serve模块的话会快很多**
 
 ### athena deploy
@@ -453,7 +458,7 @@ $ athena clone --from [来源模块] --widget [widget名字]
 
 The MIT License (MIT)
 
-Copyright (c) 2015 
+Copyright (c) 2015
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -472,4 +477,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
