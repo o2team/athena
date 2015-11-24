@@ -263,6 +263,13 @@ module.exports = {
       replace: true,
       media_query: false
     },
+    fontcompress : {
+      enable: false
+    },
+    csssprite: { //css雪碧图合并配置
+      enable: true,
+      retina: false  //是否支持retina
+    }
   }
 };
 ```
@@ -441,6 +448,100 @@ $ ath pu -m [模块名]
 
 ```
 $ athena clone --from [来源模块] --widget [widget名字]
+```
+
+## 部分功能使用方法
+
+### px转rem
+
+自动将`px`转成`rem`，需要配置`module-conf.js`里面的`support`属性如下即可：
+
+```javascript
+support : {  
+    px2rem: {
+      enable: false,  // 是否开启
+      root_value: 40,  // 1rem = 40px
+      unit_precision: 5,
+      prop_white_list: ['prop1','prop2'],  // prop1,prop2为需要转换的属性
+      selector_black_list: ['prop3','prop4'],  // prop3,prop4为不需要转换的属性
+      replace: true,  //替换原来的属性
+      media_query: false
+    }
+  }
+```
+
+假设上面的白名单属性设为`width`,`height`，下面举例转换过程：
+
+#### source.css
+
+```css
+.demo {
+  width: 80px;
+  height: 100px;
+  padding: 40px;
+}
+```
+
+#### output.css
+
+```css
+.demo {
+  width: 2rem;
+  height: 2.5rem;
+  padding: 40px;
+}
+```
+
+### CSS雪碧图合并
+
+将`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
+
+```javascript
+support : {  
+    csssprite: {
+      enable: true,
+      retina: true  //是否支持retina
+    }
+  }
+```
+
+> 上面的属性会结合`px2rem`是否开启使用，若开启了`px2rem`，那么`csssprite`功能最终输出的单位为`rem`，默认为`px`
+> 同时，若开启了`retina`属性，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
+
+以上面的配置为例，下面为转换过程，更多[参考](https://github.com/o2team/postcss-athena-spritesmith)
+
+#### source.css
+
+```css
+body {
+  background: url('images/ball.png?__sprite') no-repeat 0 0; 
+}
+
+h1 {
+ background-image: url('images/help.png?__sprite');
+ background-repeat: no-repeat;
+ background-position: 20px 30px;
+}
+
+.arrow {
+  background: url('images/help@2x.png?__sprite') no-repeat 0 100px;width:40px;height:50px;
+}
+
+.logo {
+  background: url('images/ball@2x.png?__sprite') no-repeat 100px 0;
+}
+```
+
+#### output.css
+
+```css
+body { background-image:url(../images/sprite.png); background-position:-2.7rem 0; }
+
+h1 { background-image:url(../images/sprite.png); background-position:0 0;}
+
+.arrow { background-image:url(../images/sprite.@2x.png); background-position:0 0; background-size:2.75rem 3.25rem;width:1rem;height:1.25rem;}
+
+.logo { background-image:url(../images/sprite.@2x.png); background-position:-1.35rem 0; background-size:2.75rem 3.25rem;}
 ```
 
 ## CONTRIBUTORS
