@@ -501,11 +501,12 @@ support : {
     csssprite: {
       enable: true,
       retina: true  //是否支持retina
+      rootvalue: 40
     }
   }
 ```
 
-> 上面的属性会结合`px2rem`是否开启使用，若开启了`px2rem`，那么`csssprite`功能最终输出的单位为`rem`，默认为`px`
+> 上面的属性`rootvalue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootvalue`的值。
 > 同时，若开启了`retina`属性，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
 
 以上面的配置为例，下面为转换过程，更多[参考](https://github.com/o2team/postcss-athena-spritesmith)
