@@ -258,6 +258,7 @@ program
   .option('-m, --module [moduleName]', '编译模块')
   .option('--verbose', '编译详细信息')
   .option('--pack', '打包功能，输出静态稿')
+  .option('--remote [remoteName]', '目标机器，目前为tencent/jdTest')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -286,8 +287,9 @@ program
   .description('预览项目or模块')
   .option('-a, --app [appName]', '预览项目')
   .option('-m, --module [moduleName]', '预览模块')
-  .option('--page')
-  .option('--verbose')
+  .option('--page [moduleName]', '预览页面')
+  .option('--verbose', '编译详细信息')
+  .option('--dist', '预览经过完整编译流程后的文件')
   .action(function (option) {
     var app = null;
     var mod = null;
