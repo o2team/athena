@@ -258,7 +258,7 @@ program
   .option('-m, --module [moduleName]', '编译模块')
   .option('--verbose', '编译详细信息')
   .option('--pack', '打包功能，输出静态稿')
-  .option('--remote [remoteName]', '目标机器，目前为tencent/jdTest')
+  .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
   .action(function (option) {
     var app = null;
     var mod = null;
@@ -313,47 +313,9 @@ program
   });
 
 program
-  .command('deploy')
-  .alias('d')
-  .description('部署项目or模块，部署到qiang.it机器上')
-  .option('-a, --app [appName]', '部署项目')
-  .option('-m, --module [moduleName]', '部署模块')
-  .option('--verbose', '部署详细信息')
-  .action(function (option) {
-    var app = null;
-    var mod = null;
-    // 带参数
-    if (option) {
-      if (typeof option.app === 'string') {
-        app = option.app;
-      }
-      if (typeof option.module === 'string') {
-        mod = option.module;
-      }
-    }
-    builder.deploy(app, mod).then(function (argv) {
-      var args = argv.mods;
-      if (argv.appConf) {
-        report('deploy', args, function (params) {
-          params.app = argv.appConf.appId;
-        });
-      }
-    }).catch(function (e) {
-      console.log(e.stack);
-    });
-  }).on('--help', function() {
-    console.log('  Examples:');
-    console.log('');
-    console.log('    $ athena deploy');
-    console.log('    $ athena deploy -a cx');
-    console.log('    $ athena deploy -m tz');
-    console.log();
-  });
-
-program
   .command('publish')
   .alias('pu')
-  .description('发布项目or模块，发布到tencent/jd开发机')
+  .description('发布项目or模块，发布到预览机以及tencent/jd开发机')
   .option('-a, --app [appName]', '发布项目')
   .option('-m, --module [moduleName]', '发布模块')
   .option('-n, --noImage', '不发布图片')

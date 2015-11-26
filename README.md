@@ -204,11 +204,16 @@ module.exports = {
   common: 'gb', // 公共模块
   moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过athena module命令生成模块时会自动往此处添加新模块名
   deploy: {  // 需要发布时的配置
-    qiang: {
+    local: { // 不涉及到部署至哪台机器
+      fdPath: '/' // 需要放置的目录
+    },
+    preview: { // 预览机的配置，名字不能修改，配置内容可以随自己需求修改
       host: 'labs.qiang.it', // 机器host
       user: '', // 用户名
       pass: '', // 密码
       port: 21, // 端口
+      fdPath: '/h5/', // 需要放置的目录
+      domain: 'labs.qiang.it', // 机器域名
       remotePath: '/labs.qiang.it/h5/qwd/frs' // 上传到的目录
     },
     jdTest: {
@@ -216,7 +221,7 @@ module.exports = {
       user: '',
       pass: '',
       port: 22,
-      fdPath: '/fd/h5',
+      fdPath: '/fd/h5/',
       domain: 's.paipaiimg.com',
       remotePath: '/export/paipai/resource/static/fd/h5/hellokity',
       cssi: '/export/paipai/resource/sinclude/cssi/fd/h5/hellokity', // 上传页面片的目录
@@ -228,7 +233,7 @@ module.exports = {
       user: '',
       pass: '',
       port: 21,
-      fdPath: '/fd/h5',
+      fdPath: '/fd/h5/',
       domain: 'static.paipaiimg.com',
       remotePath: '/newforward/static/fd/h5/hellokity',
       cssi: '/newforward/static/sinclude/cssi/fd/h5/hellokity',
@@ -240,6 +245,8 @@ module.exports = {
 
 ```
 其中 **app**、**common** 配置项 **不要** 修改，我们需要重点关注 **deploy** 这个配置项，这是发布到一些机器上的配置，可以注意到用户名和密码是空的，我们需要自己去完善它，同时上传的目录可以根据自己的需要进行修改。
+
+需要注意的是 **local** 、**preview** 是特殊配置项，其中 **preview** 代表需要发布到的预览机器，这两者的名字 **不可修改** ，目前配置中有配置了两台开发机，分别是 *tencnet* 和 *jdTest*，若需要发布到其他开发机请自行仿照增加配置。
 
 ### module-conf.js
 
@@ -410,31 +417,10 @@ $ ath s -m [模块名] --page [页面名]
 
 **建议只serve当前正在修改的模块，因为只serve模块的话会快很多**
 
-### athena deploy
-
-在 **项目根目录下** 通过 ``athena deploy`` 会将整个项目重新编译，并且将编译好的文件部署到预览机器 *labs.qiang.it* 上去。我们需要更改 **app-conf.js** 的配置填写机器的用户名和密码。
-
-``deploy`` 可简写成 ``d``。
-
-通过传入参数来观察文件传输情况：
-
-```
-$ athena deploy --verbose
-```
-可以选择只发布一个模块的内容
-
-如果觉得一次性部署整个项目太慢，可以选择进入到你想要部署的 **模块** 下来执行 ``athena deploy``
-
-命令简写
-
-```
-$ ath d
-```
-
 ### athena publish
 
-``athena publish`` 会将模块重新编译后发布到开发机上，同时会将压缩并重命名后的css文件和动态生成的页面片文件发布到机器的对应目录下。而在每次执行 ``athena publish`` 后页面片中的时间戳将会自动更新。目前支持发布到腾讯和京东域的开发机，机器代号分别是 *tencent*
-*jdTest*。在 ``athena publish`` 的过程中，你可以自行选择需要发布到开发机上的页面和对应静态资源。
+``athena publish`` 会将模块重新编译后发布到 ``app-conf.js`` 中配置的机器（包括预览机和开发机）上，同时会将压缩并重命名后的css文件和动态生成的页面片文件发布到机器的对应目录下（预览机器除外）。而在每次执行 ``athena publish`` 后页面片中的时间戳将会自动更新。目前配置了发布到腾讯和京东域的开发机，机器代号分别是 *tencent*
+*jdTest*，同时可发布到预览机 *labs.qiang.it* 上。在 ``athena publish`` 的过程中，你可以自行选择需要发布到开发机上的页面和对应静态资源。
 
 ``publish`` 可简写成 ``pu``。
 
