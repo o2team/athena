@@ -19,6 +19,7 @@ athena-html
 - [x] 根据组件加载情况生成资源依赖表
 - [x] 页面、组件html编译
 - [x] Sass/less 编译
+- [x] csslint/jslint 代码检查
 - [x] CSS合并压缩
 - [x] CSS prefix，px转rem
 - [x] JS合并压缩
@@ -298,6 +299,12 @@ module.exports = {
   module: 'mm',  // 当前模块名
   description: 'test',  // 模块简要信息
   support : {  
+    csslint: {
+      enable: true //是否开启
+    },
+    jslint: {
+      enable: true //是否开启
+    },
     px2rem: {  // px转rem配置
       enable: false,  // 是否开启
       root_value: 40,
