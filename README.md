@@ -19,7 +19,7 @@ athena-html
 - [x] 根据组件加载情况生成资源依赖表
 - [x] 页面、组件html编译
 - [x] Sass/less 编译
-- [x] csslint/jslint 代码检查
+- [x] csslint/jshint 代码检查
 - [x] CSS合并压缩
 - [x] CSS prefix，px转rem
 - [x] JS合并压缩
@@ -302,7 +302,7 @@ module.exports = {
     csslint: {
       enable: true //是否开启
     },
-    jslint: {
+    jshint: {
       enable: true //是否开启
     },
     px2rem: {  // px转rem配置

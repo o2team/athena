@@ -54,7 +54,7 @@
     "js-beautify": "^1.5.10",
     "jsftp": "^1.5.3",
     "jsftp-mkdirp": "^1.0.0",
-    "jslint": "^0.9.5",
+    "jshint": "^2.8.0",
     "lodash": "^3.10.1",
     "mem-fs": "^1.1.0",
     "mem-fs-editor": "^2.0.4",
