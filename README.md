@@ -127,6 +127,14 @@ $ gem install rails
 
 基于命令 ``athena``，同时提供了简写``ath``
 
+### 初始化
+
+首先需要初始化Athena，在这一步会有初始化工作目录、输入用户名等操作
+
+```
+$ ath init [工作目录]
+```
+
 ### 生成新项目
 
 生成一个新的项目目录
@@ -487,6 +495,28 @@ $ ath pu -m [模块名]
 $ athena clone --from [来源模块] --widget [widget名字]
 ```
 
+### athena list-config
+
+可以列出Athena配置
+
+```
+$ athena list-config
+```
+
+将会得到如下输出
+
+```
+  ___  _   _
+ / _ \| | | |
+/ /_\ \ |_| |__   ___ _ __   __ _
+|  _  | __| '_ \ / _ \ '_ \ / _` |
+| | | | |_| | | |  __/ | | | (_| |
+\_| |_/\__|_| |_|\___|_| |_|\__,_|
+
+user_name=luckyadam
+work_space=/Users/luckyadam/project/temp
+```
+
 ## 部分功能使用方法
 
 ### px转rem
@@ -495,16 +525,16 @@ $ athena clone --from [来源模块] --widget [widget名字]
 
 ```javascript
 support : {  
-    px2rem: {
-      enable: false,  // 是否开启
-      root_value: 40,  // 1rem = 40px
-      unit_precision: 5,
-      prop_white_list: ['prop1','prop2'],  // prop1,prop2为需要转换的属性
-      selector_black_list: ['prop3','prop4'],  // prop3,prop4为不需要转换的属性
-      replace: true,  //替换原来的属性
-      media_query: false
-    }
+  px2rem: {
+    enable: false,  // 是否开启
+    root_value: 40,  // 1rem = 40px
+    unit_precision: 5,
+    prop_white_list: ['prop1','prop2'],  // prop1,prop2为需要转换的属性
+    selector_black_list: ['prop3','prop4'],  // prop3,prop4为不需要转换的属性
+    replace: true,  //替换原来的属性
+    media_query: false
   }
+}
 ```
 
 假设上面的白名单属性设为`width`,`height`，下面举例转换过程：
@@ -584,9 +614,9 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 
 ## CONTRIBUTORS
 
-[![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen)| [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan)
-:---:|:---:|:---:
-[luckyadam](http://diao.li/) | [Simba Chen](https://github.com/Simbachen) | [adamchuan](https://github.com/adamchuan)
+[![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992)
+:---:|:---:|:---:|:---:
+[luckyadam](http://diao.li/) | [Simba Chen](https://github.com/Simbachen) | [adamchuan](https://github.com/adamchuan) | [Sky Cai](https://github.com/cnt1992)
 
 ## LICENCE
 

@@ -27,19 +27,20 @@ var reportPath = '/api/commands';
 var userHome = Util.homedir();
 var userName = process.env.USER || path.basename(userHome);
 var config = Util.getConfig();
+var setting = Util.getSetting();
 
 // 数据上报
 function report (command, args, processParams, cb) {
   var requestParams = {
     cmd: command,
     time: new Date().getTime(),
-    user: userName,
+    user: Util.getConfig().user_name,
     args: args
   };
   if (typeof processParams === 'function') {
     processParams(requestParams);
   }
-  request.post(config.report_url + reportPath, { form: requestParams }, function (err, res, body) {
+  request.post(setting.report_url + reportPath, { form: requestParams }, function (err, res, body) {
     if (err) {
       return;
     }
@@ -62,7 +63,7 @@ program
 
 program
   .command('init [url]')
-  .description('初始化一个工作目录')
+  .description('初始化Athena')
   .action(function (url) {
     console.log(chalk.magenta('  Allo ' + userName + '! 开始愉快工作吧~'));
     if (!url) {
@@ -72,26 +73,32 @@ program
       console.log('  即将设置工作目录为：', url);
     }
     console.log();
+    var prompt = [];
     if (!config.work_space) {
       config.work_space = url;
-      fs.writeFileSync(path.join(rootPath, '.config.json'), JSON.stringify(config, null, 2));
     } else {
       if (config.work_space !== url) {
-        var prompt = [];
         prompt.push({
           type: 'confirm',
           name: 'needNewWorkSpace',
           message: '已经设置过工作目录' + config.work_space + '，是否要以新目录为工作目录？',
           default: false
         });
-        inquirer.prompt(prompt, function (answers) {
-          if (answers.needNewWorkSpace) {
-            config.work_space = url;
-            fs.writeFileSync(path.join(rootPath, '.config.json'), JSON.stringify(config, null, 2));
-          }
-        });
       }
     }
+    prompt.push({
+      type: 'input',
+      name: 'userName',
+      message: '雁过留声，人过留名~~',
+      default: userName
+    });
+    inquirer.prompt(prompt, function (answers) {
+      if (answers.needNewWorkSpace) {
+        config.work_space = url;
+      }
+      config.user_name = answers.userName;
+      Util.setConfig(config);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -380,6 +387,16 @@ program
     console.log('    $ athena clone widgetName --from moduleName');
     console.log('    $ athena clone widgetName --from moduleName --to moduleName');
     console.log();
+  });
+
+program
+  .command('list-config')
+  .description('列出配置项')
+  .action(function () {
+    var config = Util.getConfig();
+    for (var i in config) {
+      console.log('  ' + i + '=' + config[i]);
+    }
   });
 
 program
