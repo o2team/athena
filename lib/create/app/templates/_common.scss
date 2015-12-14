@@ -1,0 +1,228 @@
+$browser-default-font-size: 20px !default;
+$pixelBase : 20px !default;
+//pxTorem
+@function pxTorem($px) {
+
+    @if $px == 0 or $px == 0px {
+        @return 0;
+    }
+    @else {
+        @return $px / $browser-default-font-size * 1rem;
+    }
+
+}
+@mixin flexbox() {
+    display: box;
+    display: -ms-box;
+    display: -webkit-box;
+    display: flex;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+}
+
+@mixin flex($values) {
+  display: block;
+  -webkit-box-flex: $values;
+  -moz-box-flex:  $values;
+  -webkit-flex:  $values;
+  -ms-flex:  $values;
+  flex:  $values;
+}
+
+//多参数转rem
+@function rem($values) {
+  $list: (); /* 存储转变后的值 */
+
+  @each $value in $values { /* 遍历传入的值 */
+
+    @if $value == 0 or $value == auto { /* 0 和 auto 原样返回 */
+      $list: append($list, $value);
+    }
+
+    @else {
+      $unit: unit($value);    /* 取单位 */
+      $val: parseInt($value); /* 取数字值 */
+
+      @if $unit == "px" {  /* 转换px值 */
+        $list: append($list, ($val / $pixelBase + rem));
+      }
+
+      @if $unit == "rem" { /* rem值不转换 */
+        $list: append($list, $value);
+      }
+    }
+  }
+
+  @return $list; /* 返回值列表 */
+}
+//文字省略号
+@mixin textoverflow{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+//垂直和水平都居中
+@mixin centers($width:100px,$height:100px){
+    position: absolute;
+    left:0;right:0;bottom:0;top:0;
+    margin:auto;
+    width:$width;
+    height:$height;
+}
+//对话框 垂直水平居中
+@mixin dialog(){
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate3d(-50%,-50%,0);
+    -webkit-transform:translate3d(-50%,-50%,0);
+}
+
+//动画
+@mixin animation($value...){
+    -webkit-animation:$value;
+    animation:$value;
+}
+//阴影
+@mixin shadowbox($value...){
+    -webkit-box-shadow:$value;
+    box-shadow:$value;  
+}
+//浏览器前缀
+@mixin css3($property, $value) {
+    @each $prefix in -webkit-, -moz-, -ms-, -o-, '' {
+        #{$prefix}#{$property}: $value;
+    }
+}
+
+@mixin absCenter($sprite,$name,$toRem:true){
+
+    $ml: ceil(image-width(sprite-file($sprite,$name)) / 4 * -1);
+    $mt: ceil(image-height(sprite-file($sprite,$name)) / 4 * -1);
+    @if $toRem {
+        $ml: pxTorem($ml);
+        $mt: pxTorem($mt);
+    }
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-left: $ml ;
+    margin-top:  $mt ;
+    @include s2b($sprite,$name,$toRem);
+}
+
+
+//
+@mixin coverimg($path,$toBase64:true){
+    $width: ceil(image-width($path) / 2);
+    $height: ceil(image-height($path) / 2);
+ 
+    $width: pxTorem($width);
+    $height: pxTorem($height);
+    
+
+    width: $width;
+    height: $height;
+    
+    @if $toBase64 {
+        background-image:inline-image($path);
+    } @else { 
+        background-image:image-url($path);
+    }
+    background-size:cover;
+    background-repeat:no-repeat;
+
+}
+
+
+@mixin imgCenter($sprite,$name,$toRem:true){
+    $ml: ceil(image-width(sprite-file($sprite,$name)) / 4 * -1);
+    $mt: ceil(image-height(sprite-file($sprite,$name)) / 4 * -1);
+    @if $toRem {
+        $ml: pxTorem($ml);
+        $mt: pxTorem($mt);
+    }
+    position: absolute;
+    left:50%;
+    margin-left: $ml ;
+    @include s2b($sprite,$name,$toRem);
+}
+// 静态图片
+@mixin staticImg($path,$toRem:true,$toBase64 : false,$isbg : false){
+    $width: ceil(image-width($path) / 2);
+    $height: ceil(image-height($path) / 2);
+    @if $toRem {
+        $width: pxTorem($width);
+        $height: pxTorem($height);
+    }
+    @if $isbg == false{
+        width: $width;
+        height: $height;
+    }
+    @if $toBase64 {
+        background-image:inline-image($path);
+    } @else { 
+        background-image:image-url($path);
+    }
+    background-size:100% auto;
+    background-repeat:no-repeat;
+}
+@mixin imgInfo($sprite, $name,$toRem:true){
+    $width: ceil(image-width(sprite-file($sprite, $name)) / 2);
+    $height: ceil(image-height(sprite-file($sprite, $name)) / 2);
+    @if $toRem {
+        $width: pxTorem($width);
+        $height: pxTorem($height);
+    }
+    width: $width;
+    height: $height;
+}
+//compass 二倍图转rem
+@mixin s2b($sprite, $name, $toRem:true) {
+    $pos_x: floor(nth(sprite-position($sprite, $name), 1) / 2);
+    $pos_y: floor(nth(sprite-position($sprite, $name), 2) / 2);
+    $width: ceil(image-width(sprite-file($sprite, $name)) / 2);
+    $height: ceil(image-height(sprite-file($sprite, $name)) / 2);
+    $size_w: ceil(image-width(sprite-path($sprite)) / 2);
+    $size_h: ceil(image-height(sprite-path($sprite)) / 2);
+    @if $toRem {
+        $pos_x: pxTorem($pos_x);
+        $pos_y: pxTorem($pos_y);
+        $width: pxTorem($width);
+        $height: pxTorem($height);
+        $size_w: pxTorem($size_w);
+        $size_h: pxTorem($size_h);
+    }
+    background-image: $sprite;
+    background-repeat: no-repeat;
+    background-position: $pos_x $pos_y;
+    background-size: $size_w $size_h;
+    //background-size: $size_w auto;
+    height: $height;
+    width: $width;
+}
+
+//compass 二倍图转rem
+@mixin imgMediaquery($sprite, $name, $num) {
+    $pos_x: floor(nth(sprite-position($sprite, $name), 1) / 2) * $num;
+    $pos_y: floor(nth(sprite-position($sprite, $name), 2) / 2) * $num;
+    $width: ceil(image-width(sprite-file($sprite, $name)) / 2) * $num;
+    $height: ceil(image-height(sprite-file($sprite, $name)) / 2) * $num;
+    $size_w: ceil(image-width(sprite-path($sprite)) / 2) * $num;
+    $size_h: ceil(image-height(sprite-path($sprite)) / 2) * $num;
+    background-image: $sprite;
+    background-position: $pos_x $pos_y;
+    background-size: $size_w $size_h;
+    height: $height;
+    width: $width;
+}
+
+@mixin bp($sprite,$name,$toRem:true){
+    $pos_x: floor(nth(sprite-position($sprite, $name), 1) / 2);
+    $pos_y: floor(nth(sprite-position($sprite, $name), 2) / 2);
+    @if $toRem {
+        $pos_x: pxTorem($pos_x);
+        $pos_y: pxTorem($pos_y);
+    }
+    background-position: $pos_x $pos_y;
+}

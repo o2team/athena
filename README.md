@@ -4,7 +4,7 @@ athena-html
 [![Code Climate](https://codeclimate.com/github/JDC-FD/athena-html/badges/gpa.svg)](https://codeclimate.com/github/JDC-FD/athena-html)
 [![Dependency Status](https://david-dm.org/o2team/athena-html.svg)](https://david-dm.org/o2team/athena-html)
 
-> JDC构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
+> O2Team构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
 > 一次安装，到处运行
 
 ## 功能一览
@@ -518,6 +518,25 @@ work_space=/Users/luckyadam/project/temp
 ```
 
 ## 部分功能使用方法
+
+### Sass的使用
+
+全局的 **sass** 库文件放置在 **公共模块gb** 的 `static/sass` 目录下，目前会自动生成一个 `_common.scss` 库，包含一些常用的mixins、变量和方法，若需引入其他库文件，请以下划线 `_` 作为文件名的开始，直接放入 `static/sass` 目录下即可，随后在代码中这样引用：
+
+需要在 `banner.scss` 中引用 `_common.scss` 中的 mixin `flexbox`
+
+```
+@import "_common";
+
+.banner {
+  background: red;
+  @include flexbox;
+}
+```
+
+若要在一个模块中引入模块私有的sass库，可以将文件放入模块的 `static/sass` 下，调用方式和上述一致。
+
+注：之前工具自动生成项目没有自动生成 `static/sass` 目录，如需使用sass库，请自动创建该目录。
 
 ### px转rem
 
