@@ -162,7 +162,7 @@ $ ath module [模块名]
 举个栗子
 
 ```
-// 一下命令将创建my和hello两个模块
+// 以下命令将创建my和hello两个模块
 ath m -b my,hello
 ```
 
