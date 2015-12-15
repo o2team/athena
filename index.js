@@ -30,10 +30,6 @@ var setting = Util.getSetting();
 
 // 数据上报
 function report (command, args, processParams, cb) {
-
-
-  console.log(123);
-  return;
   var requestParams = {
     cmd: command,
     time: new Date().getTime(),

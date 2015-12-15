@@ -1,7 +1,0 @@
-{
-  "author": "<%= conf.author %>",
-  "name": "<%= conf.pageName %>",
-  "module": "<%= conf.modName %>",
-  "date": "<%= conf.date %>",
-  "description": "<%= conf.description %>"
-}
