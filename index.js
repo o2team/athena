@@ -14,10 +14,10 @@ var chalk = require('chalk');
 var gutil = require('gulp-util');
 
 var Util = require('./lib/util');
-var App = require('./lib/create/app');
-var MModule = require('./lib/create/module');
-var Page = require('./lib/create/page');
-var Widget = require('./lib/create/widget');
+var App = require('./lib/create/task/app');
+var MModule = require('./lib/create/task/module');
+var Page = require('./lib/create/task/page');
+var Widget = require('./lib/create/task/widget');
 var builder = require('./lib/build');
 
 var rootPath = __dirname;
@@ -32,8 +32,6 @@ var setting = Util.getSetting();
 function report (command, args, processParams, cb) {
 
 
-  console.log(123);
-  return;
   var requestParams = {
     cmd: command,
     time: new Date().getTime(),
