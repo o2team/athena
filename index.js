@@ -39,20 +39,28 @@ function report (command, args, processParams, cb) {
   if (typeof processParams === 'function') {
     processParams(requestParams);
   }
-  request.post(setting.report_url + reportPath, { form: requestParams }, function (err, res, body) {
+  if (typeof cb !== 'function') {
+    cb = function () {};
+  }
+  request.post(setting.report_url + reportPath, {
+    form: requestParams,
+    timeout: 5000
+  }, function (err, res, body) {
     if (err) {
+      console.log(chalk.red('  上报失败'));
+      cb();
       return;
     }
     if (res.statusCode === 200 || res.statusCode === 201) {
       try {
         body = JSON.parse(body);
-        if (typeof cb === 'function') {
-          cb(body);
-        }
       } catch (e) {
-        console.log(e);
+        console.log(chalk.red('  上报失败'));
       }
+    } else {
+      console.log(chalk.red('  上报失败'));
     }
+    cb(body);
   });
 }
 var athenaText = fs.readFileSync(path.join(__dirname, 'athena.txt'));
@@ -108,7 +116,7 @@ program
 program
   .command('app [appName]')
   .alias('a')
-  .description('创建一个新的项目')
+  .description('创建新的项目')
   .action(function(appName) {
     var app = new App({
       appName: appName
@@ -124,7 +132,7 @@ program
         params.commonModuleId = commonModuleConf.moduleId;
         params.commonModuleName = commonModuleConf.module;
       }, function (body) {
-        if (body.no === 0) {
+        if (body && body.no === 0) {
           console.log('success');
         }
       });
@@ -141,14 +149,53 @@ program
 program
   .command('module [moduleName]')
   .alias('m')
-  .description('创建一个新的模块')
-  .action(function(moduleName) {
+  .description('创建新的模块')
+  .option('-b, --batch <modules>', '批量模块', function (val) {
+    return val.split(',');
+  })
+  .action(function(moduleName, option) {
+    if (option && option.batch) {
+      if (option.batch.map) {
+        var promises = [];
+        promises = option.batch.map(function (item) {
+          return createModule.bind(null, item);
+        });
+        promises.reduce(function (prev, curr) {
+          return prev.then(function () {
+            return curr();
+          });
+        }, Promise.resolve('start')).catch(function (e) {
+          if (e) {
+            console.log(e.plugin);
+            if (e.stack) {
+              console.log(e.stack);
+            }
+          }
+        });
+      }
+    } else {
+      if (moduleName) {
+        createModule(moduleName);
+      }
+    }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena module my');
+    console.log('    $ athena m my');
+    console.log('    $ athena m -b my,hello');
+    console.log();
+  });
+
+function createModule (moduleName) {
+  return new Promise(function (resolve, reject) {
     var mmodule = new MModule({
       moduleName: moduleName
     });
     var appConfPath = mmodule.destinationPath('app-conf.js');
     if (!fs.existsSync(appConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有app-conf.js，请检查当前目录是否是一个项目目录！'));
+      console.log(chalk.red('  出错了，当前目录没有app-conf.js，请检查当前目录是否是项目目录！'));
+      reject();
       return;
     }
     mmodule.create(function () {
@@ -162,19 +209,15 @@ program
           params.appName = appConf.app;
           params.appId = appConf.appId;
         }, function (body) {
-          if (body.no === 0) {
+          if (body && body.no === 0) {
             console.log('success');
           }
+          resolve();
         });
       }
     });
-  }).on('--help', function() {
-    console.log('  Examples:');
-    console.log('');
-    console.log('    $ athena module my');
-    console.log('    $ athena m my');
-    console.log();
   });
+}
 
 program
   .command('page [pageName]')
@@ -202,7 +245,7 @@ program
           params.appId = appConf.appId;
           params.page = argv[0];
         }, function (body) {
-          if (body.no === 0) {
+          if (body && body.no === 0) {
             console.log('success');
           }
         });
@@ -242,7 +285,7 @@ program
           params.appId = appConf.appId;
           params.widget = argv[0];
         }, function (body) {
-          if (body.no === 0) {
+          if (body && body.no === 0) {
             console.log('success');
           }
         });
