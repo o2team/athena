@@ -1,7 +1,6 @@
 #! /usr/bin/env node --harmony
 /**
  * 主入口，程序控制
- * test
  */
 
 'use strict';
@@ -117,9 +116,18 @@ program
   .command('app [appName]')
   .alias('a')
   .description('创建新的项目')
-  .action(function(appName) {
+  .option('--name [appName]', '项目名称')
+  .option('--description [appDescription]', '项目描述')
+  .option('--sass', '启用sass')
+  .option('--less', '启用less')
+  .option('--template [templateName]', '设置模板')
+  .action(function(appName, option) {
     var app = new App({
-      appName: appName
+      appName: appName || option.name,
+      description: option.description,
+      sass: option.sass,
+      less: option.less,
+      template: option.template
     });
     app.create(function () {
       var argv = [].slice.call(arguments);
@@ -150,47 +158,48 @@ program
   .command('module [moduleName]')
   .alias('m')
   .description('创建新的模块')
-  .option('-b, --batch <modules>', '批量模块', function (val) {
-    return val.split(',');
-  })
+  .option('--name [appName]', '模块名称')
+  .option('--description [moduleDescription]', '模块描述')
+  .option('--sass', '启用sass')
+  .option('--less', '启用less')
   .action(function(moduleName, option) {
-    if (option && option.batch) {
-      if (option.batch.map) {
-        var promises = [];
-        promises = option.batch.map(function (item) {
-          return createModule.bind(null, item);
+    if (moduleName) {
+      var moduleList = moduleName.split(',');
+      var promises = [];
+      promises = moduleList.map(function (item) {
+        return createModule.bind(null, item, option);
+      });
+      promises.reduce(function (prev, curr) {
+        return prev.then(function () {
+          return curr();
         });
-        promises.reduce(function (prev, curr) {
-          return prev.then(function () {
-            return curr();
-          });
-        }, Promise.resolve('start')).catch(function (e) {
-          if (e) {
-            console.log(e.plugin);
-            if (e.stack) {
-              console.log(e.stack);
-            }
+      }, Promise.resolve('start')).catch(function (e) {
+        if (e) {
+          console.log(e.plugin);
+          if (e.stack) {
+            console.log(e.stack);
           }
-        });
-      }
+        }
+      });
     } else {
-      if (moduleName) {
-        createModule(moduleName);
-      }
+      createModule(moduleName, option);
     }
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
     console.log('    $ athena module my');
     console.log('    $ athena m my');
-    console.log('    $ athena m -b my,hello');
+    console.log('    $ athena m my,hello');
     console.log();
   });
 
-function createModule (moduleName) {
+function createModule (moduleName, option) {
   return new Promise(function (resolve, reject) {
     var mmodule = new MModule({
-      moduleName: moduleName
+      moduleName: moduleName || option.name,
+      moduleDescription: option.description,
+      sass: option.sass,
+      less: option.less
     });
     var appConfPath = mmodule.destinationPath('app-conf.js');
     if (!fs.existsSync(appConfPath)) {
@@ -222,10 +231,19 @@ function createModule (moduleName) {
 program
   .command('page [pageName]')
   .alias('pa')
-  .description('创建一个新的页面')
-  .action(function(pageName) {
+  .description('创建新的页面')
+  .option('--name [pageName]', '页面名称')
+  .option('--description [pageDescription]', '页面描述')
+  .option('--sass', '启用sass')
+  .option('--less', '启用less')
+  .option('--remote [remoteName]', '选择域')
+  .action(function(pageName, option) {
     var page = new Page({
-      pageName: pageName
+      pageName: pageName || option.name,
+      description: option.description,
+      sass: option.sass,
+      less: option.less,
+      remote: option.remote
     });
     var moduleConfPath = page.destinationPath('module-conf.js');
     var appConfPath = path.join(path.resolve(page.destinationRoot(), '..'), 'app-conf.js');
@@ -262,10 +280,17 @@ program
 program
   .command('widget [widgetName]')
   .alias('w')
-  .description('创建一个新的组件')
-  .action(function(widgetName) {
+  .option('--name [widgetName]', '组件名称')
+  .option('--description [widgetDescription]', '组件描述')
+  .option('--sass', '启用sass')
+  .option('--less', '启用less')
+  .description('创建新的组件')
+  .action(function(widgetName, option) {
     var widget = new Widget({
-      widgetName: widgetName
+      widgetName: widgetName || option.name,
+      description: option.description,
+      sass: option.sass,
+      less: option.less
     });
     var moduleConfPath = widget.destinationPath('module-conf.js');
     var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
