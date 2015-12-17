@@ -69,6 +69,7 @@
     "through-gulp": "^0.3.8",
     "through2": "^2.0.0",
     "uglify-save-license": "^0.4.1",
+    "unzip": "^0.1.11",
     "uuid": "^2.0.1",
     "verror": "^1.6.0",
     "vinyl-fs": "^0.3.0",
