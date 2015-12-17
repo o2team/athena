@@ -127,7 +127,7 @@ program
       description: option.description,
       sass: option.sass,
       less: option.less,
-      template: option.template
+      tmpId: option.template
     });
     app.create(function () {
       var argv = [].slice.call(arguments);
