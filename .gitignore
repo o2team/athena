@@ -28,3 +28,4 @@ node_modules
 .DS_Store
 .config.json
 _cache.json
+.tmp
