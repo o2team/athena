@@ -329,7 +329,9 @@ program
   .alias('b')
   .description('编译项目or模块')
   .option('-a, --app [appName]', '编译项目')
-  .option('-m, --module [moduleName]', '编译模块')
+  .option('-m, --module [moduleName]', '编译模块', function (val) {
+    return val.split(',');
+  })
   .option('--verbose', '编译详细信息')
   .option('--pack', '打包功能，输出静态稿')
   .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
@@ -341,7 +343,7 @@ program
       if (typeof option.app === 'string') {
         app = option.app;
       }
-      if (typeof option.module === 'string') {
+      if (option.module && typeof option.module.sort === 'function') {
         mod = option.module;
       }
     }
@@ -360,8 +362,10 @@ program
   .alias('s')
   .description('预览项目or模块')
   .option('-a, --app [appName]', '预览项目')
-  .option('-m, --module [moduleName]', '预览模块')
-  .option('--page [moduleName]', '预览页面')
+  .option('-m, --module [moduleName]', '预览模块', function (val) {
+    return val.split(',');
+  })
+  .option('--page [pageName]', '预览页面')
   .option('--verbose', '编译详细信息')
   .option('--dist', '预览经过完整编译流程后的文件')
   .action(function (option) {
@@ -372,7 +376,7 @@ program
       if (typeof option.app === 'string') {
         app = option.app;
       }
-      if (typeof option.module === 'string') {
+      if (option.module && typeof option.module.sort === 'function') {
         mod = option.module;
       }
     }
@@ -391,7 +395,9 @@ program
   .alias('pu')
   .description('发布项目or模块，发布到预览机以及tencent/jd开发机')
   .option('-a, --app [appName]', '发布项目')
-  .option('-m, --module [moduleName]', '发布模块')
+  .option('-m, --module [moduleName]', '发布模块', function (val) {
+    return val.split(',');
+  })
   .option('-n, --noImage', '不发布图片')
   .option('--verbose', '发布详细信息')
   .action(function (option) {
@@ -402,7 +408,7 @@ program
       if (typeof option.app === 'string') {
         app = option.app;
       }
-      if (typeof option.module === 'string') {
+      if (option.module && typeof option.module.sort === 'function') {
         mod = option.module;
       }
     }
