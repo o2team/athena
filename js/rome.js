@@ -1,36 +1,9 @@
-/*
- * ROME v1.0
- * Copyright 2014 Limitless LLC
- */
-
 jQuery(document).ready(function($) {
-   'use strict';
+  'use strict';
 
-   	//Vars
+  //Vars
 	var windowHeight = $(window).height();
-	var windowWidth = $(window).width();
-
-	//Basics
-	$(".player").each(function() {
-
-		var t = $(this).attr("data-type");
-		var u = $(this).attr("data-url");
-
-		if(t==="youtube") {
-
-			var d = '<iframe width="440" height="330" src="//www.youtube.com/embed/'+ u +'?rel=0" frameborder="0" allowfullscreen></iframe>';
-			$(this).html(d);
-
-		} else if (t==="vimeo") {
-			var d = '<iframe src="//player.vimeo.com/video/'+ u + '?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff" width="440" height="330" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
-			$(this).html(d);
-
-		} else if (t==="soundcloud") {
-			var d = '<iframe width="440" height="333" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + u + '&amp;auto_play=false&amp;hide_related=false&amp;visual=true"></iframe>'
-			$(this).html(d);
-		}
-
-	});
+	var windowWidth = $(window).width();	
 
 	$(document).scroll(function() { 
 		var y = $(this).scrollTop();
@@ -42,7 +15,6 @@ jQuery(document).ready(function($) {
 			}
 		}
 	});
-	//Basics
 
 	//Navigate
 	$(".navigation li").click(function(e){
@@ -67,8 +39,7 @@ jQuery(document).ready(function($) {
 		} else {
 			var url = $(this).attr("data-url");
 			window.location = url;
-		}
-		
+		}		
 	});
 
 	$(".subscribe .arrow, footer .arrow").click(function(e){

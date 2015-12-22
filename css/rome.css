@@ -387,6 +387,20 @@
 		background-image: url(../img/blackberry.png);
 	}
 
+	.home .info div.download li.github {
+		background-image: url(../img/github.png);
+	}
+
+	.home .info div.download li.npm {
+		background-image: url(../img/npm.png);
+	}
+
+	.home .info div.download li.aotu {
+		background-image: url(../img/aotu.png);
+	}
+
+
+
 
 /* #About
 ================================================== */
