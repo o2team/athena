@@ -1,0 +1,439 @@
+/*
+* Rome V1.0
+* Copyright 2014, Limitless LLC
+* www.limitless.ma
+*/
+
+
+/* Table of Content
+==================================================
+	#Site Styles
+	#Page Styles
+	#Media Queries
+	#Font-Face */
+
+/* #Site Styles
+================================================== */
+
+/* #Page Styles
+================================================== */
+
+/* #Media Queries
+================================================== */
+
+	/* Smaller than standard 960 (devices and browsers) */
+	@media only screen and (max-width: 959px) {
+
+
+
+
+
+	}
+
+	/* Tablet Portrait size to standard 960 (devices and browsers) */
+	@media only screen and (min-width: 768px) and (max-width: 959px) {
+
+		/* #Header
+		================================================== */
+
+		header .logo {
+			margin-left: 20px;
+		}
+
+		header .navigation {
+			margin-right: 20px;
+		}
+
+		header .navigation li {
+			margin-right: 20px;
+		}
+
+
+		/* #Home
+		================================================== */
+
+		.home .phone {
+			display: none;
+		}
+
+		.home .info {
+			padding: 35px 10px 0px;
+			position: relative;
+			text-align: center;
+			width: 100% !important;
+		}
+
+		.home .info div.download li:last-child {
+			margin: 0px 0px 0px 0px;
+		}
+
+		/* #About
+		================================================== */
+
+		.about .video .media iframe {
+			width: 100%;
+		}
+
+		.about .video .info {
+			padding-left: 10px;
+		}
+
+		/* #Featured
+		================================================== */
+
+		.featured .item {
+			margin-left: 13px;
+			margin-right: 13px;
+		}
+
+		/* #Blog
+		================================================== */
+
+		.article {
+			margin: 8px auto;
+			position: relative;
+			width: 100% !important;
+		}
+
+		.article .cover {
+			width: 100%;
+		}
+
+		.article .content {
+			padding: 20px 0px;
+		}
+
+		.article .title {
+			
+		}
+
+		.article .text {
+			line-height: 26px;
+			padding: 0px 10px;
+		}
+
+		/* #Contact
+		================================================== */
+
+		.contact .form {
+			float: left;
+			padding-left: 20px;
+			width: 364px;
+		}
+
+
+
+	}
+
+	/* All Mobile Sizes (devices and browser) */
+	@media only screen and (max-width: 767px) {
+
+		/* #Basics
+		================================================== */
+		body {
+			
+		}
+
+		h1 { font-size: 36px; line-height: 56px; margin-bottom: 8px; }
+		h2 { font-size: 35px; line-height: 40px; margin-bottom: 10px; }
+		h3 { font-size: 24px; line-height: 34px; margin-bottom: 7px; }
+		h4 { font-size: 20px; line-height: 30px; margin-bottom: 4px; }
+		h5 { font-size: 17px; line-height: 24px; }
+		h6 { font-size: 14px; line-height: 21px; }
+		p {font-size: 16px; line-height: 22px;}
+
+		.title {
+			line-height: 30px;
+		}
+
+		/* #Header
+		================================================== */
+
+		header {
+			background-color: #000000 !important;
+			height: 70px;
+		}
+
+		header .logo {
+			position: absolute;
+			height: 40px;
+			width: 50%;
+			left: 10px;
+			top: 15px;
+		}
+
+		header .menu {
+			display: block;
+			position: absolute;
+			right: 10px;
+			top: 25px;
+		}
+
+		header .navigation {
+			background-color: #000000 !important;
+			display: none;
+			margin: 0px;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			right: 0px;
+			bottom: 0px;
+		}
+
+		header .navigation ul {
+			display: block;
+		}
+
+		header .navigation li {
+			color: #ffffff;
+			font-family: "Montserrat";
+			font-weight: 400;
+			font-size: 18px;
+			display: block;
+			margin: 0px auto;
+			padding: 8px 5px;
+			text-align: center;
+		}
+
+		header .navigation li:last-child {
+			border-bottom: none;
+		}
+
+
+		/* #Home
+		================================================== */
+
+		.home .phone {
+			display: none;
+		}
+
+		.home .info {
+			padding: 35px 10px 0px;
+			position: relative;
+			text-align: center;
+		}
+
+		.home .info .welcome {
+			line-height: 30px;
+			margin-bottom: 10px;
+			margin-top: 20px;
+			width: 100%;
+		}
+
+		.home .info div.download {
+			margin-top: 40px;
+		}
+
+		.home .info button {
+			padding: 10px 20px;
+		}
+
+		.home .info button.download {
+			margin-bottom: 20px;
+			margin-right: 5px;
+		}
+
+		.home .info div.download li {
+			background-size: 24px 24px;
+			height: 48px;
+			margin: 0px 15px 0px 0px;
+			width: 48px;
+		}
+
+		.home .info div.download li:last-child {
+			margin: 0px 0px 0px 0px;
+		}
+
+		/* #About
+		================================================== */
+
+		.about .story .text {
+			padding: 0px;
+		}
+
+		.about .video {
+			padding: 50px 0px;
+		}
+
+		.about .video .media iframe {
+			width: 100%;
+		}
+
+		.about .video .info {
+			margin-top: 50px !important;
+			padding-left: 0px;
+			text-align: center;
+		}
+
+		.about .video .more {
+			margin-left: 5px;
+		}
+
+
+		/* #Features
+		================================================== */
+		
+		.features .main .feature {
+			margin-bottom: 50px;
+		}
+
+		.features .more .feature {
+			text-align: center;
+		}
+
+		.features .more .feature .icon {
+			float: none;
+			margin: 0px auto 15px;
+		}
+
+		.features .more .feature .text {
+			margin-left: 0px;
+		}
+
+		/* #Reviews
+		================================================== */
+		
+		.reviews .quote blockquote {
+			width: 100%;
+		}
+
+		.reviews .flex-control-nav {
+			display: none;
+		}
+
+
+		/* #Featured
+		================================================== */
+
+		.featured .item {
+			margin: 0px auto 40px !important;
+		}
+
+		/* #Contact
+		================================================== */
+
+		.contact .offset {
+			padding: 100px 0px 75px !important;
+		}
+
+		.contact .phone {
+			display: none;
+		}
+
+		.contact .form {
+			margin-top: 0px;
+			padding-top: 0px;
+		}
+
+
+		/* #Blog
+		================================================== */
+
+		.blog .offset {
+			padding: 40px 0px;
+		}
+
+		.blog .posts {
+			padding: 0px 10px;
+		}
+
+		.blog .post .entry-title {
+			font-size: 18px;
+			line-height: 26px;
+		}
+
+		.blog .post .entry-meta span {
+			display: block;
+		}
+
+		.blog .post .entry-meta span:after {
+			content: "";
+			margin: 0px;
+		}
+
+		.article {
+			margin: 8px auto;
+			position: relative;
+			width: 100% !important;
+		}
+
+		.article .cover {
+			height: 200px;
+			width: 100%;
+		}
+
+		.article .content {
+			padding: 20px 0px;
+		}
+
+		.article .title {
+			margin-top: 95px;
+		}
+
+		.article .text {
+			line-height: 26px;
+			padding: 0px 10px;
+		}
+
+		/* #Subscribe
+		================================================== */
+
+		.subscribe .offset {
+			padding: 40px 0px 20px;
+		}
+
+		.subscribe .devider {
+			margin-top: 10px;
+		}
+
+		.subscribe .title {
+			margin: 60px auto 30px;
+		}
+
+		.subscribe .title, .subscribe .subtitle, .subscribe .form, .subscribe .form input[type=text] {
+			width: 100% !important;
+		}
+
+		.subscribe .form p {
+			float: none;
+			margin: 0px;
+		}
+
+		.subscribe .form button {
+			margin-right: 20px;
+		}
+
+		/* #Footer
+		================================================== */
+
+		footer .offset {
+			padding: 50px 0px !important;
+		}
+
+		footer .social {
+			padding-top: 0px;
+		}
+
+		footer .social li {
+			height: 40px;
+			margin: 0px 5px;
+			width: 40px;
+		}
+
+		footer .arrow {
+			margin: 0px auto 40px;
+		}
+
+	}
+
+	/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+	@media only screen and (min-width: 480px) and (max-width: 767px) {
+
+
+	}
+
+	/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+	@media only screen and (max-width: 479px) {
+
+
+	}

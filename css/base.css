@@ -1,0 +1,364 @@
+/*
+* Rome V1.0
+* Copyright 2014, Limitless LLC
+* www.limitless.ma
+*/
+
+
+
+/* Table of Content
+==================================================
+	#Reset & Basics
+	#Basic Styles
+	#Site Styles
+	#Typography
+	#Links
+	#Lists
+	#Images
+	#Buttons
+	#Forms
+	#Misc */
+
+
+/* #Reset & Basics
+================================================== */
+	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 100%;
+		font: inherit;
+		vertical-align: baseline; }
+	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+		display: block; }
+	body {
+		line-height: 1; }
+	ol, ul {
+		list-style: none; }
+	blockquote, q {
+		quotes: none; }
+	blockquote:before, blockquote:after,
+	q:before, q:after {
+		content: '';
+		content: none; }
+	table {
+		border-collapse: collapse;
+		border-spacing: 0; }
+
+
+/* #Basic Styles
+================================================== */
+	body {
+		background: #ffffff;
+		color: #777777;
+		font: 14px/21px "Montserrat", sans-serif;
+		font-weight: 400;
+		-webkit-font-smoothing: antialiased;
+		-webkit-text-size-adjust: 100%;
+ }
+
+
+/* #Typography
+================================================== */
+	h1, h2, h3, h4, h5, h6 {
+		color: #000000;
+	}
+
+	h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit; }
+	h1 { font-size: 46px; line-height: 50px; margin-bottom: 14px;}
+	h2 { font-size: 35px; line-height: 40px; margin-bottom: 10px; }
+	h3 { font-size: 30px; line-height: 34px; margin-bottom: 8px; }
+	h4 { font-size: 21px; line-height: 30px; margin-bottom: 4px; }
+	h5 { font-size: 17px; line-height: 24px; }
+	h6 { font-size: 14px; line-height: 21px; }
+	.subheader { color: #777; }
+
+	p { margin: 0 0 20px 0; }
+	p img { margin: 0; }
+	p.lead { font-size: 21px; line-height: 27px; color: #777;  }
+
+	em { font-style: italic; }
+	strong { font-weight: bold; color: #333; }
+	small { font-size: 80%; }
+
+/*	Blockquotes  */
+	blockquote, blockquote p { font-size: 17px; line-height: 24px; color: #777; font-style: italic; }
+	blockquote { margin: 0 0 20px; padding: 9px 20px 0 19px; border-left: 1px solid #ddd; }
+	blockquote cite { display: block; font-size: 12px; color: #555; }
+	blockquote cite:before { content: "\2014 \0020"; }
+	blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: #555; }
+
+	hr { border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
+
+
+/* #Links
+================================================== */
+	a, a:visited { color: #333; text-decoration: underline; outline: 0; }
+	a:hover, a:focus { color: #000; }
+	p a, p a:visited { line-height: inherit; }
+
+
+/* #Lists
+================================================== */
+	ul, ol { margin-bottom: 20px; }
+	ul { list-style: none outside; }
+	ol { list-style: decimal; }
+	ol, ul.square, ul.circle, ul.disc { margin-left: 30px; }
+	ul.square { list-style: square outside; }
+	ul.circle { list-style: circle outside; }
+	ul.disc { list-style: disc outside; }
+	ul ul, ul ol,
+	ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 90%;  }
+	ul ul li, ul ol li,
+	ol ol li, ol ul li { margin-bottom: 6px; }
+	li { line-height: 18px; margin-bottom: 12px; }
+	ul.large li { line-height: 21px; }
+	li p { line-height: 21px; }
+
+/* #Images
+================================================== */
+
+	img.scale-with-grid {
+		max-width: 100%;
+		height: auto; }
+
+
+/* #Buttons
+================================================== */
+
+	.button,
+	button,
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"] {
+		background-color: #45a593;
+		border: none;
+		border-radius: 3px;
+		color: #ffffff;
+		cursor: pointer;
+		display: inline-block;
+		font-family: "Montserrat";
+		font-size: 14px;
+		font-weight: 700; 
+		height: 50px;
+		outline:none;
+		padding: 0px 35px;
+		text-transform: uppercase;
+		-webkit-transition: all .5s ease 0;
+		-moz-transition: all .5s ease 0;
+		-ms-transition: all .5s ease 0;
+		-o-transition: all .5s ease 0;
+		transition: all .5s ease 0;
+	}
+
+	.button:hover,
+	button:hover,
+	input[type="submit"]:hover,
+	input[type="reset"]:hover,
+	input[type="button"]:hover {
+		background-color: #313338;
+		color: #ffffff;
+	}
+
+	.button:active,
+	button:active,
+	input[type="submit"]:active,
+	input[type="reset"]:active,
+	input[type="button"]:active {
+		background-color: #313338;
+		color: #eeeeee;
+	}
+
+	.button.full-width,
+	button.full-width,
+	input[type="submit"].full-width,
+	input[type="reset"].full-width,
+	input[type="button"].full-width {
+		width: 100%;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		text-align: center; }
+
+	/* Fix for odd Mozilla border & padding issues */
+	button::-moz-focus-inner,
+	input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+	}
+
+
+/* #Forms
+================================================== */
+
+	form {
+		margin-bottom: 20px; 
+	}
+
+	fieldset {
+		margin-bottom: 20px; 
+	}
+
+	input[type="text"],
+	input[type="password"],
+	input[type="email"],
+	textarea,
+	select {
+		background-color: transparent;
+		border: 1px solid #cccccc;
+		border-radius: 3px;
+		color: #cccccc;
+		font-family: "Montserrat";
+		font-size: 15px;
+		font-weight: 400;
+		margin-bottom: 20px;
+		outline: none;
+		padding: 20px;
+		width: 100%;
+		-webkit-transition: all .5s ease 0;
+		-moz-transition: all .5s ease 0;
+		-ms-transition: all .5s ease 0;
+		-o-transition: all .5s ease 0;
+		transition: all .5s ease 0;
+	}
+
+	input[type="text"],
+	input[type="password"],
+	input[type="email"] {
+		height: 50px;
+	}
+
+	input[type="text"]::-webkit-input-placeholder { color: #cccccc; }
+	input[type="text"]::-moz-placeholder { color: #cccccc; }
+	input[type="text"]:-ms-input-placeholder { color: #cccccc; }
+	input[type="text"]:-moz-placeholder { color: #cccccc; }
+
+	input[type="text"]:focus,
+	input[type="password"]:focus,
+	input[type="email"]:focus,
+	textarea:focus {
+		border: 1px solid #666666;
+		color: #666666;
+	}
+
+	textarea {
+		height: 170px;
+		padding-top: 10px;
+		resize: none;
+	}
+
+	textarea::-webkit-input-placeholder { color: #cccccc; }
+	textarea::-moz-placeholder { color: #cccccc; }
+	textarea:-ms-input-placeholder { color: #cccccc; }
+	textarea:-moz-placeholder { color: #cccccc; }
+
+	select {
+		padding: 0; 
+	}
+
+	label, legend {
+		display: block;
+		font-weight: bold;
+		font-size: 13px;  
+	}
+
+	select {
+		width: 220px; 
+	}
+
+	input[type="checkbox"] {
+		display: inline; 
+	}
+
+	label span, legend span {
+		font-weight: normal;
+		font-size: 13px;
+		color: #444; 
+	}
+
+/* #Misc
+================================================== */
+
+	section {
+		background-color: #ffffff;
+		text-align: center;
+		z-index: 1 !important;
+	}
+
+	.overlay {
+		bottom: 0px;
+		left: 0px;
+	    position: absolute;
+	    right: 0px;
+	    top: 0px;
+	}
+
+	.offset {
+		padding: 100px 0px;
+	}
+
+	.wrapper {	
+		position: relative;
+		width: 100%;
+		overflow: hidden !important;
+
+	}
+
+	.center {
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.devider {
+		background-color: #25292c;
+		height: 1px;
+		margin-bottom: 75px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 20px;
+		width: 100px;
+	}
+
+	.title {
+		color: #25292c;
+		font-size: 20px;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	.subtitle {
+		color: #a5a6a6;
+		font-size: 16px;
+		margin-top: 12px;
+	}
+
+	a.more {
+		background-image: url(../img/more.png);
+		background-position: right center;
+		background-repeat: no-repeat;
+		background-size: 6px 9px;
+		color: #000000;
+		font-size: 13px;
+		font-weight: bold;
+		padding-right: 10px;
+		text-decoration: none;
+		text-transform: uppercase;
+		-webkit-transition: all .3s ease 0;
+		-moz-transition: all .3s ease 0;
+		-ms-transition: all .3s ease 0;
+		-o-transition: all .3s ease 0;
+		transition: all .3s ease 0;
+	}
+
+	a.more:hover {
+		opacity: 0.8;
+		text-decoration: underline;
+	}
+
+	.alignleft { text-align: left; }
+
+	.alignright { text-align: right; }
+
+	.floatleft { float: left; }
+
+	.floatright { float: right; }
