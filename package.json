@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "O2前端流程工具",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/o2team/athena-html.git"
+    "url": "git+https://github.com/o2team/athena.git"
   },
   "keywords": [
     "build"
@@ -20,9 +20,9 @@
     "athena": "index.js"
   },
   "bugs": {
-    "url": "https://github.com/o2team/athena-html/issues"
+    "url": "https://github.com/o2team/athena/issues"
   },
-  "homepage": "https://github.com/o2team/athena-html#readme",
+  "homepage": "https://github.com/o2team/athena#readme",
   "dependencies": {
     "archiver": "^0.16.0",
     "autoprefixer": "^6.0.1",
