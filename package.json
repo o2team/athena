@@ -1,0 +1,31 @@
+{
+  "name": "athena",
+  "version": "1.0.0",
+  "description": "Athena site",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o2team/athena.git"
+  },
+  "keywords": [
+    "athena"
+  ],
+  "author": "sky cai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/o2team/athena/issues"
+  },
+  "homepage": "https://github.com/o2team/athena#readme",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat-css": "^2.2.0",
+    "gulp-csso": "^1.0.1",
+    "gulp-imagemin": "^2.4.0",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-uglify": "^1.5.1",
+    "imagemin-pngquant": "^4.2.0"
+  }
+}
