@@ -27,5 +27,13 @@
     "gulp-load-plugins": "^1.1.0",
     "gulp-uglify": "^1.5.1",
     "imagemin-pngquant": "^4.2.0"
+  },
+  "devDependencies": {
+    "express": "^4.13.3",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-favicons": "^2.2.3",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-task-loader": "github:mamboer/gulp-task-loader"
   }
 }
