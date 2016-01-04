@@ -399,6 +399,7 @@ program
     return val.split(',');
   })
   .option('-n, --noImage', '不发布图片')
+  .option('--pack', '打包功能，输出静态稿')
   .option('--verbose', '发布详细信息')
   .action(function (option) {
     var app = null;
