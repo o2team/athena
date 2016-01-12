@@ -59,7 +59,7 @@
     "mkdirp": "^0.5.1",
     "path-exists": "^2.0.0",
     "path-is-absolute": "^1.0.0",
-    "postcss-athena-spritesmith": "0.0.3",
+    "postcss-athena-spritesmith": "latest",
     "postcss-pxtorem": "^3.0.0",
     "request": "^2.61.0",
     "require-dir": "^0.3.0",
