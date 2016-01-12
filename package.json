@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "description": "O2前端流程工具",
   "main": "index.js",
   "scripts": {
