@@ -16,8 +16,8 @@
   "author": "luckyadam",
   "license": "MIT",
   "bin": {
-    "ath": "index.js",
-    "athena": "index.js"
+    "ath": "bin/athena",
+    "athena": "bin/athena"
   },
   "bugs": {
     "url": "https://github.com/o2team/athena/issues"
@@ -64,7 +64,6 @@
     "request": "^2.61.0",
     "require-dir": "^0.3.0",
     "ssh2": "^0.4.11",
-    "through-gulp": "^0.3.8",
     "through2": "^2.0.0",
     "uglify-js": "^2.6.1",
     "uglify-save-license": "^0.4.1",
