@@ -468,8 +468,19 @@ program
   .description('列出配置项')
   .action(function () {
     var config = Util.getConfig();
+    console.log('  配置地址：' + path.join(rootPath, '.config.json'));
     for (var i in config) {
       console.log('  ' + i + '=' + config[i]);
+    }
+  });
+program
+  .command('list-setting')
+  .description('列出设置项')
+  .action(function () {
+    var setting = Util.getSetting();
+    console.log('  设置地址：' + path.join(rootPath, '.setting.json'));
+    for (var i in setting) {
+      console.log('  ' + i + '=' + setting[i]);
     }
   });
 
