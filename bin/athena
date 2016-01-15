@@ -62,8 +62,12 @@ function report (command, args, processParams, cb) {
     cb(body);
   });
 }
-var athenaText = fs.readFileSync(path.join(rootPath, 'athena.txt'));
-console.log(gutil.colors.blue(String(athenaText)));
+
+function printAthena () {
+  var athenaText = fs.readFileSync(path.join(rootPath, 'athena.txt'));
+  console.log(gutil.colors.blue(String(athenaText)));
+}
+
 program
   .version('0.0.1');
 
@@ -493,5 +497,6 @@ program
 program.parse(process.argv);
 
 if (!process.argv.slice(2).length) {
+  printAthena();
   program.outputHelp();
 }
