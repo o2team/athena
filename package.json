@@ -53,7 +53,7 @@
     "jsftp-mkdirp": "^1.0.0",
     "jshint": "^2.8.0",
     "lodash": "^3.10.1",
-    "maltose": "0.0.1",
+    "maltose": "latest",
     "mem-fs": "^1.1.0",
     "mem-fs-editor": "^2.0.4",
     "mkdirp": "^0.5.1",
