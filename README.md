@@ -49,10 +49,9 @@ $ [sudo] npm install -g athena-html
 $ [sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node
 ```
 
-目前已支持**sass/less**文件的编译，使用**sass**需要使用ruby安装**sass**和**compass**
+目前已支持**sass/less**文件的编译，使用**sass**需要使用ruby安装**compass**
 
 ```
-$ [sudo] gem install sass
 $ [sudo] gem install compass
 ```
 由于墙的缘故（你懂的），原始的gen源[https://rubygems.org/](https://rubygems.org/)几乎无法使用，建议将gem源替换成淘宝的源
@@ -586,15 +585,24 @@ $ athena list-config
 将会得到如下输出
 
 ```
-  ___  _   _
- / _ \| | | |
-/ /_\ \ |_| |__   ___ _ __   __ _
-|  _  | __| '_ \ / _ \ '_ \ / _` |
-| | | | |_| | | |  __/ | | | (_| |
-\_| |_/\__|_| |_|\___|_| |_|\__,_|
-
+配置地址：/Users/luckyadam/project/jdc/athena-html/.config.json
 user_name=luckyadam
 work_space=/Users/luckyadam/project/temp
+```
+
+### athena list-setting
+
+可以列出Athena设置
+
+```
+$ athena list-setting
+```
+
+将会得到如下输出
+
+```
+设置地址：/Users/luckyadam/project/jdc/athena-html/.setting.json
+report_url=http://aotu.jd.com/athena
 ```
 
 ## 部分功能使用方法
