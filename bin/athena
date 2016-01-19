@@ -41,26 +41,26 @@ function report (command, args, processParams, cb) {
   if (typeof cb !== 'function') {
     cb = function () {};
   }
-  // request.post(setting.report_url + reportPath, {
-  //   form: requestParams,
-  //   timeout: 5000
-  // }, function (err, res, body) {
-  //   if (err) {
-  //     console.log(chalk.red('  上报失败'));
-  //     cb();
-  //     return;
-  //   }
-  //   if (res.statusCode === 200 || res.statusCode === 201) {
-  //     try {
-  //       body = JSON.parse(body);
-  //     } catch (e) {
-  //       console.log(chalk.red('  上报失败'));
-  //     }
-  //   } else {
-  //     console.log(chalk.red('  上报失败'));
-  //   }
-  //   cb(body);
-  // });
+  request.post(setting.report_url + reportPath, {
+    form: requestParams,
+    timeout: 5000
+  }, function (err, res, body) {
+    if (err) {
+      console.log(chalk.red('  上报失败'));
+      cb();
+      return;
+    }
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.log(chalk.red('  上报失败'));
+      }
+    } else {
+      console.log(chalk.red('  上报失败'));
+    }
+    cb(body);
+  });
 }
 
 function printAthena () {
