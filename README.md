@@ -320,8 +320,13 @@ $ ath w --name topbar --sass --description 测试
 
 module.exports = {
   app: 'qwd', // 项目名称
+  appId: 'd562b930-be56-11e5-8027-b52041f428b5', // 项目ID
+  description: 'demo',
+  platform: 'pc', // 平台 pc or mobile
   common: 'gb', // 公共模块
   moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过athena module命令生成模块时会自动往此处添加新模块名
+  tmpId: 'default', // 选用模板
+  useShtml: true, // 是否启用页面片
   deploy: {  // 需要发布时的配置
     local: { // 不涉及到部署至哪台机器
       fdPath: '/' // 需要放置的目录
@@ -333,7 +338,19 @@ module.exports = {
       port: 21, // 端口
       fdPath: '/h5/', // 需要放置的目录
       domain: 'labs.qiang.it', // 机器域名
-      remotePath: '/labs.qiang.it/h5/qwd/frs' // 上传到的目录
+      remotePath: '/labs.qiang.it/h5/qwd' // 上传到的目录
+    },
+    jdcfinder: { // jdcfinder
+      mode: 'http',
+      host: 'jdcfinder',
+      user: '',
+      pass: '',
+      fdPath: '/fd/h5/',
+      domain: 'jdc.jd.com',
+      remotePath: '/fd/h5/nima', // 上传代码的目录
+      cssi: '/sinclude/cssi/fd/h5/qwd', // 上传页面片的目录
+      assestPrefix: '/fd/h5/qwd', // 发布完静态资源后，静态资源路径
+      shtmlPrefix: '/sinclude/cssi/fd/h5/qwd' // 发布完页面片后，静态资源路径
     },
     jdTest: {
       host: '192.168.193.32',
@@ -342,22 +359,10 @@ module.exports = {
       port: 22,
       fdPath: '/fd/h5/',
       domain: 's.paipaiimg.com',
-      remotePath: '/export/paipai/resource/static/fd/h5/hellokity',
+      remotePath: '/export/paipai/resource/static/fd/h5/hellokity', // 上传代码的目录
       cssi: '/export/paipai/resource/sinclude/cssi/fd/h5/hellokity', // 上传页面片的目录
       assestPrefix: '/static/fd/h5/hellokity', // 发布完静态资源后，静态资源路径
       shtmlPrefix: '/sinclude/cssi/fd/h5/hellokity' // 发布完页面片后，静态资源路径
-    },
-    tencent: {
-      host: '172.25.34.21',
-      user: '',
-      pass: '',
-      port: 21,
-      fdPath: '/fd/h5/',
-      domain: 'static.paipaiimg.com',
-      remotePath: '/newforward/static/fd/h5/hellokity',
-      cssi: '/newforward/static/sinclude/cssi/fd/h5/hellokity',
-      assestPrefix: '/static/fd/h5/hellokity',
-      shtmlPrefix: '/static/sinclude/cssi/fd/h5/hellokity'
     }
   }
 };
@@ -387,6 +392,22 @@ module.exports = {
     },
     jshint: {
       enable: true //是否开启
+    },
+    imagemin: { // 图片压缩的配置
+      exclude: ['banner.png'] // 图片压缩排除的图片
+    },
+    autoprefixer: { // 自动前缀的配置
+      pc: [
+      	'last 3 versions',
+      	'Explorer >= 8',
+      	'Chrome >= 21',
+        'Firefox >= 1',
+        'Edge 13'
+      ],
+      mobile: [
+      	'Android >= 4',
+      	'iOS >= 6'
+      ]
     },
     px2rem: {  // px转rem配置
       enable: false,  // 是否开启
@@ -626,9 +647,76 @@ report_url=http://aotu.jd.com/athena
 
 注：之前工具自动生成项目没有自动生成 `static/sass` 目录，如需使用sass库，请自动创建该目录。
 
+### 图片压缩
+
+目前主要针对png图片进行压缩，使用 [pngquant](https://pngquant.org/) 内核。我们可以选择**排除**掉不需要压缩的图片，配置`module-conf.js`里面的 `support` 中的 `imagemin` 属性如下即可：
+
+```javascript
+support : {  
+  imagemin: {
+    exclude: ['banner.png']
+  }
+}
+```
+
+### autoprefixer
+
+我们提供了为CSS属性自动添加前缀的功能，同时区分了 **移动端** 和 **pc** 端，在`module-conf.js`中配置如下：
+
+```javascript
+support : {  
+  autoprefixer: {
+    pc: [
+      'last 3 versions',
+      'Explorer >= 8',
+      'Chrome >= 21',
+      'Firefox >= 1',
+      'Edge 13'
+    ],
+    mobile: [
+      'Android >= 4',
+      'iOS >= 6'
+    ]
+  }
+}
+```
+
+在编译的时候会自动读取 **项目配置** **app-conf.js** 中的配置 `platform` 来决定是 `pc` 还是 `mobile`，例如如下代码
+
+```css
+.banner {
+  transform: rotate(45deg);
+  font-size: 50px;
+}
+```
+
+在不同 `platform` 下将输出如下：
+
+**pc**
+
+```css
+.banner {
+  -webkit-transform: rotate(45deg);
+     -moz-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+  font-size: 50px;
+}
+```
+
+**mobile**
+
+```css
+.banner {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  font-size: 50px;
+}
+```
+
 ### px转rem
 
-自动将`px`转成`rem`，需要配置`module-conf.js`里面的`support`属性如下即可：
+自动将`px`转成`rem`，需要配置`module-conf.js`里面的 `support` 中的 `px2rem` 属性如下即可：
 
 ```javascript
 support : {  
