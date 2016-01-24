@@ -329,6 +329,48 @@ program
   });
 
 program
+  .command('delete')
+  .alias('del')
+  .option('-a, --app [appName]', '项目名称')
+  .option('-m, --module [moduleName]', '模块名称')
+  .option('-p, --page [pageName]', '模块名称')
+  .option('-w, --widget [widgetName]', '组件名称')
+  .description('删除操作')
+  .action(function (option) {
+    var appName = option.app;
+    var moduleName = option.module;
+    var pageName = option.page;
+    var widgetName = option.widget;
+    if (!appName && !moduleName && !pageName && !widgetName) {
+      console.log(chalk.red('  请输入参数！'));
+      console.log();
+      console.log(chalk.red('  通过命令 ath del -h 可查看帮助'));
+      console.log();
+    } else {
+      // 判断当前是否是项目路径
+      
+      if (!appName) {
+        console.log(chalk.red('  必须告知项目名！'));
+        return;
+      }
+
+      if (pageName || widgetName) {
+        if (!moduleName) {
+          console.log(chalk.red('  必须告知模块名！'));
+          return;
+        }
+
+      }
+    }
+  }).on('--help', function () {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena delete -a cx');
+    console.log('    $ athena delete -m tz');
+    console.log();
+  });
+
+program
   .command('build')
   .alias('b')
   .description('编译项目or模块')

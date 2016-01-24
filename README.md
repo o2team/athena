@@ -326,7 +326,10 @@ module.exports = {
   common: 'gb', // 公共模块
   moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过athena module命令生成模块时会自动往此处添加新模块名
   tmpId: 'default', // 选用模板
-  useShtml: true, // 是否启用页面片
+  shtml: {  //页面片配置
+    use: true, //是否使用
+    needCombo: true // 页面片中链接是否合并
+  },
   deploy: {  // 需要发布时的配置
     local: { // 不涉及到部署至哪台机器
       fdPath: '/' // 需要放置的目录
