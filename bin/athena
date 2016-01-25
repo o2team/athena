@@ -69,7 +69,7 @@ function printAthena () {
 }
 
 program
-  .version('0.0.1');
+  .version(Util.getPkgInfo().version);
 
 program
   .command('init [url]')
@@ -348,7 +348,7 @@ program
       console.log();
     } else {
       // 判断当前是否是项目路径
-      
+
       if (!appName) {
         console.log(chalk.red('  必须告知项目名！'));
         return;
