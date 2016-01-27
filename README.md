@@ -562,6 +562,12 @@ $ athena serve --page [页面名]
 $ ath s -m [模块名] --page [页面名]
 ```
 
+同时你可以通过传入参数来决定你需要编译的模块，[模块名]参数指定模块，可以包含多个模块，多模块间使用 `,` 进行分隔
+
+```
+$ ath s -m gb,home
+```
+
 携带参数``--dist``将可以预览经过完整编译流程后生成的文件
 
 **建议只serve当前正在修改的模块，因为只serve模块的话会快很多**
@@ -596,6 +602,33 @@ $ ath pu -m [模块名]
 
 ```
 $ athena clone --from [来源模块] --widget [widget名字]
+```
+
+### athena clear
+
+清除缓存，目前缓存包含 **模板文件** 、 **发布时的缓存文件**
+
+若出现模板拉取获取项目发布存在问题，可尝试清除缓存来解决。
+
+使用方式
+
+```
+$ athena clear
+```
+清除模板文件缓存
+
+```
+$ athena clear --template
+// 简写
+$ athena clear -t
+```
+
+清除发布时的缓存文件
+
+```
+$ athena clear --publish
+// 简写
+$ athena clear -p
 ```
 
 ### athena list-config
