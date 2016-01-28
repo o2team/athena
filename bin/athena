@@ -12,6 +12,7 @@ var program = require('commander');
 var chalk = require('chalk');
 var gutil = require('gulp-util');
 var del = require('del');
+var _ = require('lodash');
 
 var Util = require('../lib/util');
 var App = require('../lib/create/task/app');
@@ -20,18 +21,20 @@ var Page = require('../lib/create/task/page');
 var Widget = require('../lib/create/task/widget');
 var builder = require('../lib/build');
 
-var reportPath = '/api/commands';
+var addReportPath = '/api/commands';
+var deleteReportPath = '/api/delete';
 var userHome = Util.homedir();
 var userName = process.env.USER || path.basename(userHome);
 var config = Util.getConfig();
 var setting = Util.getSetting();
 
 // 数据上报
-function report (command, args, processParams, cb) {
+function report (command, reportPath, args, processParams, cb) {
   var requestParams = {
     cmd: command,
     time: new Date().getTime(),
     user: Util.getConfig().user_name,
+    author: Util.getConfig().user_name,
     args: args
   };
   if (typeof processParams === 'function') {
@@ -134,7 +137,7 @@ program
     });
     app.create(function () {
       var argv = [].slice.call(arguments);
-      report('app', argv, function (params) {
+      report('app', addReportPath, argv, function (params) {
         var appConfPath = app.destinationPath(argv[0], 'app-conf.js');
         var commonModuleConfPath = app.destinationPath(argv[0], 'gb', 'module-conf.js');
         var commonModuleConf = require(commonModuleConfPath);
@@ -214,7 +217,7 @@ function createModule (moduleName, option) {
       var argv = [].slice.call(arguments);
       var appConf = require(appConfPath);
       if (appConf) {
-        report('module', argv, function (params) {
+        report('module', addReportPath, argv, function (params) {
           var moduleConfPath = mmodule.destinationPath(argv[0], 'module-conf.js');
           params.moduleName = argv[0];
           params.moduleId = require(moduleConfPath).moduleId;
@@ -259,7 +262,7 @@ program
       var appConf = require(appConfPath);
       var moduleConf = require(moduleConfPath);
       if (appConf) {
-        report('page', argv, function (params) {
+        report('page', addReportPath, argv, function (params) {
           params.moduleName = moduleConf.module;
           params.moduleId = moduleConf.moduleId;
           params.appName = appConf.app;
@@ -306,7 +309,7 @@ program
       var appConf = require(appConfPath);
       var moduleConf = require(moduleConfPath);
       if (appConf) {
-        report('widget', argv, function (params) {
+        report('widget', addReportPath, argv, function (params) {
           params.moduleName = moduleConf.module;
           params.moduleId = moduleConf.moduleId;
           params.appName = appConf.app;
@@ -346,20 +349,103 @@ program
       console.log(chalk.red('  通过命令 ath del -h 可查看帮助'));
       console.log();
     } else {
-      // 判断当前是否是项目路径
-
-      if (!appName) {
-        console.log(chalk.red('  必须告知项目名！'));
-        return;
-      }
-
-      if (pageName || widgetName) {
+      // 判断当前是否是项目路径或模块路径
+      var cwd = process.cwd();
+      var appConfPath = path.join(cwd, 'app-conf.js');
+      var moduleConfPath = path.join(cwd, 'module-conf.js');
+      var deleteTypes = [];
+      var deletePlace = '';
+      var appConf = null;
+      var moduleConf = null;
+      if (Util.existsSync(appConfPath)) { // 项目根目录
         if (!moduleName) {
-          console.log(chalk.red('  必须告知模块名！'));
+          console.log(chalk.red('  在项目目录下，必须告知模块名！'));
           return;
         }
+        appConf = require(appConfPath);
 
+        moduleConfPath = path.join(cwd, moduleName, 'module-conf.js');
+        if (!Util.existsSync(moduleConfPath)) {
+          console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
+          return;
+        }
+        moduleConf = require(moduleConfPath);
+        deletePlace = 'app';
+        // 删除模块
+        if (!pageName && !widgetName) {
+          deleteTypes.push('mod');
+        } else {
+          if (pageName) {
+            deleteTypes.push('page');
+          }
+          if (widgetName) {
+            deleteTypes.push('widget');
+          }
+        }
+      } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
+        if (!pageName && !widgetName) {
+          console.log(chalk.red('  在模块目录下，必须告页面名或组件名！'));
+          return;
+        }
+        appConf = require(path.join(path.relative(cwd, '..'), 'app-conf'));
+        moduleConf = require(moduleConfPath);
+        deletePlace = 'module';
+        if (pageName) {
+          deleteTypes.push('page');
+        }
+        if (widgetName) {
+          deleteTypes.push('widget');
+        }
+      } else {
+        if (!appName) {
+          console.log(chalk.red('  请输入项目名！'));
+          return;
+        }
+        var appPath = path.join(cwd, appName);
+        // 项目外删除
+        if (Util.existsSync(appPath)) {
+          deletePlace = 'outside';
+          appConf = require(path.join(appPath, 'app-conf'));
+          if (!moduleName && !pageName && !widgetName) {
+            deleteTypes.push('app');
+          } else {
+            if (!moduleName) {
+              console.log(chalk.red('  请输入模块名！'));
+              return;
+            } else {
+              moduleConfPath = path.join(appPath, moduleName, 'module-conf.js');
+              if (!Util.existsSync(moduleConfPath)) {
+                console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
+                return;
+              }
+              moduleConf = require(moduleConfPath);
+              if (!pageName && !widgetName) {
+                deleteTypes.push('mod');
+              } else {
+                if (pageName) {
+                  deleteTypes.push('page');
+                }
+                if (widgetName) {
+                  deleteTypes.push('widget');
+                }
+              }
+            }
+          }
+        } else {
+          console.log(chalk.red('  没有找到相应项目，请检查当前目录是否符合规范！'));
+          return;
+        }
       }
+      deleteOperation({
+        deleteTypes: deleteTypes,
+        deletePlace: deletePlace,
+        appName: appName,
+        moduleName: moduleName,
+        pageName: pageName,
+        widgetName: widgetName,
+        appConf: appConf,
+        moduleConf: moduleConf
+      });
     }
   }).on('--help', function () {
     console.log('  Examples:');
@@ -368,6 +454,92 @@ program
     console.log('    $ athena delete -m tz');
     console.log();
   });
+
+function deleteOperation (deleteObj) {
+  console.log(deleteObj);
+  if (!deleteObj) {
+    return;
+  }
+  var cwd = process.cwd();
+  switch (deleteObj.deletePlace) {
+    case 'outside':
+      cwd = path.join(cwd, deleteObj.appName);
+      deleteSth(cwd, deleteObj);
+      break;
+    case 'app':
+      deleteSth(cwd, deleteObj);
+      break;
+    case 'module':
+      cwd = path.resolve(cwd, '..');
+      deleteSth(cwd, deleteObj);
+      break;
+  }
+}
+
+function deleteSth (cwd, deleteObj) {
+  if (deleteObj.deleteTypes.indexOf('app') >= 0) { //删除项目
+    deleteAtomic('app', '是否删除项目' + deleteObj.appName, cwd, null, function (params) {
+      params.app = deleteObj.appConf.appId;
+    });
+  } else if (deleteObj.deleteTypes.indexOf('mod') >= 0) {
+    deleteAtomic('module', '是否删除模块' + deleteObj.moduleName, path.join(cwd, deleteObj.moduleName),
+      function () {
+        var appConfFile = fs.readFileSync(path.join(cwd, 'app-conf.js'));
+        var appConfStr = String(appConfFile);
+        var appConfStrLines = appConfStr.split('\n');
+        var moduleList = deleteObj.appConf.moduleList;
+        var moduelIndex = moduleList.indexOf(deleteObj.moduleName);
+        if (moduelIndex >= 0) {
+          moduleList.splice(moduelIndex, 1);
+          for (var i = 0; i < appConfStrLines.length; i++) {
+            var line = appConfStrLines[i];
+            if (line.indexOf('moduleList') >= 0) {
+              appConfStrLines[i] = appConfStrLines[i].replace(/\[([\w,\,]*)\]/, function () {
+                return '[' + moduleList.toString() + ']';
+              });
+            }
+          }
+          fs.writeFileSync(path.join(cwd, 'app-conf.js'), appConfStrLines.join('\n'));
+        }
+      }, function (params) {
+        params.mod = deleteObj.moduleConf.moduleId;
+      });
+  } else {
+    if (deleteObj.deleteTypes.indexOf('page') >= 0) {
+      deleteAtomic('page', '是否删除页面' + deleteObj.pageName, path.join(cwd, deleteObj.moduleName, 'page', deleteObj.pageName), null, function (params) {
+        params.mod = deleteObj.moduleConf.moduleId;
+        params.page = deleteObj.pageName;
+      });
+    }
+
+    if (deleteObj.deleteTypes.indexOf('widget') >= 0) {
+      deleteAtomic('page', '是否删除组件' + deleteObj.widgetName, path.join(cwd, deleteObj.moduleName, 'widget', deleteObj.widgetName), null, function (params) {
+        params.mod = deleteObj.moduleConf.moduleId;
+        params.widget = deleteObj.widgetName;
+      });
+    }
+  }
+}
+
+function deleteAtomic (cmd, confirmTip, delelePath, deleteCb, processParamsCb) {
+  inquirer.prompt([{
+    type: 'confirm',
+    name: 'confirmDelete',
+    message: confirmTip,
+    default: false
+  }], function (answers) {
+    if (answers.confirmDelete) {
+      del.sync(delelePath, {force: true});
+      if (_.isFunction(deleteCb)) {
+        deleteCb();
+      }
+      console.log();
+      console.log(chalk.green('  删除成功！'));
+      console.log();
+      report(cmd, deleteReportPath, undefined, processParamsCb);
+    }
+  });
+}
 
 program
   .command('build')
@@ -461,7 +633,7 @@ program
     builder.publish(app, mod, option).then(function (argv) {
       var args = argv.files;
       if (argv.appConf) {
-        report('publish', args, function (params) {
+        report('publish', addReportPath, args, function (params) {
           params.app = argv.appConf.appId;
         });
       }
