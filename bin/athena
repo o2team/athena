@@ -343,7 +343,8 @@ program
     var moduleName = option.module;
     var pageName = option.page;
     var widgetName = option.widget;
-    if (!appName && !moduleName && !pageName && !widgetName) {
+    if (typeof(appName) !== 'string' && typeof(moduleName) !== 'string'
+      && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
       console.log(chalk.red('  请输入参数！'));
       console.log();
       console.log(chalk.red('  通过命令 ath del -h 可查看帮助'));
@@ -358,7 +359,7 @@ program
       var appConf = null;
       var moduleConf = null;
       if (Util.existsSync(appConfPath)) { // 项目根目录
-        if (!moduleName) {
+        if (typeof(moduleName) !== 'string') {
           console.log(chalk.red('  在项目目录下，必须告知模块名！'));
           return;
         }
@@ -372,32 +373,48 @@ program
         moduleConf = require(moduleConfPath);
         deletePlace = 'app';
         // 删除模块
-        if (!pageName && !widgetName) {
+        if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
           deleteTypes.push('mod');
         } else {
-          if (pageName) {
+          if (typeof(pageName) === 'string') {
+            if (!Util.existsSync(path.join(cwd, moduleName, 'page', pageName))) {
+              console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+              return;
+            }
             deleteTypes.push('page');
           }
-          if (widgetName) {
+          if (typeof(widgetName) === 'string') {
+            if (!Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName))) {
+              console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
+              return;
+            }
             deleteTypes.push('widget');
           }
         }
       } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
-        if (!pageName && !widgetName) {
+        if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
           console.log(chalk.red('  在模块目录下，必须告页面名或组件名！'));
           return;
         }
-        appConf = require(path.join(path.relative(cwd, '..'), 'app-conf'));
+        appConf = require(path.join(path.resolve(cwd, '..'), 'app-conf'));
         moduleConf = require(moduleConfPath);
         deletePlace = 'module';
-        if (pageName) {
+        if (typeof(pageName) === 'string') {
+          if (!Util.existsSync(path.join(cwd, 'page', pageName))) {
+            console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+            return;
+          }
           deleteTypes.push('page');
         }
-        if (widgetName) {
+        if (typeof(widgetName) === 'string') {
+          if (!Util.existsSync(path.join(cwd, 'widget', widgetName))) {
+            console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
+            return;
+          }
           deleteTypes.push('widget');
         }
       } else {
-        if (!appName) {
+        if (typeof(appName) !== 'string') {
           console.log(chalk.red('  请输入项目名！'));
           return;
         }
@@ -406,10 +423,11 @@ program
         if (Util.existsSync(appPath)) {
           deletePlace = 'outside';
           appConf = require(path.join(appPath, 'app-conf'));
-          if (!moduleName && !pageName && !widgetName) {
+          if (typeof(moduleName) !== 'string'
+            && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
             deleteTypes.push('app');
           } else {
-            if (!moduleName) {
+            if (typeof(moduleName) !== 'string') {
               console.log(chalk.red('  请输入模块名！'));
               return;
             } else {
@@ -419,13 +437,21 @@ program
                 return;
               }
               moduleConf = require(moduleConfPath);
-              if (!pageName && !widgetName) {
+              if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
                 deleteTypes.push('mod');
               } else {
-                if (pageName) {
+                if (typeof(pageName) === 'string') {
+                  if (!Util.existsSync(path.join(appPath, moduleName, 'page', pageName))) {
+                    console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+                    return;
+                  }
                   deleteTypes.push('page');
                 }
-                if (widgetName) {
+                if (typeof(widgetName) === 'string') {
+                  if (!Util.existsSync(path.join(appPath, moduleName, 'widget', widgetName))) {
+                    console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
+                    return;
+                  }
                   deleteTypes.push('widget');
                 }
               }
@@ -456,7 +482,6 @@ program
   });
 
 function deleteOperation (deleteObj) {
-  console.log(deleteObj);
   if (!deleteObj) {
     return;
   }
@@ -470,6 +495,7 @@ function deleteOperation (deleteObj) {
       deleteSth(cwd, deleteObj);
       break;
     case 'module':
+      deleteObj.moduleName = require(path.join(cwd, 'module-conf')).module;
       cwd = path.resolve(cwd, '..');
       deleteSth(cwd, deleteObj);
       break;
@@ -494,9 +520,18 @@ function deleteSth (cwd, deleteObj) {
           for (var i = 0; i < appConfStrLines.length; i++) {
             var line = appConfStrLines[i];
             if (line.indexOf('moduleList') >= 0) {
-              appConfStrLines[i] = appConfStrLines[i].replace(/\[([\w,\,]*)\]/, function () {
-                return '[' + moduleList.toString() + ']';
+              appConfStrLines[i] = appConfStrLines[i].replace(/\[(.*)\]/, function (m) {
+                var ret = '[';
+                moduleList.forEach(function (item, i) {
+                  ret += '\'' + item + '\'';
+                  if (i < moduleList.length - 1) {
+                    ret += ', ';
+                  }
+                });
+                ret += ']';
+                return ret;
               });
+              console.log(appConfStrLines[i]);
             }
           }
           fs.writeFileSync(path.join(cwd, 'app-conf.js'), appConfStrLines.join('\n'));
