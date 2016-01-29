@@ -531,7 +531,6 @@ function deleteSth (cwd, deleteObj) {
                 ret += ']';
                 return ret;
               });
-              console.log(appConfStrLines[i]);
             }
           }
           fs.writeFileSync(path.join(cwd, 'app-conf.js'), appConfStrLines.join('\n'));
