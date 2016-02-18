@@ -653,6 +653,8 @@ $ athena publish --module [模块名]
 $ ath pu -m [模块名]
 ```
 
+携带参数``--remote``指定要发布的机器，机器名和 **app-conf.js** 中配置的机器名一致
+
 ### athena clone
 
 进入到某一模块下，通过``athena clone`` 命令可以复制另一个模块的**widget**到当前模块。
