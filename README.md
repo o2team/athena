@@ -655,13 +655,17 @@ $ ath pu -m [模块名]
 
 携带参数``--remote``指定要发布的机器，机器名和 **app-conf.js** 中配置的机器名一致
 
+使用``ath pu -h`` 查看帮助。
+
 ### athena clone
 
 进入到某一模块下，通过``athena clone`` 命令可以复制另一个模块的**widget**到当前模块。
 
 ```
-$ athena clone --from [来源模块] --widget [widget名字]
+$ athena clone [组件名字] --from [来源模块] --to [目标模块，若是当前模块可省略]
 ```
+
+使用``ath clone -h`` 查看帮助。
 
 ### athena clear
 
