@@ -58,7 +58,7 @@ $ [sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --distur
 ```
 $ [sudo] gem install compass
 ```
-由于墙的缘故（你懂的），原始的gen源[https://rubygems.org/](https://rubygems.org/)几乎无法使用，建议将gem源替换成淘宝的源
+由于墙的缘故（你懂的），原始的gem源[https://rubygems.org/](https://rubygems.org/)几乎无法使用，建议将gem源替换成淘宝的源
 
 ```
 $ gem sources --add https://ruby.taobao.org/ --remove https://rubygems.org/
@@ -692,6 +692,20 @@ $ athena clear -t
 $ athena clear --publish
 // 简写
 $ athena clear -p
+```
+
+### athena update
+
+```
+$ athena update
+```
+
+将检测当前Athena版本是否最新，若是旧版本将自动安装最新版本Athena
+
+简写
+
+```
+$ ath up
 ```
 
 ### athena list-config

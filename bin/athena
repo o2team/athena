@@ -23,6 +23,7 @@ var builder = require('../lib/build');
 
 var addReportPath = '/api/commands';
 var deleteReportPath = '/api/delete';
+var getVersionPath = '//api/version';
 var userHome = Util.homedir();
 var userName = process.env.USER || path.basename(userHome);
 var config = Util.getConfig();
@@ -749,6 +750,83 @@ program
     console.log();
     console.log(chalk.green('  清除成功！'));
     console.log();
+  });
+
+program
+  .command('update')
+  .alias('up')
+  .description('更新Athena')
+  .action(function () {
+    printAthena();
+    // 先检测版本
+    request.get(setting.report_url + getVersionPath, function (err, res, body) {
+      if (err) {
+        console.log();
+        console.log(chalk.red('   服务器出错，请稍后再试！'));
+        console.log();
+        console.log(err);
+        return;
+      }
+      if (res.statusCode === 200 || res.statusCode === 201) {
+        try {
+          body = JSON.parse(body);
+          if (body.no === 0) {
+            var versionServer = body.data.v;
+            var versionNative = Util.getPkgInfo().version;
+            var compareResult = Util.compareVersion(versionNative, versionServer);
+            switch (compareResult) {
+              case 0:
+                console.log();
+                console.log(chalk.green('  当前已经是最新版本Athena！'));
+                console.log();
+                break;
+              case -1:
+                console.log();
+                console.log(chalk.red('  服务器端记录的Athena版本竟然比本地更旧，请反馈给liweitao或wuwenwei！'));
+                console.log();
+                break;
+              case 1:
+                console.log();
+                console.log(chalk.green('  最新的Athena版本号为' + versionServer + '，正在自动更新...'));
+                var exec = require('child_process').exec;
+                var shellCode = 'sudo npm install -g athena-html@' + versionServer + ' --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node';
+                // 非windows
+                if (process.platform !== 'win32') {
+                  var nodeInstallPath = process.execPath;
+                  if (nodeInstallPath === '\/usr\/local\/bin\/node') {
+                    shellCode = 'sudo ' + shellCode;
+                  }
+                }
+                var child = exec(shellCode,
+                  function (error, stdout, stderr) {
+                    if (error !== null) {
+                      console.log('Install error: ' + error);
+                      return;
+                    }
+                    console.log();
+                    console.log(chalk.green('  安装成功，当前Athena版本' + versionServer));
+                    console.log();
+                 });
+                break;
+            }
+          } else {
+            console.log();
+            console.log(chalk.red('   服务器出错，请稍后再试！'));
+            console.log();
+            console.log(body);
+          }
+        } catch (e) {
+          console.log();
+          console.log(chalk.red('   服务器出错，请稍后再试！'));
+          console.log();
+          console.log(e);
+        }
+      } else {
+        console.log();
+        console.log(chalk.red('   服务器出错，请稍后再试！'));
+        console.log();
+      }
+    });
   });
 
 program
