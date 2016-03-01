@@ -755,8 +755,10 @@ program
 program
   .command('update')
   .alias('up')
+  .option('--debug', '打印调试信息')
   .description('更新Athena')
-  .action(function () {
+  .action(function (option) {
+    var isDebug = option.debug ? true : false;
     printAthena();
     // 先检测版本
     request.get(setting.report_url + getVersionPath, function (err, res, body) {
@@ -789,7 +791,7 @@ program
                 console.log();
                 console.log(chalk.green('  最新的Athena版本号为' + versionServer + '，正在自动更新...'));
                 var exec = require('child_process').exec;
-                var shellCode = 'sudo npm install -g athena-html@' + versionServer + ' --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node';
+                var shellCode = 'npm install -g athena-html@' + versionServer + ' --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node';
                 // 非windows
                 if (process.platform !== 'win32') {
                   var nodeInstallPath = process.execPath;
@@ -799,8 +801,17 @@ program
                 }
                 var child = exec(shellCode,
                   function (error, stdout, stderr) {
+                    if (isDebug) {
+                      console.log('stdout: ' + stdout);
+                      console.log('stderr: ' + stderr);
+                    }
                     if (error !== null) {
-                      console.log('Install error: ' + error);
+                      if (isDebug) {
+                        console.log('Install error: ' + error);
+                      }
+                      console.log();
+                      console.log(chalk.red('  安装失败，你可以自行执行以下命令来执行安装：'));
+                      console.log(chalk.red('  ' + shellCode));
                       return;
                     }
                     console.log();
