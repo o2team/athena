@@ -23,7 +23,7 @@ var builder = require('../lib/build');
 
 var addReportPath = '/api/commands';
 var deleteReportPath = '/api/delete';
-var getVersionPath = '//api/version';
+var getVersionPath = '/api/version';
 var userHome = Util.homedir();
 var userName = process.env.USER || path.basename(userHome);
 var config = Util.getConfig();
