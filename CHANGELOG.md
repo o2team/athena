@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.0.0-rc.6
+
+* update:模板语法出错时，告知出错文件
+* update:增加文件合并放到服务端的编译模式，通过配置app-conf.js实现
+* update:文件编译到.temp目录后增加了一层当前模块名的目录
+
 ## 1.0.0-rc.5
 
 * update:增加athena update命令用于检测并更新athena包
