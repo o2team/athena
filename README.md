@@ -385,6 +385,14 @@ module.exports = {
     use: true, //是否使用
     needCombo: true // 页面片中链接是否合并
   },
+  comboConf: {  // 文件合并模式，server模式为文件在服务器端合并，client即文件通过工具本地合并
+    mode: 'server', // server/client
+    server: {
+      flag: '??', // server端合并时的分割标识，如某Url //static.360buyimg.com/nima??/gb/common_d6e4c134.css,/hh/jj_5e52390b.css,/hh/topbar_17c154d1.css,/hh/banner_2dc311a1.css,/hh/hello_1ed059f2.css
+      onlineDomain: '//static.360buyimg.com/', // 服务端合并的线上域名
+      shortPath: 'nima' // 次级目录
+    }
+  },
   deploy: {  // 需要发布时的配置
     local: { // 不涉及到部署至哪台机器
       fdPath: '/' // 需要放置的目录
@@ -593,6 +601,8 @@ $ ath b -m [模块名]
 携带参数``--remote``将根据输入的机器名来生成对应机器所需要的可上线文件，包括页面片，执行后所有可上线文件均在模块 **dist/output** 目录下，机器名和 **app-conf.js** 中配置的机器名一致
 
 注意``--pack``和``--remote``不要同时使用
+
+携带参数``--release``将编译出可上线文件，目前是针对server合并文件模式
 
 使用``ath b -h`` 查看帮助。
 
