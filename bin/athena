@@ -672,7 +672,7 @@ program
       var args = argv.files;
       if (argv.appConf) {
         report('publish', addReportPath, args, function (params) {
-          params.app = argv.appConf.appId;
+          params.appId = argv.appConf.appId;
         });
       }
     }).catch(function (e) {
