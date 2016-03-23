@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 1.0.0-rc.7
+
+* fix:修复某些node版本下png图片压缩包报错的问题
+* fix:修复server合并模式下引用网络资源的url编译错误问题
+* update:增加自定义某些组件生成html页面片的功能，通过配置app-conf.js实现
+* update:输出widget标识信息
+
 ## 1.0.0-rc.6
 
 * update:模板语法出错时，告知出错文件

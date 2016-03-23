@@ -385,6 +385,16 @@ module.exports = {
     use: true, //是否使用
     needCombo: true // 页面片中链接是否合并
   },
+  useInclude: { // 启用生成html页面片功能
+    folder: 'include', // 生成页面片目录名字
+    pathPrefix: 'include', //页面片路径前缀 include/header.html
+    files: { // 需要生成的页面片文件
+      'header.html': { // 文件名，文件对应的widget组件信息
+        module: 'gb',
+        widget: 'mod_hd'
+      }
+    }
+  },
   comboConf: {  // 文件合并模式，server模式为文件在服务器端合并，client即文件通过工具本地合并
     mode: 'server', // server/client
     server: {
