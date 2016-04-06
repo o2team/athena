@@ -15,6 +15,8 @@ var del = require('del');
 var _ = require('lodash');
 
 var Util = require('../lib/util');
+var getGitStatus = require('../lib/util/git_status');
+
 var App = require('../lib/create/task/app');
 var MModule = require('../lib/create/task/module');
 var Page = require('../lib/create/task/page');
@@ -657,11 +659,14 @@ program
   .option('--compress', '打包功能，输出静态稿，引用压缩后的静态资源')
   .option('--verbose', '发布详细信息')
   .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
+  .option('--debug', '打印调试信息')
   .action(function (option) {
     var app = null;
     var mod = null;
+    var isDebug = false;
     // 带参数
     if (option) {
+      isDebug = option.debug ? true : false;
       if (typeof option.app === 'string') {
         app = option.app;
       }
@@ -669,7 +674,68 @@ program
         mod = option.module;
       }
     }
-    builder.publish(app, mod, option).then(function (argv) {
+    function checkVersionControl () {
+      return new Promise(function (resolve, reject) {
+        var cwd = process.cwd();
+        var appConfPath = path.join(cwd, 'app-conf.js');
+        var moduleConfPath = path.join(cwd, 'module-conf.js');
+        var appConf = null;
+        var versionControl = null;
+        if (Util.existsSync(appConfPath)) {
+          // 项目根目录
+          appConf = require(appConfPath);
+        } else if (Util.existsSync(moduleConfPath)) {
+          // 模块目录
+          appConfPath = path.join(path.resolve(cwd, '..'), 'app-conf.js');
+          if (Util.existsSync(appConfPath)) {
+            appConf = require(appConfPath);
+          }
+        }
+        if (appConf !== null) {
+          versionControl = appConf.versionControl;
+          if (typeof versionControl === 'string' && versionControl === 'git') {
+            return resolve();
+          }
+        }
+        return reject('Version control check error');
+      });
+    }
+    checkVersionControl()
+      .then(getGitStatus).then(function (status) {
+      if (!status.remoteBranch) {
+        console.log();
+        console.log(chalk.red('  检测到当前项目并未设置远程仓库，或者已经设置但并未提交代码！'));
+        console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
+        console.log();
+        throw new Error('git interrupt');
+      }
+      if (status.clean) {
+        if (typeof status.remoteDiff === 'string' && status.remoteDiff.indexOf('ahead') >= 0) {
+          console.log();
+          console.log(chalk.red('  检测到你有本地提交，但并未将代码提交至远程仓库！'));
+          console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
+          console.log();
+          throw new Error('git interrupt');
+        }
+      } else {
+        console.log();
+        console.log(chalk.red('  检测到你本地有代码改动！'));
+        console.log();
+        if (status.files.length > 0) {
+          status.files.forEach(function (item) {
+            console.log(chalk.red('    ' + item));
+          });
+        }
+        console.log();
+        console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
+        console.log();
+        throw new Error('git interrupt');
+      }
+    }, function (err) {
+      if (isDebug) {
+        console.log(err);
+      }
+    }).then(builder.publish.bind(null, app, mod, option)).then(function (argv) {
       var args = argv.files;
       if (argv.appConf) {
         report('publish', addReportPath, args, function (params) {
@@ -677,7 +743,9 @@ program
         });
       }
     }).catch(function (e) {
-      console.log(e.stack);
+      if (e.message !== 'git interrupt') {
+        console.log(e.stack);
+      }
     });
   }).on('--help', function() {
     console.log('  Examples:');
