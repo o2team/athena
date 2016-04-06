@@ -381,6 +381,7 @@ module.exports = {
   common: 'gb', // 公共模块
   moduleList: ['gb', 'frs', 'test'], // 项目下模块列表，通过athena module命令生成模块时会自动往此处添加新模块名
   tmpId: 'default', // 选用模板
+  versionControl: 'git', // 标记当前项目使用的版本控制工具，目前只有git，若设置了，则在发布时将经过代码是否已提交远程仓库的检测
   shtml: {  //页面片配置
     use: true, //是否使用
     needCombo: true // 页面片中链接是否合并
