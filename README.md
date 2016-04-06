@@ -707,12 +707,45 @@ $ athena clear --template
 $ athena clear -t
 ```
 
-清除发布时的缓存文件
+清除发布时的缓存文件，请在项目或模块目录下执行，否则将清除所有的发布缓存文件！
 
 ```
+// 若要删除当前项目的发布缓存
 $ athena clear --publish
 // 简写
 $ athena clear -p
+// 若要删除当前项目某一模块的发布缓存
+$ athena clear --module xxx --publish
+// 简写
+$ athena clear -m xxx -p
+```
+
+清除sass编译的缓存文件，请在项目或模块目录下执行，否则将清除所有的sass缓存文件！
+
+```
+// 请在项目或模块目录下执行
+// 若要删除当前项目的sass编译缓存
+$ athena clear --sass
+// 简写
+$ athena clear -s
+// 若要删除当前项目某一模块的sass编译缓存
+$ athena clear --module xxx --sass
+// 简写
+$ athena clear -m xxx -s
+```
+
+清除图片压缩的缓存文件，请在项目或模块目录下执行，否则将清除所有的图片缓存文件！
+
+```
+// 请在项目或模块目录下执行
+// 若要删除当前项目的图片压缩缓存
+$ athena clear --image
+// 简写
+$ athena clear -i
+// 若要删除当前项目某一模块的图片压缩缓存
+$ athena clear --module xxx --image
+// 简写
+$ athena clear -m xxx -i
 ```
 
 ### athena update

@@ -792,29 +792,70 @@ program
   .description('清除缓存')
   .option('-p, --publish', '清除发布时的缓存')
   .option('-t, --template', '清除模板缓存')
+  .option('-s, --sass', '清除sass编译缓存')
+  .option('-i, --image', '清除图片压缩缓存')
+  .option('-a, --app [appName]', '项目')
+  .option('-m, --module [moduleName]', '模块')
   .action(function (option) {
     var athenaPath = Util.getAthenaPath();
-    if (option.publish || option.template) {
+    var athenaCachePath = path.join(athenaPath, 'cache');
+    if (typeof option !== 'object') {
+      console.log();
+      console.log(chalk.red('  输入参数有误！'));
+      console.log(chalk.red('  请通过 ath clear -h 查看帮助！'));
+      console.log();
+      return;
+    }
+    if (option.publish || option.template || option.sass || option.image) {
+      var cwd = process.cwd();
+      var appConfPath = path.join(cwd, 'app-conf.js');
+      var moduleConfPath = path.join(cwd, 'module-conf.js');
+      var mod = option.module ? option.module : null;
       if (option.publish) {
-        var cwd = process.cwd();
-        var appConfPath = path.join(cwd, 'app-conf.js');
-        var moduleConfPath = path.join(cwd, 'module-conf.js');
         if (Util.existsSync(appConfPath)) {
-          del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
+          if (mod !== null) {
+            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+          } else {
+            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
+          }
         } else if (Util.existsSync(moduleConfPath)) {
           del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module + '_filter.json'), { force: true });
         } else {
           del.sync(path.join(athenaPath, 'publish'), { force: true });
         }
-      }
-
-      if (option.template) {
+      } else if (option.sass) {
+        if (Util.existsSync(appConfPath)) {
+          if (mod !== null) {
+            del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app, mod), { force: true });
+          } else {
+            del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app), { force: true });
+          }
+        } else if (Util.existsSync(moduleConfPath)) {
+          del.sync(path.join(athenaCachePath, 'build', 'sass', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+        } else {
+          del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
+        }
+      } else if (option.image) {
+        if (Util.existsSync(appConfPath)) {
+          if (mod !== null) {
+            del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app, mod), { force: true });
+          } else {
+            del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+          }
+          del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+        } else if (Util.existsSync(moduleConfPath)) {
+          del.sync(path.join(athenaCachePath, 'build', 'images', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+        } else {
+          del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
+        }
+      } else if (option.template) {
         del.sync(path.join(athenaPath, 'tmp'), { force: true });
       }
-
     } else {
       del.sync(path.join(athenaPath, 'publish'), { force: true });
       del.sync(path.join(athenaPath, 'tmp'), { force: true });
+      del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
+      del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
     }
     console.log();
     console.log(chalk.green('  清除成功！'));
