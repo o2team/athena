@@ -550,7 +550,7 @@ function deleteSth (cwd, deleteObj) {
     }
 
     if (deleteObj.deleteTypes.indexOf('widget') >= 0) {
-      deleteAtomic('page', '是否删除组件' + deleteObj.widgetName, path.join(cwd, deleteObj.moduleName, 'widget', deleteObj.widgetName), null, function (params) {
+      deleteAtomic('widget', '是否删除组件' + deleteObj.widgetName, path.join(cwd, deleteObj.moduleName, 'widget', deleteObj.widgetName), null, function (params) {
         params.mod = deleteObj.moduleConf.moduleId;
         params.widget = deleteObj.widgetName;
       });
