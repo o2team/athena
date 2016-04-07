@@ -1,5 +1,16 @@
 # ChangeLog
 
+## 1.0.0-rc.10
+
+* update:调整打MD5戳步骤
+* update:将sass和图片编译缓存存放至用户的.athena目录，每次编译后删除dist缓存
+* update:app-conf中增加versionControl配置，用于标记醒目使用的版本控制
+* update:新增删除sass编译和图片压缩缓存选项
+* update:sass目录内的单个文件引用不需要配置
+* update:编译稍稍提速
+* update:由于管理平台机器太慢，将上传超时延长
+* fix:server编译模式下当引用不存在的组件时静态资源链接拼接错误
+
 ## 1.0.0-rc.9
 
 * fix:修复预览问题
