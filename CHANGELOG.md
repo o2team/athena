@@ -4,7 +4,7 @@
 
 * update:调整打MD5戳步骤
 * update:将sass和图片编译缓存存放至用户的.athena目录，每次编译后删除dist缓存
-* update:app-conf中增加versionControl配置，用于标记醒目使用的版本控制
+* update:app-conf中增加versionControl配置，用于标记项目使用的版本控制
 * update:新增删除sass编译和图片压缩缓存选项
 * update:sass目录内的单个文件引用不需要配置
 * update:编译稍稍提速
