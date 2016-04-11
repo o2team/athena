@@ -37,6 +37,10 @@ athena-html
 
 请见[ChangeLog](CHANGELOG.md)
 
+## 加入开发
+
+请见[开发指引](DEVELOP_GUIDE.md)
+
 ## 安装
 
 基于``node``，请确保已具备较新的node环境（>=0.12.0），推荐使用node版本管理工具[nvm](https://github.com/creationix/nvm)，这样不仅可以很方便地切换node版本，而且全局安装时候也不用加sudo了。
