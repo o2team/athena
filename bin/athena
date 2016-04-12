@@ -68,14 +68,17 @@ function report (command, reportPath, args, processParams, cb) {
   });
 }
 
+// 打印一下Athena的Logo
 function printAthena () {
   var athenaText = fs.readFileSync(path.join(Util.getRootPath(), 'athena.txt'));
   console.log(gutil.colors.blue(String(athenaText)));
 }
 
+// 读取版本号
 program
   .version(Util.getPkgInfo().version);
 
+// Command: athena init [url]
 program
   .command('init [url]')
   .description('初始化Athena')
@@ -121,6 +124,7 @@ program
     console.log();
   });
 
+// Command: athena app [appName]
 program
   .command('app [appName]')
   .alias('a')
@@ -138,6 +142,7 @@ program
       less: option.less,
       tmpId: option.template
     });
+    // 创建完项目后进行数据上报
     app.create(function () {
       var argv = [].slice.call(arguments);
       report('app', addReportPath, argv, function (params) {
@@ -163,6 +168,7 @@ program
     console.log();
   });
 
+// Command: athena module [moduleName]
 program
   .command('module [moduleName]')
   .alias('m')
@@ -173,6 +179,7 @@ program
   .option('--less', '启用less')
   .action(function(moduleName, option) {
     if (moduleName) {
+      // 支持一次性创建多个模块
       var moduleList = moduleName.split(',');
       var promises = [];
       promises = moduleList.map(function (item) {
@@ -202,6 +209,7 @@ program
     console.log();
   });
 
+// 创建单个模块
 function createModule (moduleName, option) {
   return new Promise(function (resolve, reject) {
     var mmodule = new MModule({
@@ -237,6 +245,7 @@ function createModule (moduleName, option) {
   });
 }
 
+// Command: athena page [pageName]
 program
   .command('page [pageName]')
   .alias('pa')
@@ -260,6 +269,7 @@ program
       console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
       return;
     }
+    // 创建完页面后提交统计
     page.create(function () {
       var argv = [].slice.call(arguments);
       var appConf = require(appConfPath);
@@ -286,6 +296,7 @@ program
     console.log();
   });
 
+// Command: athena widget [widgetName]
 program
   .command('widget [widgetName]')
   .alias('w')
@@ -333,6 +344,7 @@ program
     console.log();
   });
 
+// Command: athena delete
 program
   .command('delete')
   .alias('del')
@@ -649,7 +661,7 @@ program
 program
   .command('publish')
   .alias('pu')
-  .description('发布项目or模块，发布到预览机以及tencent/jd开发机')
+  .description('发布项目or模块，发布到预览机以及自定义开发机')
   .option('-a, --app [appName]', '发布项目')
   .option('-m, --module [moduleName]', '发布模块', function (val) {
     return val.split(',');

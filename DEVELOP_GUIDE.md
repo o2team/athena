@@ -382,6 +382,12 @@ module.exports = {
 
 上面编译概述中的例子就是**client模式**的build过程，**client模式**和**server模式**体现在代码和文件上的区别主要是在，若方法名最后是以`Server`结束，则是**server模式**中调用的方法，若文件名最后以`_server`结束，则是**server模式**中调用的文件，若没有则一般是**client模式**调用，或两种模式可以通用。
 
+#### 预览
+
+`ath serve`命令可以实现实时预览，它的具体实现逻辑可以在`/lib/build/index.js`中找到，以**client模式**为例，预览单个模块的主要执行`buildSingleModuleSimple(app, mod, conf, args)`函数中的逻辑，在这个函数中调用预览需要的编译任务，编译完后再打开静态服务器**maltose**，将`.temp`目录作为预览目录，同时watch相应文件改动完成对应的编译任务。
+
+这里需要注意的是`ath serve`和`ath build`所执行的编译任务不一样的，`ath serve`的编译任务相对简单很多，为了保证开发时的响应速度，它不需要完成像图片压缩、文件MD5、代码压缩等操作。
+
 ### 创建逻辑
 
 创建项目、模块、页面、组件的逻辑均在`create`目录下，其中`base.js`是所有创建类的基类，包括拷贝文件、创建目录，以及请求远程模板的逻辑方法。
@@ -796,6 +802,19 @@ module.exports = function ($, appConf, moduleConf, args) {
 ```
 
 最后我们需要在编译入口文件`/lib/build/index.js`中进行调用，将任务插入到`temp`任务之前。
+
+## 一些接口
+
+与管理后台通信的接口，管理后台地址在项目根目录下的`.setting.json`中有配置
+
+- `/api/commands` 操作命令统计上报
+- `/api/delete` 删除数据上报
+- `/api/version` 获取Athena版本号
+- `/api/upload` 统计代码包上传
+- `/api/gb/version` 获取公共模块**map.json**文件版本号
+- `/api/gb` 获取公共模块**map.json**
+- `/api/templates` 获取远程模板信息
+- `/api/template/download` 下载远程模板
 
 ## 命令总结
 
