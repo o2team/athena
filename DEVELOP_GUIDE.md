@@ -561,6 +561,9 @@ module.exports = {
   moduleId: 'c4248360-8cd8-11e5-a75b-1f4efad69e34', // 模块ID
   description: 'test',  // 模块简要信息
   support : {  
+    useHash: {
+      enable: true // 是否启用md5重命名
+    },
     csslint: {
       enable: true //是否开启
     },

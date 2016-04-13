@@ -496,6 +496,9 @@ program
     console.log();
   });
 
+/**
+ * 删除操作，根据当前所处不同位置
+ */
 function deleteOperation (deleteObj) {
   if (!deleteObj) {
     return;
@@ -517,6 +520,9 @@ function deleteOperation (deleteObj) {
   }
 }
 
+/**
+ * 删除项目，模块，页面，组件，并上报数据
+ */
 function deleteSth (cwd, deleteObj) {
   if (deleteObj.deleteTypes.indexOf('app') >= 0) { //删除项目
     deleteAtomic('app', '是否删除项目' + deleteObj.appName, cwd, null, function (params) {
@@ -570,6 +576,9 @@ function deleteSth (cwd, deleteObj) {
   }
 }
 
+/**
+ * 删除目录文件
+ */
 function deleteAtomic (cmd, confirmTip, delelePath, deleteCb, processParamsCb) {
   inquirer.prompt([{
     type: 'confirm',
