@@ -44,7 +44,7 @@
     "gulp-postcss": "^6.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-util": "^3.0.6",
-    "ignore": "^2.2.15",
+    "ignore": "^3.0.9",
     "inquirer": "^0.11.0",
     "js-beautify": "^1.5.10",
     "jsftp": "^1.5.3",
