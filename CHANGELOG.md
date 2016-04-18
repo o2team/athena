@@ -1,5 +1,15 @@
 # ChangeLog
 
+## 1.0.0
+
+* update:未发布过公共模块时不给于错误提示
+* update:添加开发指引
+* fix:修复低版本node不支持Object.assign以及在模块中发布时报错的问题
+* 添加关键代码的注释
+* update:文件md5可配置
+* fix:修复预览时二维码url的bug
+* fix:将compass合成图片目录放到自己模块的static/images目录下
+
 ## 1.0.0-rc.10
 
 * update:调整打MD5戳步骤
