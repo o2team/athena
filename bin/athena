@@ -3,7 +3,6 @@
  * 主入口，程序控制
  */
 
-'use strict';
 var fs = require('fs');
 var path = require('path');
 var request = require('request');
@@ -72,6 +71,67 @@ function report (command, reportPath, args, processParams, cb) {
 function printAthena () {
   var athenaText = fs.readFileSync(path.join(Util.getRootPath(), 'athena.txt'));
   console.log(gutil.colors.blue(String(athenaText)));
+}
+
+// 检测Athena版本
+function checkAthenaVersion (successCb, errorCb) {
+  request.get(setting.report_url + getVersionPath, function (err, res, body) {
+    if (err) {
+      errorCb && errorCb(err);
+      return;
+    }
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      try {
+        body = JSON.parse(body);
+        if (body.no === 0) {
+          var versionServer = body.data.v;
+          var versionNative = Util.getPkgInfo().version;
+          var compareResult = Util.compareVersion(versionNative, versionServer);
+          successCb(versionServer, versionNative, compareResult);
+        } else {
+          errorCb && errorCb(body);
+        }
+      } catch (e) {
+        errorCb && errorCb(e);
+      }
+    } else {
+      errorCb && errorCb();
+    }
+  });
+}
+
+// 安装某一版本athena
+function installAthena (installParams) {
+  var exec = require('child_process').exec;
+  var shellCode = 'npm install -g athena-html@' + installParams.version + ' --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node';
+  // 非windows
+  if (process.platform !== 'win32') {
+    var nodeInstallPath = process.execPath;
+    if (nodeInstallPath === '\/usr\/local\/bin\/node') {
+      shellCode = 'sudo ' + shellCode;
+    }
+  }
+  var child = exec(shellCode,
+    function (error, stdout, stderr) {
+      if (installParams.isDebug) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+      }
+      if (error !== null) {
+        if (installParams,isDebug) {
+          console.log('Install error: ' + error);
+        }
+        console.log();
+        console.log(chalk.red('  安装失败，你可以自行执行以下命令来执行安装：'));
+        console.log(chalk.red('  ' + shellCode));
+        installParams.onError && installParams.onError();
+        return;
+      }
+      console.log();
+      console.log(chalk.green('  安装成功，当前Athena版本' + installParams.version));
+      console.log();
+      installParams.onSuccess && installParams.onSuccess();    
+    });
 }
 
 // 读取版本号
@@ -891,83 +951,33 @@ program
   .action(function (option) {
     var isDebug = option.debug ? true : false;
     printAthena();
-    // 先检测版本
-    request.get(setting.report_url + getVersionPath, function (err, res, body) {
-      if (err) {
-        console.log();
-        console.log(chalk.red('   服务器出错，请稍后再试！'));
-        console.log();
-        console.log(err);
-        return;
-      }
-      if (res.statusCode === 200 || res.statusCode === 201) {
-        try {
-          body = JSON.parse(body);
-          if (body.no === 0) {
-            var versionServer = body.data.v;
-            var versionNative = Util.getPkgInfo().version;
-            var compareResult = Util.compareVersion(versionNative, versionServer);
-            switch (compareResult) {
-              case 0:
-                console.log();
-                console.log(chalk.green('  当前已经是最新版本Athena！'));
-                console.log();
-                break;
-              case -1:
-                console.log();
-                console.log(chalk.red('  服务器端记录的Athena版本竟然比本地更旧，请反馈给liweitao或wuwenwei！'));
-                console.log();
-                break;
-              case 1:
-                console.log();
-                console.log(chalk.green('  最新的Athena版本号为' + versionServer + '，正在自动更新...'));
-                var exec = require('child_process').exec;
-                var shellCode = 'npm install -g athena-html@' + versionServer + ' --registry=http://registry.npm.taobao.org --disturl=http://npm.taobao.org/mirrors/node';
-                // 非windows
-                if (process.platform !== 'win32') {
-                  var nodeInstallPath = process.execPath;
-                  if (nodeInstallPath === '\/usr\/local\/bin\/node') {
-                    shellCode = 'sudo ' + shellCode;
-                  }
-                }
-                var child = exec(shellCode,
-                  function (error, stdout, stderr) {
-                    if (isDebug) {
-                      console.log('stdout: ' + stdout);
-                      console.log('stderr: ' + stderr);
-                    }
-                    if (error !== null) {
-                      if (isDebug) {
-                        console.log('Install error: ' + error);
-                      }
-                      console.log();
-                      console.log(chalk.red('  安装失败，你可以自行执行以下命令来执行安装：'));
-                      console.log(chalk.red('  ' + shellCode));
-                      return;
-                    }
-                    console.log();
-                    console.log(chalk.green('  安装成功，当前Athena版本' + versionServer));
-                    console.log();
-                 });
-                break;
-            }
-          } else {
-            console.log();
-            console.log(chalk.red('   服务器出错，请稍后再试！'));
-            console.log();
-            console.log(body);
-          }
-        } catch (e) {
+    // 检测版本，若版本旧则更新
+    checkAthenaVersion(function (versionServer, versionNative, compareResult) {
+      switch (compareResult) {
+        case 0:
           console.log();
-          console.log(chalk.red('   服务器出错，请稍后再试！'));
+          console.log(chalk.green('  当前已经是最新版本Athena！'));
           console.log();
-          console.log(e);
-        }
-      } else {
-        console.log();
-        console.log(chalk.red('   服务器出错，请稍后再试！'));
-        console.log();
+          break;
+        case -1:
+          console.log();
+          console.log(chalk.red('  服务器端记录的Athena版本竟然比本地更旧，请反馈给liweitao或wuwenwei！'));
+          console.log();
+          break;
+        case 1:
+          console.log();
+          console.log(chalk.green('  最新的Athena版本号为' + versionServer + '，正在自动更新...'));
+          installAthena({
+            version: versionServer,
+            isDebug: isDebug
+          });
+          break;
       }
+    }, function (info) {
+      console.log();
+      console.log(chalk.red('   服务器出错，请稍后再试！'));
+      console.log();
+      info ? console.log(info) : void(0);
     });
   });
 
@@ -998,9 +1008,69 @@ program
     console.log('    ' + chalk.red('没有该命令哟，请通过 athena -h 查看帮助！'));
   });
 
-program.parse(process.argv);
+// 新版本更新提醒功能
+var remindFile = path.join(Util.getAthenaPath(), '.remind.json');
+var remindInfo = {};
+if (Util.existsSync(remindFile)) {
+  try {
+    remindInfo = JSON.parse(String(fs.readFileSync(remindFile)));
+  } catch (ex) {
+    remindInfo = {};
+  }
+}
+if (!remindInfo.update) {
+  remindInfo.update = {};
+}
+var updateInfo = remindInfo.update;
+if (!updateInfo.date || !Util.isToday(updateInfo.date)) {
+  checkAthenaVersion(function (versionServer, versionNative, compareResult) {
+    if (compareResult === 1) {
+      var prompt = [];
+      prompt.push({
+        type: 'confirm',
+        name: 'isUpdate',
+        message: '检测到有新版本的Athena，版本号为' + versionServer + '，在修复问题的同时，新增了许多实用功能，你不想更新一下么？',
+        default: true
+      });
+      inquirer.prompt(prompt, function (answers) {
+        if (answers.isUpdate) {
+          console.log();
+          console.log(chalk.green('  正在自动安装更新...'));
+          installAthena({
+            version: versionServer,
+            isDebug: false,
+            onSuccess: function () {
+              remindInfo.update.date = new Date().getTime();
+              fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+            },
+            onError: function () {
+              remindInfo.update.date = new Date().getTime();
+              fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+            }
+          });
+        } else {
+          remindInfo.update.date = new Date().getTime();
+          fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+        }
+      });
+    } else {
+      program.parse(process.argv);
+      printNoCommand();
+      remindInfo.update.date = new Date().getTime();
+      fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+    }
+  }, function () {
+    program.parse(process.argv);
+    printNoCommand();
+  });
+} else {
+  program.parse(process.argv);
+  printNoCommand();
+}
 
-if (!process.argv.slice(2).length) {
-  printAthena();
-  program.outputHelp();
+function printNoCommand () {
+  if (!process.argv.slice(2).length) {
+    printAthena();
+    program.outputHelp();
+  }
 }
