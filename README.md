@@ -468,6 +468,9 @@ module.exports = {
   module: 'mm',  // 当前模块名
   description: 'test',  // 模块简要信息
   support : {  
+    useHash: {
+      enable: true // 是否启用文件hash
+    },
     csslint: {
       enable: true //是否开启
     },
@@ -798,6 +801,10 @@ report_url=http://aotu.jd.com/athena
 ```
 
 ## 部分功能使用方法
+
+### 文件md5重命名
+
+通过配置`module-conf.js`里面的 `support` 中的 `useHash` 属性可以控制是否开启对文件做md5重命名
 
 ### Sass的使用
 
