@@ -262,6 +262,8 @@ $ ath w --name topbar --sass --description 测试
 
 参数 `--less` 指定组件使用 `less`
 
+参数 `--cms` 指定这是供CMS使用的楼层组件
+
 每个参数都是可缺省的。
 
 然后根据提示一步一步来，将会自动生成athena的widget目录和模板

@@ -1,0 +1,31 @@
+<!--
+  @author: <%= conf.author %>
+  @name: <%= conf.widgetName %>
+  @date: <%= conf.modName %>
+  @description: <%= conf.description %>
+-->
+<script>
+  /** 
+   * cell_328：文字链
+   * cell_337：小图文
+   * cell_338：商品池
+   */
+  (function(window){
+    window.data = window.data || {};
+    window.data['<%= conf.widgetName %>_{$portal_floor_id}'] = {
+      
+    };
+  })(window);
+</script>
+<div class="" id="<%= conf.widgetName %>_{$portal_floor_id}">
+  {literal}
+  <script type="text/template" class="o2template" data-tpl-id="<%= conf.widgetName %>_{$portal_floor_id}">
+  </script>
+  {/literal}
+</div>
+
+<%% widget.scriptStart() %>
+<script>
+
+</script>
+<%% widget.scriptEnd() %>

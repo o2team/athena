@@ -364,13 +364,15 @@ program
   .option('--description [widgetDescription]', '组件描述')
   .option('--sass', '启用sass')
   .option('--less', '启用less')
+  .option('--cms', '指定这是供CMS使用的楼层组件')
   .description('创建新的组件')
   .action(function(widgetName, option) {
     var widget = new Widget({
       widgetName: widgetName || option.name,
       description: option.description,
       sass: option.sass,
-      less: option.less
+      less: option.less,
+      cms: option.cms
     });
     var moduleConfPath = widget.destinationPath('module-conf.js');
     var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
