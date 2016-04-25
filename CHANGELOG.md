@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.0.1
+
+* update:优化serve时文件watch的功能
+* update:新版本更新提醒功能
+* update:配合CMS后台的开发解决方案
+
 ## 1.0.0
 
 * update:未发布过公共模块时不给于错误提示
