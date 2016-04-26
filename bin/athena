@@ -873,7 +873,7 @@ program
 program
   .command('clear')
   .description('清除缓存')
-  .option('-p, --publish', '清除发布时的缓存')
+  .option('-p, --publish [remoteName]', '清除发布时的缓存')
   .option('-t, --template', '清除模板缓存')
   .option('-s, --sass', '清除sass编译缓存')
   .option('-i, --image', '清除图片压缩缓存')
@@ -897,12 +897,12 @@ program
       if (option.publish) {
         if (Util.existsSync(appConfPath)) {
           if (mod !== null) {
-            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, option.publish + '_filter.json'), { force: true });
           } else {
             del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
           }
         } else if (Util.existsSync(moduleConfPath)) {
-          del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module + '_filter.json'), { force: true });
+          del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, option.publish + '_filter.json'), { force: true });
         } else {
           del.sync(path.join(athenaPath, 'publish'), { force: true });
         }
