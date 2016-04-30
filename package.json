@@ -56,7 +56,6 @@
     "mem-fs-editor": "^2.0.4",
     "minimatch": "^3.0.0",
     "mkdirp": "^0.5.1",
-    "node-pngquant-native": "^1.0.2",
     "path-exists": "^2.0.0",
     "path-is-absolute": "^1.0.0",
     "postcss-athena-spritesmith": "latest",
