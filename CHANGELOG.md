@@ -1,5 +1,16 @@
 # ChangeLog
 
+## 1.0.2
+
+* update:优化ugliyfyjs的报错信息
+* update:清除发布缓存时增加机器名参数
+* fix:修复文件不加md5时图片不上传的bug
+* update:上传压缩代码包中排除psd文件
+* fix:修复不使用文件md5时发布过滤失败的bug
+* fix:处理CMS楼层模板，增加$portal_floor_id定义的代码
+* update:优化csslint，csslint失败不中断编译
+* fix:修复png图片替换后编译依然是原图的问题
+
 ## 1.0.1
 
 * update:优化serve时文件watch的功能
