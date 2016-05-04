@@ -407,16 +407,17 @@ program
   });
 
 
-// Command: athena widget-remote [widgetPath]
+// Command: athena widget-remote [widgetName]
 program
-  .command('widget-remote [widgetPath]')
+  .command('widget-remote [widgetName]')
   .alias('wr')
+  .option('--name [widgetName]', '组件名称')
   .description('加载一个远程的组件')
-  .action(function(widgetPath, option) {
-    widgetPath = widgetPath || option.widgetPath;
+  .action(function(widgetName, option) {
+    widgetName = widgetName || option.widgetName;
 
     var widget = new Widget({
-      widgetName: widgetPath || option.name,
+      widgetName: widgetName,
       description: option.description,
       sass: true,
       less: 0,
