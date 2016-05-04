@@ -407,9 +407,9 @@ program
   });
 
 
-// Command: athena widget [widgetName]
+// Command: athena widget-remote [widgetPath]
 program
-  .command('widgetremote [widgetPath]')
+  .command('widget-remote [widgetPath]')
   .alias('wr')
   .description('加载一个远程的组件')
   .action(function(widgetPath, option) {
@@ -428,7 +428,7 @@ program
       console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
       return;
     }
-    widget.loadremote(function () {
+    widget.loadRemote(function () {
       var argv = [].slice.call(arguments);
       var appConf = require(appConfPath);
       var moduleConf = require(moduleConfPath);
