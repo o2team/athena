@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.3
+
+* update:增加加载远程组件功能
+* fix:生成页面片时，允许添加引用线上样式
+
 ## 1.0.2
 
 * update:优化ugliyfyjs的报错信息
