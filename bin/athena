@@ -406,6 +406,53 @@ program
     console.log();
   });
 
+
+// Command: athena widget-remote [widgetPath]
+program
+  .command('widget-remote [widgetPath]')
+  .alias('wr')
+  .description('加载一个远程的组件')
+  .action(function(widgetPath, option) {
+    widgetPath = widgetPath || option.widgetPath;
+
+    var widget = new Widget({
+      widgetName: widgetPath || option.name,
+      description: option.description,
+      sass: true,
+      less: 0,
+      cms: 0
+    });
+    var moduleConfPath = widget.destinationPath('module-conf.js');
+    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
+    if (!fs.existsSync(moduleConfPath)) {
+      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+      return;
+    }
+    widget.loadRemote(function () {
+      var argv = [].slice.call(arguments);
+      var appConf = require(appConfPath);
+      var moduleConf = require(moduleConfPath);
+      if (appConf) {
+        report('widget', addReportPath, argv, function (params) {
+          params.moduleName = moduleConf.module;
+          params.moduleId = moduleConf.moduleId;
+          params.appName = appConf.app;
+          params.appId = appConf.appId;
+          params.widget = argv[0];
+        }, function (body) {
+          if (body && body.no === 0) {
+            console.log('success');
+          }
+        });
+      }
+    });
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena widgetremote timeline~pf_160322_1');
+    console.log('    $ athena wr timeline~pf_160322_1');
+    console.log();
+  });
 // Command: athena delete
 program
   .command('delete')
