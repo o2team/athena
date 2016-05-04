@@ -943,14 +943,23 @@ program
       var moduleConfPath = path.join(cwd, 'module-conf.js');
       var mod = option.module ? option.module : null;
       if (option.publish) {
+        var publish = option.publish;
         if (Util.existsSync(appConfPath)) {
           if (mod !== null) {
-            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, option.publish + '_filter.json'), { force: true });
+            if (typeof publish === 'string') {
+              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, publish + '_filter.json'), { force: true });
+            } else {
+              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+            }
           } else {
             del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
           }
         } else if (Util.existsSync(moduleConfPath)) {
-          del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, option.publish + '_filter.json'), { force: true });
+          if (typeof publish === 'string') {
+            del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, publish + '_filter.json'), { force: true });
+          } else {
+            del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+          }
         } else {
           del.sync(path.join(athenaPath, 'publish'), { force: true });
         }
