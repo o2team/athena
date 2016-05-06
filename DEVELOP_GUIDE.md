@@ -484,8 +484,9 @@ module.exports = {
   tmpId: 'default', // 选用模板
   versionControl: 'git', // 标记当前项目使用的版本控制工具，目前只有git，若设置了，则在发布时将经过代码是否已提交远程仓库的检测
   shtml: {  //页面片配置
-    use: true, //是否使用
-    needCombo: true // 页面片中链接是否合并
+    use: true, //是否使用，总控制，若要开启使用页面片，这里必须为true
+    needCombo: true, // 页面片中链接是否合并
+    needTimestamp: true //增加时间戳
   },
   useInclude: { // 启用生成html页面片功能
     folder: 'include', // 生成页面片目录名字
@@ -528,7 +529,11 @@ module.exports = {
       remotePath: '/fd/h5/nima', // 上传代码的目录
       cssi: '/sinclude/cssi/fd/h5/qwd', // 上传页面片的目录
       assestPrefix: '/fd/h5/qwd', // 发布完静态资源后，静态资源路径
-      shtmlPrefix: '/sinclude/cssi/fd/h5/qwd' // 发布完页面片后，静态资源路径
+      shtmlPrefix: '/sinclude/cssi/fd/h5/qwd', // 发布完页面片后，静态资源路径
+      shtml: {  //针对服务器的页面片配置
+        needCombo: true, // 页面片中链接是否合并
+        needTimestamp: true //增加时间戳
+      }
     },
     jdTest: {
       host: '192.168.193.32',
@@ -540,7 +545,11 @@ module.exports = {
       remotePath: '/export/paipai/resource/static/fd/h5/hellokity', // 上传代码的目录
       cssi: '/export/paipai/resource/sinclude/cssi/fd/h5/hellokity', // 上传页面片的目录
       assestPrefix: '/static/fd/h5/hellokity', // 发布完静态资源后，静态资源路径
-      shtmlPrefix: '/sinclude/cssi/fd/h5/hellokity' // 发布完页面片后，静态资源路径
+      shtmlPrefix: '/sinclude/cssi/fd/h5/hellokity', // 发布完页面片后，静态资源路径
+      shtml: {  //针对服务器的页面片配置
+        needCombo: true, // 页面片中链接是否合并
+        needTimestamp: true //增加时间戳
+      }
     }
   }
 };
