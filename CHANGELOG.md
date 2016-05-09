@@ -1,5 +1,15 @@
 # ChangeLog
 
+## 1.0.4
+
+* update:优化client模式编译步骤，合并重复操作
+* fix:清除发布缓存不传参数无法删除缓存
+* fix:远程加载组件回传参数
+* fix:上传后列表中图片地址，多级目录被展开，同时过滤列表中html文件
+* update:combo-use标记增加总控制
+* update:优化serve时文件修改反馈
+* update:模板中文别名，提高模板辨识度
+
 ## 1.0.3
 
 * update:增加加载远程组件功能
