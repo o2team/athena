@@ -153,7 +153,7 @@ $ ath app [项目名称]
 同时提供了通过携带参数快速创建项目的命令
 
 ```
-$ ath a --name lo --description 测试 --sass --template default
+$ ath a --name lo --description 测试 --sass --template 默认模板
 
 ```
 
@@ -165,7 +165,7 @@ $ ath a --name lo --description 测试 --sass --template default
 
 参数 `--less` 指定项目使用 `less`
 
-参数 `--template` 指定项目使用的模板，默认模板是 `default`
+参数 `--template` 指定项目使用的模板，输入模板名称，默认模板是 `默认模板`
 
 每个参数都是可缺省的。
 
