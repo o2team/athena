@@ -321,6 +321,40 @@ $ ath del -m [模块名] -w [组件名称]
 
 ## 使用及编译
 
+### 编译模式
+
+过一段时间的探索演进，目前Athena有2种编译模式，分别是
+
+ - 在客户端进行代码合并的客户端完全处理**client模式**
+ - 在静态服务器进行代码合并的**server模式**
+
+而这两种模式下又要区分是编译出上线前代码的**build**，还是进行开发时的实时预览**serve**，build和serve需要执行的编译任务是不一样的，所以其实认为有4种模式也并无不可。
+
+两种模式下大家开发时的代码写法完全一样，唯一的区分是在项目的`app-conf.js`中进行配置，配置项为`comboConf`如下
+
+```javascript
+module.exports = {
+  app: 'nima',
+  appId: '7024e980-8cd8-11e5-89fe-370bd1e969e9',
+  description: '尼玛',
+  common: 'gb',
+  moduleList: ['gb', 'hh', 'lp'],
+  platform: 'mobile',
+  versionControl: 'git',
+  comboConf: {
+    mode: 'server', // server/client
+    server: {
+      flag: '??', // server端合并时的分割标识，如某Url //static.360buyimg.com/nima??/gb/common_d6e4c134.css,/hh/jj_5e52390b.css,/hh/topbar_17c154d1.css,/hh/banner_2dc311a1.css,/hh/hello_1ed059f2.css
+      onlineDomain: '//static.360buyimg.com/', // 服务端合并的线上域名
+      shortPath: 'nima' // 次级目录
+    }
+  }
+...
+}
+```
+
+`comboConf.mode`为`server`则是server模式，`client`即是client模式。
+
 ### 模块化
 
 通过阅读设计稿，我们可以将页面拆分成不同``widget``，而一些可以通用的``widget``我们可以放到一个公共模块中去统一管理，通过这样的页面组件化方式，我们可以很好地避开复制代码的问题，同时让我们的代码更好管理。
@@ -343,6 +377,10 @@ $ ath del -m [模块名] -w [组件名称]
 #### widget.load
 
 如前一小节所显示，用来加载组件
+
+#### widget.loadFloor
+
+``widget.load`` 的变种，用来加载CMS解决方案中的楼层，参数与``widget.load``方法一致，但需要注意的是，目前这个方法只有在开启**server**模式才有效。
 
 #### getCSS
 
