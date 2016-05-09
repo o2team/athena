@@ -200,7 +200,7 @@ program
       description: option.description,
       sass: option.sass,
       less: option.less,
-      tmpId: option.template
+      tmpName: option.template
     });
     // 创建完项目后进行数据上报
     app.create(function () {
