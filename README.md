@@ -3,6 +3,7 @@ athena-html
 [![npm version](https://badge.fury.io/js/athena-html.svg)](http://badge.fury.io/js/athena-html)
 
 > O2Team构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
+>
 > 一次安装，到处运行
 
 ## 功能一览
@@ -851,9 +852,27 @@ report_url=http://aotu.jd.com/athena
 
 ## 部分功能使用方法
 
+### 代码检查
+
+#### CSSLint
+
+CSS代码检查。
+
+通过配置 `module-conf.js` 里面的 `support` 中的 `csslint` 属性可以控制是否开启对本模块CSS代码进行检查，代码检查会在**编译**、**发布**时候进行。
+
+CSSLint规则可以通过在项目目录下增加 `.csslintrc` 文件来进行配置，具体配置请见 [CSSLint Rules](https://github.com/CSSLint/csslint/wiki/Rules)。
+
+代码检查的结果会生成进入当前模块目录下的 `csslint_error.html` 文件。
+
+#### JSHint
+
+JavaScript代码检查。
+
+通过配置 `module-conf.js` 里面的 `support` 中的 `jshint` 属性可以控制是否开启对本模块JavaScript代码进行检查，代码检查会在**编译**、**发布**时候进行。
+
 ### 文件md5重命名
 
-通过配置`module-conf.js`里面的 `support` 中的 `useHash` 属性可以控制是否开启对文件做md5重命名
+通过配置 `module-conf.js` 里面的 `support` 中的 `useHash` 属性可以控制是否开启对文件做md5重命名
 
 ### Sass的使用
 
