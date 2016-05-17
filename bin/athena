@@ -118,7 +118,7 @@ function installAthena (installParams) {
         console.log('stderr: ' + stderr);
       }
       if (error !== null) {
-        if (installParams,isDebug) {
+        if (installParams.isDebug) {
           console.log('Install error: ' + error);
         }
         console.log();
