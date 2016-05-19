@@ -735,6 +735,8 @@ $ ath pu -m [模块名]
 
 使用``ath pu -h`` 查看帮助。
 
+若发现上传文件一直错误，请使用 `$ ath clear --publish` 命令来清除文件发布的缓存以解决问题（请详见`ath clear` 命令的使用），并提出issue描述问题。
+
 ### athena clone
 
 进入到某一模块下，通过``athena clone`` 命令可以复制另一个模块的**widget**到当前模块。
@@ -881,7 +883,7 @@ JavaScript代码检查。
 需要在 `banner.scss` 中引用 `_common.scss` 中的 mixin `flexbox`
 
 ```
-@import "_common";
+@import "common"; // 可以不带下划线
 
 .banner {
   background: red;
@@ -889,7 +891,16 @@ JavaScript代码检查。
 }
 ```
 
-若要在一个模块中引入模块私有的sass库，可以将文件放入模块的 `static/sass` 下，调用方式和上述一致。
+若要在一个模块中引入模块私有的sass库，可以将文件放入该模块的 `static/sass` 下，调用方式和上述一致。
+
+一个模块中的sass文件只能引用本模块和公共模块中的sass库文件，为了区分公共模块和本模块的sass库，可以在 `static/sass` 目录下再建立一级目录，例如和所在模块同名的目录，这样引用时就可以就可可以区分了。例如，在 `_common.scss` 文件放在 `static/sass/gb` 目录下，这样引用的写法就是：
+
+```
+@import "gb/common"; // 可以不带下划线
+
+```
+ 
+若发现sass文件编译一直错误，请使用 `$ ath clear --sass` 命令来清除sass编译的缓存以解决问题（请详见`ath clear` 命令的使用），并提出issue描述问题。
 
 注：之前工具自动生成项目没有自动生成 `static/sass` 目录，如需使用sass库，请自动创建该目录。
 
