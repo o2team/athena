@@ -1,5 +1,13 @@
 # ChangeLog
 
+## 1.0.5
+
+* update:client模式编译增加--release，可以通过comboConf配置线上地址
+* fix:修复资源url中带有?#&时查找出错的情况
+* update:优化CSSLint检查，检查结果输出到模块的csslint_error.html文件中
+* fix:sass中import引入，对引入importsass文件修改，不能实时编译，要清除缓存才行
+* update:优化sass编译
+
 ## 1.0.4
 
 * update:优化client模式编译步骤，合并重复操作
