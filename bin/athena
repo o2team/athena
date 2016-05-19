@@ -32,6 +32,7 @@ var setting = Util.getSetting();
 
 // 数据上报
 function report (command, reportPath, args, processParams, cb) {
+  var reportBlacklist = config.report_black_list ? config.report_black_list : [];
   var requestParams = {
     cmd: command,
     time: new Date().getTime(),
@@ -41,6 +42,11 @@ function report (command, reportPath, args, processParams, cb) {
   };
   if (typeof processParams === 'function') {
     processParams(requestParams);
+  }
+  if (reportBlacklist.indexOf(requestParams.appId) >= 0
+    || reportBlacklist.indexOf(requestParams.appName) >= 0
+    || reportBlacklist.indexOf(requestParams.app) >= 0) {
+    return;
   }
   if (typeof cb !== 'function') {
     cb = function () {};
