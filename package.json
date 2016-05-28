@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "O2前端流程工具",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/o2team/athena#readme",
   "dependencies": {
     "archiver": "^0.16.0",
-    "athena-png-native": "^0.0.2",
+    "athena-png-native": "^0.0.3",
     "autoprefixer": "^6.0.1",
     "chalk": "^1.1.1",
     "cheerio": "^0.19.0",

@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 1.0.6
+
+* fix:兼容之前项目不存config.rb文件的问题
+* fix:static目录下多级目录中的静态资源文件不压缩
+* fix:server模式下当组件或页面的css、js不存在时，不加入url
+* update:兼容Node 6.x
+
 ## 1.0.5
 
 * update:client模式编译增加--release，可以通过comboConf配置线上地址
