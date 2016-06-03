@@ -1,5 +1,13 @@
 # ChangeLog
 
+## 1.0.7
+
+* fix:sass编译时误把纯css文件缓存起来
+* update:widget.loadFloor方法增加对script的处理
+* update:cms楼层最后处理的时候增加组件编译和地址替换的操作
+* update:支持smarty模板
+* update:增加是否打开浏览器选项，ath s --silence
+
 ## 1.0.6
 
 * fix:兼容之前项目不存config.rb文件的问题
