@@ -50,6 +50,7 @@
     "jsftp": "^1.5.3",
     "jsftp-mkdirp": "^1.0.0",
     "jshint": "^2.8.0",
+    "jsmart": "^2.14.0",
     "lodash": "^4.6.1",
     "maltose": "^0.0.6",
     "mem-fs": "^1.1.0",
