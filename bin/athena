@@ -761,6 +761,7 @@ program
   .option('--page [pageName]', '预览页面')
   .option('--verbose', '编译详细信息')
   .option('--dist', '预览经过完整编译流程后的文件')
+  .option('-s, --silence', '静默不主动开启浏览器')
   .action(function (option) {
     var app = null;
     var mod = null;
