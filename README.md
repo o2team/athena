@@ -381,7 +381,11 @@ module.exports = {
 
 #### widget.loadFloor
 
-``widget.load`` 的变种，用来加载CMS解决方案中的楼层，参数与``widget.load``方法一致，但需要注意的是，目前这个方法只有在开启**server**模式才有效。
+``widget.load`` 的变种，用来加载CMS解决方案中的楼层，参数与``widget.load``方法一致，默认加载 **widget** 目录中的 `data.json` 文件，但需要注意的是，目前这个方法只有在开启**server**模式才有效。
+
+#### widget.loadFloorSmarty
+
+``widget.load`` 的变种，用来加载使用Smarty语法编写的楼层或元件，参数与``widget.load``方法一致，默认加载 **widget** 目录中的 `custom_data.json` 文件，但需要注意的是，目前这个方法只有在开启**server**模式才有效。
 
 #### getCSS
 
