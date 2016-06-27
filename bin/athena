@@ -797,6 +797,7 @@ program
   .option('--compress', '打包功能，输出静态稿，引用压缩后的静态资源')
   .option('--verbose', '发布详细信息')
   .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
+  .option('--all', '发布所有页面')
   .option('--debug', '打印调试信息')
   .action(function (option) {
     var app = null;
