@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.0.8
+
+* update:增强地址替换时的检测规则
+* update:修改资源合并逻辑，client模式不需要在gb.html中调用公共组件即可使用
+
 ## 1.0.7
 
 * fix:sass编译时误把纯css文件缓存起来
