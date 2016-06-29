@@ -735,7 +735,9 @@ $ athena publish --module [模块名]
 $ ath pu -m [模块名]
 ```
 
-携带参数``--remote``指定要发布的机器，机器名和 **app-conf.js** 中配置的机器名一致
+携带参数 ``--remote`` 指定要发布的机器，机器名和 **app-conf.js** 中配置的机器名一致
+
+携带参数 ``--all`` 指定上传所有页面，无需再单独选择页面
 
 使用``ath pu -h`` 查看帮助。
 
@@ -750,6 +752,28 @@ $ athena clone [组件名字] --from [来源模块] --to [目标模块，若是�
 ```
 
 使用``ath clone -h`` 查看帮助。
+
+### athena map
+
+用于列出某些依赖关系。
+
+列出组件被页面引用的依赖关系
+
+```
+$ athena map [--module gb] --widget tab
+```
+
+若在项目目录下，则 `--module` 参数不可缺省，而在模块目录下则可缺省之，命令可简写为
+
+```
+$ ath map [-m gb] -w tab
+```
+
+示例：
+
+![示例](http://ww4.sinaimg.cn/large/49320207gw1f5cbrbnstcj20dw05rjs5.jpg)
+
+使用``ath map -h`` 查看帮助。
 
 ### athena clear
 
