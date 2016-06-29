@@ -12,6 +12,7 @@ var chalk = require('chalk');
 var gutil = require('gulp-util');
 var del = require('del');
 var _ = require('lodash');
+var Table = require('cli-table');
 
 var Util = require('../lib/util');
 var getGitStatus = require('../lib/util/git_status');
@@ -925,6 +926,112 @@ program
     console.log('    $ athena clone widgetName --from moduleName --to moduleName');
     console.log();
   });
+
+program
+  .command('map')
+  .description('列出引用关系')
+  .option('-m, --module [moduleName]', '模块选项')
+  .option('-w, --widget [widgetName]', '组件选项')
+  .action(function (option) {
+    var moduleName = option.module;
+    var widgetName = option.widget;
+    if (typeof(moduleName) !== 'string' && typeof(widgetName) !== 'string') {
+      console.log(chalk.red('  请输入参数！'));
+      console.log();
+      console.log(chalk.red('  通过命令 ath map -h 可查看帮助'));
+      console.log();
+    } else {
+      // 判断当前是否是项目路径或模块路径
+      var cwd = process.cwd();
+      var appConfPath = path.join(cwd, 'app-conf.js');
+      var moduleConfPath = path.join(cwd, 'module-conf.js');
+      var appConf = null;
+      var moduleConf = null;
+      var appPath = '';
+      if (Util.existsSync(appConfPath)) { // 项目根目录
+        if (typeof(moduleName) !== 'string') {
+          console.log(chalk.red('  在项目目录下，必须告知模块名！'));
+          return;
+        }
+        if (typeof(widgetName) !== 'string') {
+          console.log(chalk.red('  请告知组件名称！'));
+          return;
+        }
+        var isWidgetExist = Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName));
+        if (!isWidgetExist) {
+          console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
+          return;
+        }
+        appConf = require(appConfPath);
+        appPath = cwd;
+      } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
+        if (typeof(widgetName) !== 'string') {
+          console.log(chalk.red('  请告知组件名称！'));
+          return;
+        }
+        var isWidgetExist = Util.existsSync(path.join(cwd, 'widget', widgetName));
+        if (!isWidgetExist) {
+          console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
+          return;
+        }
+        appPath = path.resolve(cwd, '..');
+        appConf = require(path.join(appPath, 'app-conf.js'));
+        moduleConf = require(moduleConfPath);
+        moduleName = moduleConf.module;
+      } else {
+        console.log(chalk.red('  当前目录既不是项目目录也不是模块目录！'));
+        return;
+      }
+      var dependencyList = [];
+      if (moduleName === appConf.common) {
+        var moduleList = appConf.moduleList;
+        moduleList.forEach(function (item) {
+          var dependencyListArr = getModuleMapDenpencyByWidget(appPath, item, widgetName);
+          dependencyList = dependencyList.concat(dependencyListArr);
+        });
+      } else {
+        dependencyList = getModuleMapDenpencyByWidget(appPath, moduleName, widgetName);
+      }
+      if (dependencyList.length === 0) {
+        return;
+      }
+      // 画出依赖表格
+      var table = new Table({
+        head: ['module', 'page'],
+        colWidths: [20, 40],
+        style: { head: ['bgGreen'] }
+      });
+      dependencyList.forEach(function (item) {
+        table.push([item.module, item.page]);
+      });
+      console.log();
+      console.log(chalk.green(moduleName + '模块组件' + widgetName + '被以下页面所引用：'));
+      console.log(table.toString());
+      console.log();
+    }
+  });
+
+function getModuleMapDenpencyByWidget (appPath, moduleName, widgetName) {
+  var mapJsonPath = path.join(appPath, moduleName, 'dist', 'map.json');
+  var dependencyList = [];
+  if (Util.existsSync(mapJsonPath)) {
+    var mapJson = Util.readJsonFile(mapJsonPath);
+    var dependency = mapJson.dependency;
+    for (var key in dependency) {
+      dependency[key].forEach(function (di) {
+        if (di.widgetName === widgetName) {
+          dependencyList.push({
+            module: moduleName,
+            page: key
+          });
+        }
+      });
+    }
+  } else {
+    console.log(chalk.red('  项目' + moduleName + '还没被编译，无法列出依赖关系，请先编译！'));
+  }
+  return dependencyList;  
+}
 
 program
   .command('clear')
