@@ -753,6 +753,40 @@ $ athena clone [组件名字] --from [来源模块] --to [目标模块，若是�
 
 使用``ath clone -h`` 查看帮助。
 
+### athena widget-publish
+
+发布某一组件到公共组件库
+
+使用方式
+
+```
+$ athena widget-publish [组件名字]
+$ athena widget-publish --widget [组件名字]
+```
+简写
+
+```
+$ athena wp [组件名字]
+$ athena wp -w [组件名字]
+```
+
+### athena widget-load
+
+从组件库下载某一组件
+
+使用方式
+
+```
+$ athena widget-load [组件id] --alias [组件重命名]
+$ athena widget-load --id [组件id] --alias [组件重命名]
+```
+简写
+
+```
+$ athena wl [组件id] -a [组件重命名]
+$ athena wl -i [组件id] -a [组件重命名]
+```
+
 ### athena map
 
 用于列出某些依赖关系。

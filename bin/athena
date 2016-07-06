@@ -413,54 +413,169 @@ program
     console.log();
   });
 
+// Command: athena widget-publish [widgetName]
+program
+  .command('widget-publish [widgetName]')
+  .alias('wp')
+  .option('-w, --widget [widgetName]', '组件名称')
+  .description('发布组件到组件库')
+  .action(function (widgetName, option) {
+    widgetName = widgetName || option.widget;
+    var mdouleConfPath = path.join(process.cwd(), 'module-conf.js');
+    if (!Util.existsSync(mdouleConfPath)) {
+      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+      return;
+    }
+    var moduleConf = require(mdouleConfPath);
+    var widgetPath = path.join(process.cwd(), 'widget', widgetName);
+    var appConf = require(path.join(path.resolve(process.cwd(), '..'), 'app-conf.js'));
+    var archiver = require('archiver');
+    var archive = archiver.create('zip', {});
+    var output = fs.createWriteStream(path.join(process.cwd(), widgetName + '.zip'));
+    archive.on('error', function(err){
+      throw err;
+    });
+    archive.pipe(output);
+    archive.bulk([
+      {
+        expand: true,
+        cwd: widgetPath,
+        src: ['**/*']
+      }
+    ]).finalize();
+    output.on('close', function () {
+      var formData = {
+        appId: appConf.appId,
+        moduleId: moduleConf.moduleId,
+        platform: appConf.platform,
+        author: config.user_name,
+        widget: {
+          value: fs.createReadStream(path.join(process.cwd(), widgetName + '.zip')),
+          options: {
+            filename: widgetName + '.zip',
+            contentType: 'application/zip'
+          }
+        }
+      };
+      
+      var boundaryKey = Math.random().toString(16);
+      request.post({
+        url: setting.component_platform + '/api/push',
+        headers: {
+          'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
+        },
+        formData: formData
+      }, function(err, res, body) {
+        if (err) {
+          throw err;
+        }
+        if (res.statusCode === 200) {
+          var result = null;
+          try {
+            result = JSON.parse(body);
+          } catch (e) {
+            result = null;
+          }
+          console.log(chalk.green('  组件发布成功！'));
+          if (result.no === 0) {
+            var data = result.data;
+            console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
+          }
+        }
+      });
+    });
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena widget-publish tab');
+    console.log('    $ athena wp tab');
+    console.log();
+  });
+
+// Command: athena widget-load [widgetName]
+program
+  .command('widget-load [uuid]')
+  .alias('wl')
+  .option('-i, --id [uuid]', '组件id')
+  .option('-a, --alias [widgetAlias]', '组件重命名')
+  .description('加载一个远程的组件')
+  .action(function (uuid, option) {
+    uuid = uuid || option.id;
+    if (typeof uuid !== 'string') {
+      console.log(chalk.red('  参数有误，必须告知组件id！'));
+      return;
+    }
+    var alias = typeof option.alias === 'string' ? option.alias : null;
+    var remoteUrl = setting.component_platform + '/api/pull/' + uuid;
+    if (alias) {
+      remoteUrl += '/' + alias;
+    }
+    loadRemoteWidget(remoteUrl, uuid, option);
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena widget-load 749c39b0-4357-11e6-adbc-dfa2f92dcb1c --alias tab');
+    console.log('    $ athena wl 749c39b0-4357-11e6-adbc-dfa2f92dcb1c -a tab');
+    console.log();
+  });
 
 // Command: athena widget-remote [widgetName]
 program
   .command('widget-remote [widgetName]')
   .alias('wr')
-  .option('--name [widgetName]', '组件名称')
+  .option('-w, --widget [widgetName]', '组件名称')
   .description('加载一个远程的组件')
   .action(function(widgetName, option) {
-    widgetName = widgetName || option.widgetName;
-
-    var widget = new Widget({
-      widgetName: widgetName,
-      description: option.description,
-      sass: true,
-      less: 0,
-      cms: 0
-    });
-    var moduleConfPath = widget.destinationPath('module-conf.js');
-    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
-    if (!fs.existsSync(moduleConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-      return;
-    }
-    widget.loadRemote(function () {
-      var argv = [].slice.call(arguments);
-      var appConf = require(appConfPath);
-      var moduleConf = require(moduleConfPath);
-      if (appConf) {
-        report('widget', addReportPath, argv, function (params) {
-          params.moduleName = moduleConf.module;
-          params.moduleId = moduleConf.moduleId;
-          params.appName = appConf.app;
-          params.appId = appConf.appId;
-          params.widget = argv[0];
-        }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
-          }
-        });
-      }
-    });
+    widgetName = widgetName || option.widget;
+    var wname = widgetName.split('~');
+    var remoteUrl = setting.remote_widget_url + '?cate=' + wname[0] + '&filename=' + wname[1];
+    loadRemoteWidget(remoteUrl, widgetName, option);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
-    console.log('    $ athena widgetremote timeline~pf_160322_1');
+    console.log('    $ athena widget-remote timeline~pf_160322_1');
     console.log('    $ athena wr timeline~pf_160322_1');
     console.log();
   });
+
+function loadRemoteWidget (remoteUrl, widgetName, option) {
+  widgetName = widgetName || option.widget;
+  if (typeof option.alias === 'string') {
+    widgetName = option.alias;
+  }
+  var widget = new Widget({
+    widgetName: widgetName,
+    description: option.description,
+    sass: true,
+    less: 0,
+    cms: 0
+  });
+  var moduleConfPath = widget.destinationPath('module-conf.js');
+  var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
+  if (!fs.existsSync(moduleConfPath)) {
+    console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+    return;
+  }
+  widget.loadRemote(remoteUrl, function () {
+    var argv = [].slice.call(arguments);
+    var appConf = require(appConfPath);
+    var moduleConf = require(moduleConfPath);
+    if (appConf) {
+      report('widget', addReportPath, argv, function (params) {
+        params.moduleName = moduleConf.module;
+        params.moduleId = moduleConf.moduleId;
+        params.appName = appConf.app;
+        params.appId = appConf.appId;
+        params.widget = argv[0];
+      }, function (body) {
+        if (body && body.no === 0) {
+          console.log('success');
+        }
+      });
+    }
+  });
+}
+
 // Command: athena delete
 program
   .command('delete')
@@ -1009,6 +1124,12 @@ program
       console.log(table.toString());
       console.log();
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena map -m module -w tab');
+    console.log('    $ athena map -w tab');
+    console.log();
   });
 
 function getModuleMapDenpencyByWidget (appPath, moduleName, widgetName) {
