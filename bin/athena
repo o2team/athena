@@ -1236,6 +1236,20 @@ program
     console.log();
     console.log(chalk.green('  清除成功！'));
     console.log();
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena delete --publish preview');
+    console.log('    $ ath del -p preview');
+    console.log('    $ athena delete --template');
+    console.log('    $ ath del -t');
+    console.log('    $ athena delete --sass');
+    console.log('    $ ath del -s');
+    console.log('    $ athena delete --image');
+    console.log('    $ ath del -i');
+    console.log('    $ athena delete --image --module home');
+    console.log('    $ ath del -i -m home');
+    console.log();
   });
 
 program
@@ -1274,10 +1288,17 @@ program
       console.log();
       info ? console.log(info) : void(0);
     });
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena update');
+    console.log('    $ ath up');
+    console.log();
   });
 
 program
   .command('list-config')
+  .alias('lc')
   .description('列出配置项')
   .action(function () {
     var config = Util.getConfig();
@@ -1285,9 +1306,17 @@ program
     for (var i in config) {
       console.log('  ' + i + '=' + config[i]);
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena list-config');
+    console.log('    $ ath lc');
+    console.log();
   });
+
 program
   .command('list-setting')
+  .alias('ls')
   .description('列出设置项')
   .action(function () {
     var setting = Util.getSetting();
@@ -1295,6 +1324,12 @@ program
     for (var i in setting) {
       console.log('  ' + i + '=' + setting[i]);
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena list-setting');
+    console.log('    $ ath ls');
+    console.log();
   });
 
 program

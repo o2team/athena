@@ -890,6 +890,11 @@ $ ath up
 ```
 $ athena list-config
 ```
+简写
+
+```
+$ ath lc
+```
 
 将会得到如下输出
 
@@ -905,6 +910,12 @@ work_space=/Users/luckyadam/project/temp
 
 ```
 $ athena list-setting
+```
+
+简写
+
+```
+$ ath ls
 ```
 
 将会得到如下输出
