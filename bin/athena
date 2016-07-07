@@ -428,10 +428,15 @@ program
     }
     var moduleConf = require(mdouleConfPath);
     var widgetPath = path.join(process.cwd(), 'widget', widgetName);
+    if (!Util.existsSync(widgetPath)) {
+      console.log(chalk.red('  出错了，当前模块没有组件' + widgetName + '！'));
+      return;
+    }
     var appConf = require(path.join(path.resolve(process.cwd(), '..'), 'app-conf.js'));
     var archiver = require('archiver');
     var archive = archiver.create('zip', {});
-    var output = fs.createWriteStream(path.join(process.cwd(), widgetName + '.zip'));
+    var tmpZipPath = path.join(process.cwd(), widgetName + '.zip');
+    var output = fs.createWriteStream(tmpZipPath);
     archive.on('error', function(err){
       throw err;
     });
@@ -450,7 +455,7 @@ program
         platform: appConf.platform,
         author: config.user_name,
         widget: {
-          value: fs.createReadStream(path.join(process.cwd(), widgetName + '.zip')),
+          value: fs.createReadStream(tmpZipPath),
           options: {
             filename: widgetName + '.zip',
             contentType: 'application/zip'
@@ -477,10 +482,13 @@ program
             result = null;
           }
           console.log(chalk.green('  组件发布成功！'));
-          if (result.no === 0) {
+          del.sync(tmpZipPath, {force: true});
+          if (result && result.no === 0) {
             var data = result.data;
             console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
           }
+        } else {
+          console.log(chalk.red('  组件发布失败，请重试！'));
         }
       });
     });
