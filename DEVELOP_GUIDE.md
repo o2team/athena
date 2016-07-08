@@ -608,8 +608,11 @@ module.exports = {
       enable: false
     },
     csssprite: { //css雪碧图合并配置
-      enable: true,
-      retina: false  //是否支持retina
+      enable: true, // 是否开启
+      retina: true,  //是否支持retina
+      rootValue: 40, // px转rem
+      padding: 10, // 图与图之间的距离
+      spriteFolder: 'sprites' // 雪碧图放置目录
     }
   }
 };

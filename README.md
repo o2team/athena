@@ -560,8 +560,11 @@ module.exports = {
       enable: false
     },
     csssprite: { //css雪碧图合并配置
-      enable: true,
-      retina: false  //是否支持retina
+      enable: true, // 是否开启
+      retina: true,  //是否支持retina
+      rootValue: 40, // px转rem
+      padding: 10, // 图与图之间的距离
+      spriteFolder: 'sprites' // 雪碧图放置目录
     }
   }
 };
@@ -766,8 +769,8 @@ $ athena widget-publish --widget [组件名字]
 简写
 
 ```
-$ athena wp [组件名字]
-$ athena wp -w [组件名字]
+$ ath wp [组件名字]
+$ ath wp -w [组件名字]
 ```
 
 ### athena widget-load
@@ -783,8 +786,8 @@ $ athena widget-load --id [组件id] --alias [组件重命名]
 简写
 
 ```
-$ athena wl [组件id] -a [组件重命名]
-$ athena wl -i [组件id] -a [组件重命名]
+$ ath wl [组件id] -a [组件重命名]
+$ ath wl -i [组件id] -a [组件重命名]
 ```
 
 ### athena map
@@ -825,7 +828,7 @@ $ athena clear
 ```
 $ athena clear --template
 // 简写
-$ athena clear -t
+$ ath clear -t
 ```
 
 清除发布时的缓存文件，请在项目或模块目录下执行，否则将清除所有的发布缓存文件！
@@ -834,11 +837,11 @@ $ athena clear -t
 // 若要删除当前项目的发布缓存
 $ athena clear --publish
 // 简写
-$ athena clear -p
+$ ath clear -p
 // 若要删除当前项目某一模块的发布缓存
 $ athena clear --module xxx --publish
 // 简写
-$ athena clear -m xxx -p
+$ ath clear -m xxx -p
 ```
 
 清除sass编译的缓存文件，请在项目或模块目录下执行，否则将清除所有的sass缓存文件！
@@ -848,11 +851,11 @@ $ athena clear -m xxx -p
 // 若要删除当前项目的sass编译缓存
 $ athena clear --sass
 // 简写
-$ athena clear -s
+$ ath clear -s
 // 若要删除当前项目某一模块的sass编译缓存
 $ athena clear --module xxx --sass
 // 简写
-$ athena clear -m xxx -s
+$ ath clear -m xxx -s
 ```
 
 清除图片压缩的缓存文件，请在项目或模块目录下执行，否则将清除所有的图片缓存文件！
@@ -862,11 +865,11 @@ $ athena clear -m xxx -s
 // 若要删除当前项目的图片压缩缓存
 $ athena clear --image
 // 简写
-$ athena clear -i
+$ ath clear -i
 // 若要删除当前项目某一模块的图片压缩缓存
 $ athena clear --module xxx --image
 // 简写
-$ athena clear -m xxx -i
+$ ath clear -m xxx -i
 ```
 
 ### athena update
@@ -1086,19 +1089,21 @@ support : {
 
 ### CSS雪碧图合并
 
-将`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
+将所有文件中`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
 
 ```javascript
 support : {  
     csssprite: {
-      enable: true,
-      retina: true  //是否支持retina
-      rootvalue: 40
+      enable: true, // 是否开启
+      retina: true,  //是否支持retina
+      rootValue: 40, // px转rem
+      padding: 10, // 图与图之间的距离
+      spriteFolder: 'sprites' // 雪碧图放置目录
     }
   }
 ```
 
-> 上面的属性`rootvalue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootvalue`的值。
+> 上面的属性`rootValue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootValue`的值。
 > 同时，若开启了`retina`属性，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
 
 以上面的配置为例，下面为转换过程，更多[参考](https://github.com/o2team/postcss-athena-spritesmith)
@@ -1135,6 +1140,48 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 .arrow { background-image:url(../images/sprite.@2x.png); background-position:0 0; background-size:2.75rem 3.25rem;width:1rem;height:1.25rem;}
 
 .logo { background-image:url(../images/sprite.@2x.png); background-position:-1.35rem 0; background-size:2.75rem 3.25rem;}
+```
+
+同时，提供了自定义生成多张雪碧图的功能，例如引用图片A/B/C/D，想要让A/B生成雪碧图`sprite_1`，C/D生成雪碧图`sprite_2`，则可以通过分别携带后缀`?__sprite=sprite_1`和`?__sprite=sprite_2`来生成两张雪碧图。
+
+#### source.css
+
+```css
+
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1');
+}
+
+.b {
+  background-image: url('images/B.png?__sprite=sprite_1');
+}
+.c {
+  background-image: url('images/C.png?__sprite=sprite_2');
+}
+
+.d {
+  background-image: url('images/D.png?__sprite=sprite_2');
+}
+```
+
+#### output.css
+
+```css
+
+.a {
+  background-image: url('images/sprite.sprite_1.png');
+}
+
+.b {
+  background-image: url('images/sprite.sprite_1.png');
+}
+.c {
+  background-image: url('images/sprite.sprite_2.png');
+}
+
+.d {
+  background-image: url('images/sprite.sprite_2.png');
+}
 ```
 
 ## CONTRIBUTORS
