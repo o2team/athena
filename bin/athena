@@ -201,6 +201,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--template [templateName]', '设置模板')
+  .option('--debug', '打印调试信息')
   .action(function(appName, option) {
     var app = new App({
       appName: appName || option.name,
@@ -221,8 +222,8 @@ program
         params.commonModuleId = commonModuleConf.moduleId;
         params.commonModuleName = commonModuleConf.module;
       }, function (body) {
-        if (body && body.no === 0) {
-          console.log('success');
+        if (option.debug) {
+          console.log(body);
         }
       });
     });
@@ -244,6 +245,7 @@ program
   .option('--description [moduleDescription]', '模块描述')
   .option('--sass', '启用sass')
   .option('--less', '启用less')
+  .option('--debug', '打印调试信息')
   .action(function(moduleName, option) {
     if (moduleName) {
       // 支持一次性创建多个模块
@@ -302,8 +304,8 @@ function createModule (moduleName, option) {
           params.appName = appConf.app;
           params.appId = appConf.appId;
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
           resolve();
         });
@@ -322,6 +324,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--remote [remoteName]', '选择域')
+  .option('--debug', '打印调试信息')
   .action(function(pageName, option) {
     var page = new Page({
       pageName: pageName || option.name,
@@ -349,8 +352,8 @@ program
           params.appId = appConf.appId;
           params.page = argv[0];
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
         });
       }
@@ -372,6 +375,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--cms', '指定这是供CMS使用的楼层组件')
+  .option('--debug', '打印调试信息')
   .description('创建新的组件')
   .action(function(widgetName, option) {
     var widget = new Widget({
@@ -399,8 +403,8 @@ program
           params.appId = appConf.appId;
           params.widget = argv[0];
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
         });
       }
@@ -532,6 +536,7 @@ program
   .command('widget-remote [widgetName]')
   .alias('wr')
   .option('-w, --widget [widgetName]', '组件名称')
+  .option('--debug', '打印调试信息')
   .description('加载一个远程的组件')
   .action(function(widgetName, option) {
     widgetName = widgetName || option.widget;
@@ -576,8 +581,8 @@ function loadRemoteWidget (remoteUrl, widgetName, option) {
         params.appId = appConf.appId;
         params.widget = argv[0];
       }, function (body) {
-        if (body && body.no === 0) {
-          console.log('success');
+        if (option.debug) {
+          console.log(body);
         }
       });
     }
