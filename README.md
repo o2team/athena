@@ -125,8 +125,6 @@ $ gem install compass
 
 在创建项目时，每个项目都会默认拥有一个公共模块 **gb** 。
 
-这个公共模块主要放置一些公共的组件、样式或js。在 **gb** 中的 **page** 目录下默认带了一个叫 **gb** 的页面，这主要是为了上线方便而设置的，在编译阶段需要把 **gb** 的静态资源合并到自己的css/js文件中。页面的 **gb.css** 放置是整个项目的公共样式，**gb.html** 用来加载本模块的组件，若没有在 **gb.html** 中将组件加载一次，会发现使用时css和js都没有加载进来，加载组件的方式见后文。
-
 普通模块只允许调用公共模块 **gb** 的公共的组件、css或js，而不允许调用其他普通模块的资源。
 
 ## 快速开始
@@ -560,8 +558,11 @@ module.exports = {
       enable: false
     },
     csssprite: { //css雪碧图合并配置
-      enable: true,
-      retina: false  //是否支持retina
+      enable: true, // 是否开启
+      retina: true,  //是否支持retina
+      rootValue: 40, // px转rem
+      padding: 10, // 图与图之间的距离
+      spriteFolder: 'sprites' // 雪碧图放置目录
     }
   }
 };
@@ -753,6 +754,40 @@ $ athena clone [组件名字] --from [来源模块] --to [目标模块，若是�
 
 使用``ath clone -h`` 查看帮助。
 
+### athena widget-publish
+
+发布某一组件到公共组件库
+
+使用方式
+
+```
+$ athena widget-publish [组件名字]
+$ athena widget-publish --widget [组件名字]
+```
+简写
+
+```
+$ ath wp [组件名字]
+$ ath wp -w [组件名字]
+```
+
+### athena widget-load
+
+从组件库下载某一组件
+
+使用方式
+
+```
+$ athena widget-load [组件id] --alias [组件重命名]
+$ athena widget-load --id [组件id] --alias [组件重命名]
+```
+简写
+
+```
+$ ath wl [组件id] -a [组件重命名]
+$ ath wl -i [组件id] -a [组件重命名]
+```
+
 ### athena map
 
 用于列出某些依赖关系。
@@ -791,7 +826,7 @@ $ athena clear
 ```
 $ athena clear --template
 // 简写
-$ athena clear -t
+$ ath clear -t
 ```
 
 清除发布时的缓存文件，请在项目或模块目录下执行，否则将清除所有的发布缓存文件！
@@ -800,11 +835,11 @@ $ athena clear -t
 // 若要删除当前项目的发布缓存
 $ athena clear --publish
 // 简写
-$ athena clear -p
+$ ath clear -p
 // 若要删除当前项目某一模块的发布缓存
 $ athena clear --module xxx --publish
 // 简写
-$ athena clear -m xxx -p
+$ ath clear -m xxx -p
 ```
 
 清除sass编译的缓存文件，请在项目或模块目录下执行，否则将清除所有的sass缓存文件！
@@ -814,11 +849,11 @@ $ athena clear -m xxx -p
 // 若要删除当前项目的sass编译缓存
 $ athena clear --sass
 // 简写
-$ athena clear -s
+$ ath clear -s
 // 若要删除当前项目某一模块的sass编译缓存
 $ athena clear --module xxx --sass
 // 简写
-$ athena clear -m xxx -s
+$ ath clear -m xxx -s
 ```
 
 清除图片压缩的缓存文件，请在项目或模块目录下执行，否则将清除所有的图片缓存文件！
@@ -828,11 +863,11 @@ $ athena clear -m xxx -s
 // 若要删除当前项目的图片压缩缓存
 $ athena clear --image
 // 简写
-$ athena clear -i
+$ ath clear -i
 // 若要删除当前项目某一模块的图片压缩缓存
 $ athena clear --module xxx --image
 // 简写
-$ athena clear -m xxx -i
+$ ath clear -m xxx -i
 ```
 
 ### athena update
@@ -856,6 +891,11 @@ $ ath up
 ```
 $ athena list-config
 ```
+简写
+
+```
+$ ath lc
+```
 
 将会得到如下输出
 
@@ -871,6 +911,12 @@ work_space=/Users/luckyadam/project/temp
 
 ```
 $ athena list-setting
+```
+
+简写
+
+```
+$ ath ls
 ```
 
 将会得到如下输出
@@ -1041,19 +1087,21 @@ support : {
 
 ### CSS雪碧图合并
 
-将`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
+将所有文件中`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
 
 ```javascript
 support : {  
     csssprite: {
-      enable: true,
-      retina: true  //是否支持retina
-      rootvalue: 40
+      enable: true, // 是否开启
+      retina: true,  //是否支持retina
+      rootValue: 40, // px转rem
+      padding: 10, // 图与图之间的距离
+      spriteFolder: 'sprites' // 雪碧图放置目录
     }
   }
 ```
 
-> 上面的属性`rootvalue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootvalue`的值。
+> 上面的属性`rootValue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootValue`的值。
 > 同时，若开启了`retina`属性，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
 
 以上面的配置为例，下面为转换过程，更多[参考](https://github.com/o2team/postcss-athena-spritesmith)
@@ -1090,6 +1138,48 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 .arrow { background-image:url(../images/sprite.@2x.png); background-position:0 0; background-size:2.75rem 3.25rem;width:1rem;height:1.25rem;}
 
 .logo { background-image:url(../images/sprite.@2x.png); background-position:-1.35rem 0; background-size:2.75rem 3.25rem;}
+```
+
+同时，提供了自定义生成多张雪碧图的功能，例如引用图片A/B/C/D，想要让A/B生成雪碧图`sprite_1`，C/D生成雪碧图`sprite_2`，则可以通过分别携带后缀`?__sprite=sprite_1`和`?__sprite=sprite_2`来生成两张雪碧图。
+
+#### source.css
+
+```css
+
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1');
+}
+
+.b {
+  background-image: url('images/B.png?__sprite=sprite_1');
+}
+.c {
+  background-image: url('images/C.png?__sprite=sprite_2');
+}
+
+.d {
+  background-image: url('images/D.png?__sprite=sprite_2');
+}
+```
+
+#### output.css
+
+```css
+
+.a {
+  background-image: url('images/sprite.sprite_1.png');
+}
+
+.b {
+  background-image: url('images/sprite.sprite_1.png');
+}
+.c {
+  background-image: url('images/sprite.sprite_2.png');
+}
+
+.d {
+  background-image: url('images/sprite.sprite_2.png');
+}
 ```
 
 ## CONTRIBUTORS

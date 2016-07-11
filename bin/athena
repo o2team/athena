@@ -201,6 +201,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--template [templateName]', '设置模板')
+  .option('--debug', '打印调试信息')
   .action(function(appName, option) {
     var app = new App({
       appName: appName || option.name,
@@ -221,8 +222,8 @@ program
         params.commonModuleId = commonModuleConf.moduleId;
         params.commonModuleName = commonModuleConf.module;
       }, function (body) {
-        if (body && body.no === 0) {
-          console.log('success');
+        if (option.debug) {
+          console.log(body);
         }
       });
     });
@@ -244,6 +245,7 @@ program
   .option('--description [moduleDescription]', '模块描述')
   .option('--sass', '启用sass')
   .option('--less', '启用less')
+  .option('--debug', '打印调试信息')
   .action(function(moduleName, option) {
     if (moduleName) {
       // 支持一次性创建多个模块
@@ -302,8 +304,8 @@ function createModule (moduleName, option) {
           params.appName = appConf.app;
           params.appId = appConf.appId;
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
           resolve();
         });
@@ -322,6 +324,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--remote [remoteName]', '选择域')
+  .option('--debug', '打印调试信息')
   .action(function(pageName, option) {
     var page = new Page({
       pageName: pageName || option.name,
@@ -349,8 +352,8 @@ program
           params.appId = appConf.appId;
           params.page = argv[0];
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
         });
       }
@@ -372,6 +375,7 @@ program
   .option('--sass', '启用sass')
   .option('--less', '启用less')
   .option('--cms', '指定这是供CMS使用的楼层组件')
+  .option('--debug', '打印调试信息')
   .description('创建新的组件')
   .action(function(widgetName, option) {
     var widget = new Widget({
@@ -399,8 +403,8 @@ program
           params.appId = appConf.appId;
           params.widget = argv[0];
         }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
+          if (option.debug) {
+            console.log(body);
           }
         });
       }
@@ -413,54 +417,178 @@ program
     console.log();
   });
 
+// Command: athena widget-publish [widgetName]
+program
+  .command('widget-publish [widgetName]')
+  .alias('wp')
+  .option('-w, --widget [widgetName]', '组件名称')
+  .description('发布组件到组件库')
+  .action(function (widgetName, option) {
+    widgetName = widgetName || option.widget;
+    var mdouleConfPath = path.join(process.cwd(), 'module-conf.js');
+    if (!Util.existsSync(mdouleConfPath)) {
+      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+      return;
+    }
+    var moduleConf = require(mdouleConfPath);
+    var widgetPath = path.join(process.cwd(), 'widget', widgetName);
+    if (!Util.existsSync(widgetPath)) {
+      console.log(chalk.red('  出错了，当前模块没有组件' + widgetName + '！'));
+      return;
+    }
+    var appConf = require(path.join(path.resolve(process.cwd(), '..'), 'app-conf.js'));
+    var archiver = require('archiver');
+    var archive = archiver.create('zip', {});
+    var tmpZipPath = path.join(process.cwd(), widgetName + '.zip');
+    var output = fs.createWriteStream(tmpZipPath);
+    archive.on('error', function(err){
+      throw err;
+    });
+    archive.pipe(output);
+    archive.bulk([
+      {
+        expand: true,
+        cwd: widgetPath,
+        src: ['**/*']
+      }
+    ]).finalize();
+    output.on('close', function () {
+      var formData = {
+        appId: appConf.appId,
+        moduleId: moduleConf.moduleId,
+        platform: appConf.platform,
+        author: config.user_name,
+        widget: {
+          value: fs.createReadStream(tmpZipPath),
+          options: {
+            filename: widgetName + '.zip',
+            contentType: 'application/zip'
+          }
+        }
+      };
+      
+      var boundaryKey = Math.random().toString(16);
+      request.post({
+        url: setting.component_platform + '/api/push',
+        headers: {
+          'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
+        },
+        formData: formData
+      }, function(err, res, body) {
+        if (err) {
+          throw err;
+        }
+        if (res.statusCode === 200) {
+          var result = null;
+          try {
+            result = JSON.parse(body);
+          } catch (e) {
+            result = null;
+          }
+          console.log(chalk.green('  组件发布成功！'));
+          del.sync(tmpZipPath, {force: true});
+          if (result && result.no === 0) {
+            var data = result.data;
+            console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
+          }
+        } else {
+          console.log(chalk.red('  组件发布失败，请重试！'));
+        }
+      });
+    });
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena widget-publish tab');
+    console.log('    $ athena wp tab');
+    console.log();
+  });
+
+// Command: athena widget-load [widgetName]
+program
+  .command('widget-load [uuid]')
+  .alias('wl')
+  .option('-i, --id [uuid]', '组件id')
+  .option('-a, --alias [widgetAlias]', '组件重命名')
+  .description('加载一个远程的组件')
+  .action(function (uuid, option) {
+    uuid = uuid || option.id;
+    if (typeof uuid !== 'string') {
+      console.log(chalk.red('  参数有误，必须告知组件id！'));
+      return;
+    }
+    var alias = typeof option.alias === 'string' ? option.alias : null;
+    var remoteUrl = setting.component_platform + '/api/pull/' + uuid;
+    if (alias) {
+      remoteUrl += '/' + alias;
+    }
+    loadRemoteWidget(remoteUrl, uuid, option);
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena widget-load 749c39b0-4357-11e6-adbc-dfa2f92dcb1c --alias tab');
+    console.log('    $ athena wl 749c39b0-4357-11e6-adbc-dfa2f92dcb1c -a tab');
+    console.log();
+  });
 
 // Command: athena widget-remote [widgetName]
 program
   .command('widget-remote [widgetName]')
   .alias('wr')
-  .option('--name [widgetName]', '组件名称')
+  .option('-w, --widget [widgetName]', '组件名称')
+  .option('--debug', '打印调试信息')
   .description('加载一个远程的组件')
   .action(function(widgetName, option) {
-    widgetName = widgetName || option.widgetName;
-
-    var widget = new Widget({
-      widgetName: widgetName,
-      description: option.description,
-      sass: true,
-      less: 0,
-      cms: 0
-    });
-    var moduleConfPath = widget.destinationPath('module-conf.js');
-    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
-    if (!fs.existsSync(moduleConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-      return;
-    }
-    widget.loadRemote(function () {
-      var argv = [].slice.call(arguments);
-      var appConf = require(appConfPath);
-      var moduleConf = require(moduleConfPath);
-      if (appConf) {
-        report('widget', addReportPath, argv, function (params) {
-          params.moduleName = moduleConf.module;
-          params.moduleId = moduleConf.moduleId;
-          params.appName = appConf.app;
-          params.appId = appConf.appId;
-          params.widget = argv[0];
-        }, function (body) {
-          if (body && body.no === 0) {
-            console.log('success');
-          }
-        });
-      }
-    });
+    widgetName = widgetName || option.widget;
+    var wname = widgetName.split('~');
+    var remoteUrl = setting.remote_widget_url + '?cate=' + wname[0] + '&filename=' + wname[1];
+    loadRemoteWidget(remoteUrl, widgetName, option);
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
-    console.log('    $ athena widgetremote timeline~pf_160322_1');
+    console.log('    $ athena widget-remote timeline~pf_160322_1');
     console.log('    $ athena wr timeline~pf_160322_1');
     console.log();
   });
+
+function loadRemoteWidget (remoteUrl, widgetName, option) {
+  widgetName = widgetName || option.widget;
+  if (typeof option.alias === 'string') {
+    widgetName = option.alias;
+  }
+  var widget = new Widget({
+    widgetName: widgetName,
+    description: option.description,
+    sass: true,
+    less: 0,
+    cms: 0
+  });
+  var moduleConfPath = widget.destinationPath('module-conf.js');
+  var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
+  if (!fs.existsSync(moduleConfPath)) {
+    console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+    return;
+  }
+  widget.loadRemote(remoteUrl, function () {
+    var argv = [].slice.call(arguments);
+    var appConf = require(appConfPath);
+    var moduleConf = require(moduleConfPath);
+    if (appConf) {
+      report('widget', addReportPath, argv, function (params) {
+        params.moduleName = moduleConf.module;
+        params.moduleId = moduleConf.moduleId;
+        params.appName = appConf.app;
+        params.appId = appConf.appId;
+        params.widget = argv[0];
+      }, function (body) {
+        if (option.debug) {
+          console.log(body);
+        }
+      });
+    }
+  });
+}
+
 // Command: athena delete
 program
   .command('delete')
@@ -1009,6 +1137,12 @@ program
       console.log(table.toString());
       console.log();
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena map -m module -w tab');
+    console.log('    $ athena map -w tab');
+    console.log();
   });
 
 function getModuleMapDenpencyByWidget (appPath, moduleName, widgetName) {
@@ -1115,6 +1249,20 @@ program
     console.log();
     console.log(chalk.green('  清除成功！'));
     console.log();
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena delete --publish preview');
+    console.log('    $ ath del -p preview');
+    console.log('    $ athena delete --template');
+    console.log('    $ ath del -t');
+    console.log('    $ athena delete --sass');
+    console.log('    $ ath del -s');
+    console.log('    $ athena delete --image');
+    console.log('    $ ath del -i');
+    console.log('    $ athena delete --image --module home');
+    console.log('    $ ath del -i -m home');
+    console.log();
   });
 
 program
@@ -1153,10 +1301,17 @@ program
       console.log();
       info ? console.log(info) : void(0);
     });
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena update');
+    console.log('    $ ath up');
+    console.log();
   });
 
 program
   .command('list-config')
+  .alias('lc')
   .description('列出配置项')
   .action(function () {
     var config = Util.getConfig();
@@ -1164,9 +1319,17 @@ program
     for (var i in config) {
       console.log('  ' + i + '=' + config[i]);
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena list-config');
+    console.log('    $ ath lc');
+    console.log();
   });
+
 program
   .command('list-setting')
+  .alias('ls')
   .description('列出设置项')
   .action(function () {
     var setting = Util.getSetting();
@@ -1174,6 +1337,12 @@ program
     for (var i in setting) {
       console.log('  ' + i + '=' + setting[i]);
     }
+  }).on('--help', function() {
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ athena list-setting');
+    console.log('    $ ath ls');
+    console.log();
   });
 
 program
