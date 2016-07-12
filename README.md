@@ -1039,6 +1039,25 @@ __inline('demo.css', 'module')
 <%= inline('http://static.360buyimg.com/mtd/pc/cms/js/o2_ua.min.js') %>
 ```
 
+### 图片转base64
+
+提供了两种方式来进行使用
+
+第一种，在URL后面加上 `?__inline` 标识，这样会直接转base64；
+
+第二种，通过在 `module-conf.js` 中增加配置，定义规则，来进行统一转换处理
+
+```
+// module-conf.js
+support : {  
+  base64: {
+    enable: false, // 表示是否开启统一转换
+    exclude: [], // 排除图片
+    size: 5000 // 小于5000b的图片就会转
+  }
+}
+```
+
 ### 图片压缩
 
 目前主要针对png图片进行压缩，使用 [pngquant](https://pngquant.org/) 内核。我们可以选择**排除**掉不需要压缩的图片，配置`module-conf.js`里面的 `support` 中的 `imagemin` 属性如下即可：
