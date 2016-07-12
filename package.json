@@ -65,6 +65,7 @@
     "request": "^2.61.0",
     "require-dir": "^0.3.0",
     "ssh2": "^0.4.11",
+    "sync-request": "^3.0.1",
     "ternary-stream": "^2.0.0",
     "through2": "^2.0.0",
     "uglify-js": "^2.6.1",

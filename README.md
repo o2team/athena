@@ -978,6 +978,67 @@ JavaScript代码检查。
 
 注：之前工具自动生成项目没有自动生成 `static/sass` 目录，如需使用sass库，请自动创建该目录。
 
+### 资源定位
+
+资源定位是为了可以自动化将资源引用链接替换成配置好的目标地址。
+
+在 `HTML` 模板中定位使用API
+
+```
+<%= uri('demo.css') %>
+```
+
+在 `js` 中定位使用API
+
+```
+__uri('demo.css')
+```
+
+### 文件内联
+
+工具提供了将文件内容直接打印到页面中的功能，例如可以将一个 `CSS` 文件以内联的方式在 `HTML` 中引用。使用方式如下
+
+在 `HTML` 模板中内联样式或脚本文件
+
+```
+// 第一个参数是文件名，第二个参数是模块名，如果是当前模块，可省略
+<%= inline('demo.css', 'module') %>
+```
+API的第一个参数文件名是需要在模块 `static-conf.js` 文件中进行配置的，配置方式见上述文档中关于 `static-conf.js` 的使用说明。
+
+而且需要注意的是，如果需要直接内嵌组件或页面的资源，即使只引用了一个组件的资源，也需要在 `static-conf.js` 中配置，而且如果配置中包含了组件或页面的资源，则最后打包的时候 `<%= getCSS() %>`、`<%= getJS() %>` 输出的资源中将不会再包含这个组件或页面的资源，，以避免重复，例如
+
+```
+// demo.css
+
+module.exports = {
+  staticPath: {
+    't.js': [
+      'static/js/t1.js',
+      'static/js/t2.js'
+    ],
+    'demo.css': [
+      'widget/heheda/heheda.css',
+      'widget/topbar/topbar.css'
+    ]
+  }
+};
+```
+`__inline('demo.css')` 将直接输出组件 `heheda`、`topbar` 的合并样式，并且 `<%= getCSS() %>` 输出的样式表中将不会包含这两个组件样式。
+
+在 `js` 中内联资源使用API
+
+```
+// 第一个参数是文件名，第二个参数是模块名，如果是当前模块，可省略
+__inline('demo.css', 'module')
+```
+
+同时，`inline` API是支持内联网络资源的，例如想要在模板中内联引入一段脚本，可以直接这样写
+
+```
+<%= inline('http://static.360buyimg.com/mtd/pc/cms/js/o2_ua.min.js') %>
+```
+
 ### 图片压缩
 
 目前主要针对png图片进行压缩，使用 [pngquant](https://pngquant.org/) 内核。我们可以选择**排除**掉不需要压缩的图片，配置`module-conf.js`里面的 `support` 中的 `imagemin` 属性如下即可：
