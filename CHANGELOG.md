@@ -1,5 +1,14 @@
 # ChangeLog
 
+## 1.1.0
+
+* update:发布、下载远程组件
+* update:删除组件发布时的临时文件，同时增加容错
+* update:sprite功能完善，可根据参数生成多张雪碧图
+* update:增加模板抽离去空格配置
+* update:文件内联功能完善
+* update:自定义图片转base64功能
+
 ## 1.0.10
 
 * update:新增 `ath map` 命令，列出组件依赖关系
