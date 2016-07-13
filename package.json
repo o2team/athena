@@ -68,7 +68,7 @@
     "sync-request": "^3.0.1",
     "ternary-stream": "^2.0.0",
     "through2": "^2.0.0",
-    "uglify-js": "^2.6.1",
+    "uglify-js": "^2.7.0",
     "uglify-save-license": "^0.4.1",
     "unzip": "^0.1.11",
     "uuid": "^2.0.1",
