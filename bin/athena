@@ -857,6 +857,7 @@ program
   .option('--compress', '打包功能，输出静态稿，引用压缩后的静态资源')
   .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
   .option('--release', '发布功能')
+  .option('--allin', '压缩文件，server模式专用')
   .action(function (option) {
     var app = null;
     var mod = null;
