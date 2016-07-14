@@ -23,6 +23,7 @@ athena-html
 - [x] CSS prefix，px转rem
 - [x] JS合并压缩
 - [x] 自动生成雪碧图，自动多倍图
+- [x] 文件内联，自定义图片转base64
 - [x] 图片压缩
 - [x] 字体压缩
 - [x] 文件MD5戳
@@ -560,9 +561,14 @@ module.exports = {
     csssprite: { //css雪碧图合并配置
       enable: true, // 是否开启
       retina: true,  //是否支持retina
-      rootValue: 40, // px转rem
+      rootValue: 40, // px转rem，若不想转rem，此处应为0
       padding: 10, // 图与图之间的距离
-      spriteFolder: 'sprites' // 雪碧图放置目录
+      spriteFolder: 'sprites' // 雪碧图放置目录，若不想将雪碧图单独放置目录，此处为空或不传
+    },
+    base64: {
+      enable: false, // 表示是否开启统一转换
+      exclude: [], // 排除图片，例如 images/icon.png
+      size: 5000 // 小于5000b的图片就会转
     }
   }
 };
@@ -600,7 +606,7 @@ module.exports = {
 
 **map.json** 文件是通过执行编译任务后生成一个标识依赖关系的文件，文件中包含了当前模块所有页面所依赖的 **widget** 组件的信息，同时还有页面引用静态资源的信息，资源md5后资源名称的对应关系，它的文件结构如下
 
-```javascript
+```
 {
   "dependency": {
   	"find.html": [],
@@ -1247,18 +1253,18 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 ```css
 
 .a {
-  background-image: url('images/sprite.sprite_1.png');
+  background-image: url('images/sprite_sprite_1.png');
 }
 
 .b {
-  background-image: url('images/sprite.sprite_1.png');
+  background-image: url('images/sprite_sprite_1.png');
 }
 .c {
-  background-image: url('images/sprite.sprite_2.png');
+  background-image: url('images/sprite_sprite_2.png');
 }
 
 .d {
-  background-image: url('images/sprite.sprite_2.png');
+  background-image: url('images/sprite_sprite_2.png');
 }
 ```
 

@@ -610,9 +610,14 @@ module.exports = {
     csssprite: { //css雪碧图合并配置
       enable: true, // 是否开启
       retina: true,  //是否支持retina
-      rootValue: 40, // px转rem
+      rootValue: 40, // px转rem，若不想转rem，此处应为0
       padding: 10, // 图与图之间的距离
-      spriteFolder: 'sprites' // 雪碧图放置目录
+      spriteFolder: 'sprites' // 雪碧图放置目录，若不想将雪碧图单独放置目录，此处为空或不传
+    },
+    base64: {
+      enable: false, // 表示是否开启统一转换
+      exclude: [], // 排除图片，例如 images/icon.png
+      size: 5000 // 小于5000b的图片就会转
     }
   }
 };
