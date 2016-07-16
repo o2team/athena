@@ -390,13 +390,14 @@ module.exports = {
 
 使用方式 `<%= getCSS() %>`
 
-用来输出页面所需引用的**CSS Link**，可传入2个参数，第一个参数是`CSS` 样式表的名称，第二个参数是模块名。如果什么都不传则默认输出与当前页面同名的样式表。例如：
+用来输出页面所需引用的**CSS Link**，可传入3个参数，第一个参数是`CSS` 样式表的名称，第二个参数是模块名，第二个参数是是否加入页面片中（client模式）。如果什么都不传则默认输出与当前页面同名的样式表。例如：
 
 当前模块`hello`中有一页面为`mine.html`，在页面`<head>`标签中调用`<%= getCSS() %>`将输出
 
 ```
 <link rel="stylesheet" type="text/css" href="css/mine.css" combo-use="/hello/css/mine.min.css">
 ```
+若第三个参数为 `inline` ，则该样式文件会以内联的形式写入页面片中（client模式）。
 
 #### getJS
 
@@ -681,7 +682,9 @@ $ ath b -m [模块名]
 
 注意``--pack``和``--remote``不要同时使用
 
-携带参数``--release``将编译出可上线文件，目前是针对server合并文件模式
+携带参数``--release``将编译出可上线文件
+
+携带参数 ``--allin`` 在使用server模式编译时会同时产生出合并后的资源文件
 
 使用``ath b -h`` 查看帮助。
 
