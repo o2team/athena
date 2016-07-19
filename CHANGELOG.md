@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.1.5
+
+* fix:uglifyjs
+* update:增加读取测试数据文件容错
+* update:文件内联支持引用图片，将转为base64，同时支持模板中style属性中的地址替换
+
 ## 1.1.4
 
 * fix:server模式，不合并压缩后文件
