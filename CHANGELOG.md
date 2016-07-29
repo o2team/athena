@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.1.6
+
+* fix:当模块下没有css文件时编译出错，fix #26
+* update:js页面片
+* update:组件平台地址
+
 ## 1.1.5
 
 * fix:uglifyjs
