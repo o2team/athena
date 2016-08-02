@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.1.7
+
+* fix:页面片combo地址错误
+
 ## 1.1.6
 
 * fix:当模块下没有css文件时编译出错，fix #26
