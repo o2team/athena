@@ -406,9 +406,10 @@ module.exports = {
 当前模块`hello`中有一页面为`mine.html`，在页面`<body>`标签最后调用`<%= getJS() %>`将输出
 
 ```
-<script src="js/hello.js"></script>
+<script src="js/mine.js" combo-use="/hello/css/mine.min.js"></script>
 ```
 
+若第三个参数为 `inline` ，则该样式文件会以内联的形式写入页面片中（client模式）。
 
 **注意**
 
