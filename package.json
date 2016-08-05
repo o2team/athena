@@ -34,7 +34,7 @@
     "commander": "^2.9.0",
     "concat-with-sourcemaps": "^1.0.4",
     "csslint": "^0.10.0",
-    "csso": "^1.4.4",
+    "cssnano": "^3.7.3",
     "cssom": "^0.3.0",
     "del": "^2.0.2",
     "event-stream": "^3.3.1",
