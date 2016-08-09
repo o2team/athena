@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.1.8
+
+* update:使用cssnano来压缩css文件
+* update:client模式雪碧图支持跨模块
+
 ## 1.1.7
 
 * fix:页面片combo地址错误
