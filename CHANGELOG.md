@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.1.9
+
+* update:将css和js的压缩配置抽到module-conf中
+* update:publish时增加--showall选项展示所有上线引用资源
+
 ## 1.1.8
 
 * update:使用cssnano来压缩css文件
