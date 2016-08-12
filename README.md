@@ -1,10 +1,22 @@
 athena-html
 ===
-[![npm version](https://badge.fury.io/js/athena-html.svg)](http://badge.fury.io/js/athena-html)
+[![npm](https://img.shields.io/npm/v/athena-html.svg?maxAge=2592000&style=flat-square)](https://www.npmjs.com/package/athena-html)
+[![npm](https://img.shields.io/npm/dm/athena-html.svg?maxAge=2592000&style=flat-square)](https://npmjs.com/package/athena-html)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/o2team/athena/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/o2team/athena.svg?style=flat-square)](https://github.com/o2team/athena/stargazers)
 
 > O2Team构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
 >
 > 一次安装，到处运行
+
+```
+    ___  _   _
+   / _ \| | | |
+  / /_\ \ |_| |__   ___ _ __   __ _
+  |  _  | __| '_ \ / _ \ '_ \ / _` |
+  | | | | |_| | | |  __/ | | | (_| |
+  \_| |_/\__|_| |_|\___|_| |_|\__,_|
+```
 
 ## 功能一览
 
