@@ -1,5 +1,16 @@
 # ChangeLog
 
+## 1.1.11
+
+* update:组件上传选择业务和类别
+* fix:修复server模式合并文件时css压缩的问题
+* update:去掉inline获取远程文件时的缓存
+* update:inline加载网络资源时增加debug参数，用于在发布页面时将inline语句删去
+
+## 1.1.10
+
+* fix:文件压缩出错
+
 ## 1.1.9
 
 * update:将css和js的压缩配置抽到module-conf中
