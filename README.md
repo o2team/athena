@@ -1,10 +1,22 @@
 athena-html
 ===
-[![npm version](https://badge.fury.io/js/athena-html.svg)](http://badge.fury.io/js/athena-html)
+[![npm](https://img.shields.io/npm/v/athena-html.svg?maxAge=2592000&style=flat-square)](https://www.npmjs.com/package/athena-html)
+[![npm](https://img.shields.io/npm/dm/athena-html.svg?maxAge=2592000&style=flat-square)](https://npmjs.com/package/athena-html)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/o2team/athena/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/o2team/athena.svg?style=flat-square)](https://github.com/o2team/athena/stargazers)
 
 > O2Team构建项目流程工具，可以生成相应目录和代码，同时对项目进行编译
 >
 > 一次安装，到处运行
+
+```
+    ___  _   _
+   / _ \| | | |
+  / /_\ \ |_| |__   ___ _ __   __ _
+  |  _  | __| '_ \ / _ \ '_ \ / _` |
+  | | | | |_| | | |  __/ | | | (_| |
+  \_| |_/\__|_| |_|\___|_| |_|\__,_|
+```
 
 ## 功能一览
 
@@ -1016,7 +1028,7 @@ __uri('demo.css')
 ```
 API的第一个参数文件名是需要在模块 `static-conf.js` 文件中进行配置的，配置方式见上述文档中关于 `static-conf.js` 的使用说明。
 
-而且需要注意的是，如果需要直接内嵌组件或页面的资源，即使只引用了一个组件的资源，也需要在 `static-conf.js` 中配置，而且如果配置中包含了组件或页面的资源，则最后打包的时候 `<%= getCSS() %>`、`<%= getJS() %>` 输出的资源中将不会再包含这个组件或页面的资源，，以避免重复，例如
+而且需要注意的是，如果需要直接内嵌组件或页面的资源，即使只引用了一个组件的资源，也需要在 `static-conf.js` 中配置，而且如果配置中包含了组件或页面的资源，则最后打包的时候 `<%= getCSS() %>`、`<%= getJS() %>` 输出的资源中将不会再包含这个组件或页面的资源，以避免重复，例如
 
 ```
 // demo.css
@@ -1047,6 +1059,13 @@ __inline('demo.css', 'module')
 
 ```
 <%= inline('http://static.360buyimg.com/mtd/pc/cms/js/o2_ua.min.js') %>
+```
+
+若只想在预览时加载网络资源，发布时删去，则可以传入第二个参数 `debug` 来进行控制
+
+```
+// 以下写法，在页面发布时，会将这一句删掉，主要用于开发时调试之用
+<%= inline('http://static.360buyimg.com/mtd/pc/cms/js/o2_ua.min.js', 'debug') %>
 ```
 
 ### 图片转base64

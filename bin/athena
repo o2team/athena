@@ -441,60 +441,131 @@ program
     var archive = archiver.create('zip', {});
     var tmpZipPath = path.join(process.cwd(), widgetName + '.zip');
     var output = fs.createWriteStream(tmpZipPath);
-    archive.on('error', function(err){
-      throw err;
-    });
-    archive.pipe(output);
-    archive.bulk([
-      {
-        expand: true,
-        cwd: widgetPath,
-        src: ['**/*']
-      }
-    ]).finalize();
-    output.on('close', function () {
-      var formData = {
-        appId: appConf.appId,
-        moduleId: moduleConf.moduleId,
-        platform: appConf.platform,
-        author: config.user_name,
-        widget: {
-          value: fs.createReadStream(tmpZipPath),
-          options: {
-            filename: widgetName + '.zip',
-            contentType: 'application/zip'
-          }
-        }
-      };
-      
-      var boundaryKey = Math.random().toString(16);
-      request.post({
-        url: setting.component_platform + '/api/push',
-        headers: {
-          'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
-        },
-        formData: formData
-      }, function(err, res, body) {
-        if (err) {
-          throw err;
-        }
-        if (res.statusCode === 200) {
-          var result = null;
-          try {
-            result = JSON.parse(body);
-          } catch (e) {
-            result = null;
-          }
-          console.log(chalk.green('  组件发布成功！'));
-          del.sync(tmpZipPath, {force: true});
-          if (result && result.no === 0) {
-            var data = result.data;
-            console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
-          }
+
+    var prompts = [];
+    var tmpchoices = [];
+    // 请求业务清单
+    var requestBusinessPromise = new Promise(function(resolve, reject) {
+      request.get(setting.component_platform + '/api/business/list', function(err, res, body) {
+        if(!err && res.statusCode === 200) {
+          resolve( JSON.parse(body) );
         } else {
-          console.log(chalk.red('  组件发布失败，请重试！'));
+          reject(err);
         }
       });
+    });
+    // 请求类别清单
+    var requestClassifyPromise = new Promise(function(resolve, reject) {
+      request.get(setting.component_platform + '/api/classify/list', function(err, res, body) {
+        if(!err && res.statusCode === 200) {
+          resolve( JSON.parse(body) );
+        } else {
+          reject(err);
+        }
+      });
+    });
+    Promise.resolve().then(function() {
+      return requestBusinessPromise;
+    }).then(function( business ) {
+      if(business.length>0) {
+        business.forEach(function (o, i) {
+          tmpchoices.push({
+            name : o.name,
+            value: o.objectId
+          });
+        });
+        prompts.push({
+          type: 'list',
+          name: 'business',
+          message: '请选择所属业务',
+          choices: tmpchoices
+        });
+      }
+
+      return requestClassifyPromise;
+    }).then(function( classify ) {
+      if(classify.length>0) {
+        tmpchoices = [];
+        classify.forEach(function (o, i) {
+          tmpchoices.push({
+            name : o.name,
+            value: o.objectId
+          });
+        });
+        prompts.push({
+          type: 'list',
+          name: 'classify',
+          message: '请选择所属类别',
+          choices: tmpchoices
+        });
+      }
+
+      inquirer.prompt(prompts, function (answers) {
+        archive.on('error', function(err){
+          throw err;
+        });
+        archive.pipe(output);
+        archive.bulk([
+          {
+            expand: true,
+            cwd: widgetPath,
+            src: ['**/*']
+          }
+        ]).finalize();
+        output.on('close', function () {
+          var formData = {
+            appId: appConf.appId,
+            moduleId: moduleConf.moduleId,
+            platform: appConf.platform,
+            author: config.user_name,
+            widget: {
+              value: fs.createReadStream(tmpZipPath),
+              options: {
+                filename: widgetName + '.zip',
+                contentType: 'application/zip'
+              }
+            }
+          };
+          if(answers.business) { formData.business = answers.business; }
+          if(answers.classify) { formData.classify = answers.classify; }
+
+          
+          var boundaryKey = Math.random().toString(16);
+          request.post({
+            url: setting.component_platform + '/api/push',
+            headers: {
+              'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
+            },
+            formData: formData
+          }, function(err, res, body) {
+            if (err) {
+              throw err;
+            }
+            if (res.statusCode === 200) {
+              var result = null;
+              try {
+                result = JSON.parse(body);
+              } catch (e) {
+                result = null;
+              }
+              console.log(chalk.green('  组件发布成功！'));
+              del.sync(tmpZipPath, {force: true});
+              if (result && result.no === 0) {
+                var data = result.data;
+                console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
+              }
+            } else {
+              console.log(chalk.red('  组件发布失败，请重试！'));
+            }
+          });
+        });
+      });
+    }).catch(function(err) {
+      if(err) {
+        throw err;
+      } else {
+        console.log('  请求列表数据时出错')
+      }
     });
   }).on('--help', function() {
     console.log('  Examples:');

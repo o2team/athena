@@ -1,5 +1,23 @@
 # ChangeLog
 
+## 1.1.12
+
+* fix:watch时inline失效
+* fix:static目录下资源支持多级目录引用
+* update:编译时扫描代码检查页面引用组件是否在引用的公共模块页面中被引用，避免重复引用资源
+* update:雪碧图功能增加自定义宽高、位置计算单位（即是否px还是rem）
+
+## 1.1.11
+
+* update:组件上传选择业务和类别
+* fix:修复server模式合并文件时css压缩的问题
+* update:去掉inline获取远程文件时的缓存
+* update:inline加载网络资源时增加debug参数，用于在发布页面时将inline语句删去
+
+## 1.1.10
+
+* fix:文件压缩出错
+
 ## 1.1.9
 
 * update:将css和js的压缩配置抽到module-conf中
