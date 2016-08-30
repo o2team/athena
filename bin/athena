@@ -13,6 +13,7 @@ var gutil = require('gulp-util');
 var del = require('del');
 var _ = require('lodash');
 var Table = require('cli-table');
+var fse = require('fs-extra');
 
 var Util = require('../lib/util');
 var getGitStatus = require('../lib/util/git_status');
@@ -466,7 +467,7 @@ program
     });
     Promise.resolve().then(function() {
       return requestBusinessPromise;
-    }).then(function( business ) {
+    }).then(function(business) {
       if(business.length>0) {
         business.forEach(function (o, i) {
           tmpchoices.push({
@@ -483,7 +484,7 @@ program
       }
 
       return requestClassifyPromise;
-    }).then(function( classify ) {
+    }).then(function(classify) {
       if(classify.length>0) {
         tmpchoices = [];
         classify.forEach(function (o, i) {
@@ -501,6 +502,65 @@ program
       }
 
       inquirer.prompt(prompts, function (answers) {
+        
+        var scssFilePath = path.join(widgetPath, widgetName + '.scss');
+        var scssImportsPath = path.join(widgetPath, '_imports');
+        var scssBuildCssFile = path.join(widgetPath, '_build_' + widgetName + '.css');
+
+        if(Util.existsSync(scssFilePath)) {
+          // 索引 SCSS Imports
+          console.log(chalk.magenta('  正在解析SCSS引用'));
+          var imports = Util.mapScssImports(scssFilePath);
+          if(imports.length>0) {
+            // 清空/创建
+            fse.emptydirSync(scssImportsPath);
+            imports.forEach(function(e) {
+              console.log(chalk.green(e.path));
+              var basename = path.basename(e.path);
+              fse.copySync(e.path, path.join(scssImportsPath, e.dir, basename));
+            });
+          }
+
+          // 编译SCSS
+          var vfs = require('vinyl-fs');
+          var through2 = require('through2');
+          var athenaMate = require('../lib/build/athena_mate');
+          vfs.src([path.join(widgetPath, '*.scss'), path.join(widgetPath, '*.sass')])
+            .on('finish', function() {
+              console.log(chalk.magenta('开始组件SASS本地编译任务'));
+            })
+            .pipe(athenaMate.compass({
+              cwd: '../',
+              sasslib : [path.join(widgetPath, '_imports')]
+            }))
+            .on('data', function() {})
+            .on('finish', function() {
+              vfs.src([path.join(widgetPath, '*.css')])
+                .pipe(through2.obj(function (file, encoding, cb) {
+                  var dirname = path.dirname(file.path);
+                  var basename = path.basename(file.path);
+                  if(!/_build_/.test(basename)) {
+                    try {
+                      fs.renameSync(file.path, path.join(dirname, '_build_' + basename));
+                    } catch(err) {
+                      throw err;
+                    }
+                  }
+                  cb();
+                }))
+                .on('finish', function() {
+                  // console.log(chalk.green('已完成组件SASS本地编译'));
+                })
+                .on('error', function(err) {
+                  console.log('编译过程发生错误');
+                });
+            })
+            .on('error', function (err) {
+              console.log('编译过程发生错误');
+              throw err;
+            });
+        }
+        
         archive.on('error', function(err){
           throw err;
         });
@@ -529,7 +589,6 @@ program
           if(answers.business) { formData.business = answers.business; }
           if(answers.classify) { formData.classify = answers.classify; }
 
-          
           var boundaryKey = Math.random().toString(16);
           request.post({
             url: setting.component_platform + '/api/push',
@@ -550,6 +609,8 @@ program
               }
               console.log(chalk.green('  组件发布成功！'));
               del.sync(tmpZipPath, {force: true});
+              del.sync(scssImportsPath, {force: true});
+              del.sync(scssBuildCssFile, {force: true});
               if (result && result.no === 0) {
                 var data = result.data;
                 console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
@@ -562,9 +623,14 @@ program
       });
     }).catch(function(err) {
       if(err) {
-        throw err;
+        if(err.code) {
+          console.log(chalk.red('  ' + err.code));
+        } else {
+          console.log(err);
+          throw err;
+        }
       } else {
-        console.log('  请求列表数据时出错')
+        console.log(chalk.red('  请求列表数据时出错'));
       }
     });
   }).on('--help', function() {
