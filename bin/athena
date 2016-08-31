@@ -590,9 +590,6 @@ program
     }
     var alias = typeof option.alias === 'string' ? option.alias : null;
     var remoteUrl = setting.component_platform + '/api/pull/' + uuid;
-    if (alias) {
-      remoteUrl += '/' + alias;
-    }
     loadRemoteWidget(remoteUrl, uuid, option);
   }).on('--help', function() {
     console.log('  Examples:');
@@ -623,25 +620,46 @@ program
   });
 
 function loadRemoteWidget (remoteUrl, widgetName, option) {
-  widgetName = widgetName || option.widget;
-  if (typeof option.alias === 'string') {
-    widgetName = option.alias;
-  }
-  var widget = new Widget({
-    widgetName: widgetName,
-    description: option.description,
-    sass: true,
-    less: 0,
-    cms: 0
-  });
-  var moduleConfPath = widget.destinationPath('module-conf.js');
-  var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
-  if (!fs.existsSync(moduleConfPath)) {
-    console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-    return;
-  }
-  widget.loadRemote(remoteUrl, function () {
+  var widgetName = widgetName || option.widget;
+  var widgetAlias = option.alias;
+  var remoteWidgetNameUrl = setting.component_platform + '/api/detail?id=' + widgetName;
+
+  function loadWidgetName () {
+      return new Promise(function (resolve, reject) {
+        if (typeof widgetAlias === 'string') {
+          return resolve(widgetAlias);
+        }else{
+          request.get({
+            url: remoteWidgetNameUrl
+          },function(err, res){
+            if(res.statusCode === 200){
+              return resolve(JSON.parse(res.body).widget.name);
+            }else{
+              console.log(chalk.red('  出错了，' + remoteWidgetNameUrl + '接口出错，请联系liweitao'));
+              return resolve();
+            }
+          });
+        }
+      });
+    }
+  loadWidgetName()
+  .then(function(widgetName){
+    var widget = new Widget({
+      widgetName: widgetName,
+      description: option.description,
+      sass: true,
+      less: 0,
+      cms: 0
+    });
+    var moduleConfPath = widget.destinationPath('module-conf.js');
+    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
+    if (!fs.existsSync(moduleConfPath)) {
+      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+      return;
+    }
+    widget.loadRemote(remoteUrl,widgetAlias, function () {
     var argv = [].slice.call(arguments);
+    widget.renameContent(argv[0]);
     var appConf = require(appConfPath);
     var moduleConf = require(moduleConfPath);
     if (appConf) {
@@ -657,6 +675,7 @@ function loadRemoteWidget (remoteUrl, widgetName, option) {
         }
       });
     }
+    });
   });
 }
 
