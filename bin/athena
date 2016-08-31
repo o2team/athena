@@ -689,23 +689,26 @@ function loadRemoteWidget (remoteUrl, widgetName, option) {
   var widgetName = widgetName || option.widget;
   var widgetAlias = option.alias;
   var remoteWidgetNameUrl = setting.component_platform + '/api/detail?id=' + widgetName;
+  var widgetOriginName = '';
 
   function loadWidgetName () {
       return new Promise(function (resolve, reject) {
-        if (typeof widgetAlias === 'string') {
-          return resolve(widgetAlias);
-        }else{
           request.get({
             url: remoteWidgetNameUrl
           },function(err, res){
             if(res.statusCode === 200){
-              return resolve(JSON.parse(res.body).widget.name);
+              widgetOriginName = JSON.parse(res.body).widget.name;;
+              if (typeof widgetAlias === 'string') {
+                return resolve(widgetAlias);
+              }else{
+                return resolve(JSON.parse(res.body).widget.name);
+              }
             }else{
               console.log(chalk.red('  出错了，' + remoteWidgetNameUrl + '接口出错，请联系liweitao'));
               return resolve();
             }
           });
-        }
+        
       });
     }
   loadWidgetName()
@@ -725,7 +728,7 @@ function loadRemoteWidget (remoteUrl, widgetName, option) {
     }
     widget.loadRemote(remoteUrl,widgetAlias, function () {
     var argv = [].slice.call(arguments);
-    widget.renameContent(argv[0]);
+    widget.renameContent(argv[0], widgetOriginName);
     var appConf = require(appConfPath);
     var moduleConf = require(moduleConfPath);
     if (appConf) {
