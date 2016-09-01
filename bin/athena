@@ -511,9 +511,9 @@ program
           // 索引 SCSS Imports
           console.log(chalk.magenta('  正在解析SCSS引用'));
           var imports = Util.mapScssImports(scssFilePath);
+          // 清空/创建
+          fse.emptydirSync(scssImportsPath);
           if(imports.length>0) {
-            // 清空/创建
-            fse.emptydirSync(scssImportsPath);
             imports.forEach(function(e) {
               console.log(chalk.green(e.path));
               var basename = path.basename(e.path);
