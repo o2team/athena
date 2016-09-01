@@ -531,7 +531,7 @@ program
             })
             .pipe(athenaMate.compass({
               cwd: '../',
-              sasslib : [path.join(widgetPath, '_imports')]
+              sasslib : [scssImportsPath]
             }))
             .on('data', function() {})
             .on('finish', function() {
