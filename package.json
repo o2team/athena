@@ -71,6 +71,7 @@
     "through2": "^2.0.0",
     "uglify-js": "2.6.4",
     "uglify-save-license": "^0.4.1",
+    "unzip": "^0.1.11",
     "unzip2": "^0.2.5",
     "uuid": "^2.0.1",
     "verror": "^1.6.0",
