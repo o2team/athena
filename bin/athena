@@ -507,119 +507,130 @@ program
         var scssImportsPath = path.join(widgetPath, '_imports');
         var scssBuildCssFile = path.join(widgetPath, '_build_' + widgetName + '.css');
 
-        if(Util.existsSync(scssFilePath)) {
-          // 索引 SCSS Imports
-          console.log(chalk.magenta('  正在解析SCSS引用'));
-          var imports = Util.mapScssImports(scssFilePath);
-          // 清空/创建
-          fse.emptydirSync(scssImportsPath);
-          if(imports.length>0) {
-            imports.forEach(function(e) {
-              console.log(chalk.green(e.path));
-              var basename = path.basename(e.path);
-              fse.copySync(e.path, path.join(scssImportsPath, e.dir, basename));
-            });
-          }
-
-          // 编译SCSS
-          var vfs = require('vinyl-fs');
-          var through2 = require('through2');
-          var athenaMate = require('../lib/build/athena_mate');
-          vfs.src([path.join(widgetPath, '*.scss'), path.join(widgetPath, '*.sass')])
-            .on('finish', function() {
-              console.log(chalk.magenta('  开始组件SASS本地编译任务'));
-            })
-            .pipe(athenaMate.compass({
-              cwd: '../',
-              sasslib : [scssImportsPath]
-            }))
-            .on('data', function() {})
-            .on('finish', function() {
-              vfs.src([path.join(widgetPath, '*.css')])
-                .pipe(through2.obj(function (file, encoding, cb) {
-                  var dirname = path.dirname(file.path);
-                  var basename = path.basename(file.path);
-                  if(!/_build_/.test(basename)) {
-                    try {
-                      fs.renameSync(file.path, path.join(dirname, '_build_' + basename));
-                    } catch(err) {
-                      throw err;
-                    }
-                  }
-                  cb();
-                }))
-                .on('finish', function() {
-                  // console.log(chalk.green('已完成组件SASS本地编译'));
-                })
-                .on('error', function(err) {
-                  console.log('编译过程发生错误');
+        Promise.resolve().then(function() {
+          return new Promise(function(resolve, reject) {
+            if(Util.existsSync(scssFilePath)) {
+              // 索引 SCSS Imports
+              console.log(chalk.magenta('  正在解析SCSS引用'));
+              var imports = Util.mapScssImports(scssFilePath);
+              // 清空/创建
+              fse.emptydirSync(scssImportsPath);
+            
+              if(imports.length>0) {
+                imports.forEach(function(e) {
+                  console.log(chalk.green(e.path));
+                  var basename = path.basename(e.path);
+                  fse.copySync(e.path, path.join(scssImportsPath, e.dir, basename));
                 });
-            })
-            .on('error', function (err) {
-              console.log('编译过程发生错误');
-              throw err;
-            });
-        }
-        
-        archive.on('error', function(err){
-          throw err;
-        });
-        archive.pipe(output);
-        archive.bulk([
-          {
-            expand: true,
-            cwd: widgetPath,
-            src: ['**/*']
-          }
-        ]).finalize();
-        output.on('close', function () {
-          var formData = {
-            appId: appConf.appId,
-            moduleId: moduleConf.moduleId,
-            platform: appConf.platform,
-            author: config.user_name,
-            widget: {
-              value: fs.createReadStream(tmpZipPath),
-              options: {
-                filename: widgetName + '.zip',
-                contentType: 'application/zip'
               }
-            }
-          };
-          if(answers.business) { formData.business = answers.business; }
-          if(answers.classify) { formData.classify = answers.classify; }
-
-          var boundaryKey = Math.random().toString(16);
-          request.post({
-            url: setting.component_platform + '/api/push',
-            headers: {
-              'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
-            },
-            formData: formData
-          }, function(err, res, body) {
-            if (err) {
-              throw err;
-            }
-            if (res.statusCode === 200) {
-              var result = null;
-              try {
-                result = JSON.parse(body);
-              } catch (e) {
-                result = null;
-              }
-              console.log(chalk.green('  组件发布成功！'));
-              del.sync(tmpZipPath, {force: true});
-              del.sync(scssImportsPath, {force: true});
-              del.sync(scssBuildCssFile, {force: true});
-              if (result && result.no === 0) {
-                var data = result.data;
-                console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
-              }
+            
+              // 编译SCSS
+              var vfs = require('vinyl-fs');
+              var through2 = require('through2');
+              var athenaMate = require('../lib/build/athena_mate');
+              vfs.src([path.join(widgetPath, '*.scss'), path.join(widgetPath, '*.sass')])
+                .on('finish', function() {
+                  console.log(chalk.magenta('  开始组件SASS本地编译任务'));
+                })
+                .pipe(athenaMate.compass({
+                  cwd: '../',
+                  sasslib : [scssImportsPath]
+                }))
+                .on('data', function() {})
+                .on('finish', function() {
+                  vfs.src([path.join(widgetPath, '*.css')])
+                    .pipe(through2.obj(function (file, encoding, cb) {
+                      var dirname = path.dirname(file.path);
+                      var basename = path.basename(file.path);
+                      if(!/_build_/.test(basename)) {
+                        try {
+                          fs.renameSync(file.path, path.join(dirname, '_build_' + basename));
+                        } catch(err) {
+                          throw err;
+                        }
+                      }
+                      cb();
+                    }))
+                    .on('finish', function() {
+                      // console.log(chalk.green('已完成组件SASS本地编译'));
+                      resolve();
+                    })
+                    .on('error', function(err) {
+                      console.log('编译过程发生错误');
+                      reject();
+                    });
+                })
+                .on('error', function (err) {
+                  console.log('编译过程发生错误');
+                  throw err;
+                });
             } else {
-              console.log(chalk.red('  组件发布失败，请重试！'));
+              resolve();
             }
+          })
+        }).then(function() {
+          archive.on('error', function(err){
+            throw err;
           });
-        });
+          archive.pipe(output);
+          archive.bulk([
+            {
+              expand: true,
+              cwd: widgetPath,
+              src: ['**/*']
+            }
+          ]).finalize();
+          output.on('close', function () {
+            var formData = {
+              appId: appConf.appId,
+              moduleId: moduleConf.moduleId,
+              platform: appConf.platform,
+              author: config.user_name,
+              widget: {
+                value: fs.createReadStream(tmpZipPath),
+                options: {
+                  filename: widgetName + '.zip',
+                  contentType: 'application/zip'
+                }
+              }
+            };
+            if(answers.business) { formData.business = answers.business; }
+            if(answers.classify) { formData.classify = answers.classify; }
+  
+            var boundaryKey = Math.random().toString(16);
+            request.post({
+              url: setting.component_platform + '/api/push',
+              headers: {
+                'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
+              },
+              formData: formData
+            }, function(err, res, body) {
+              if (err) {
+                throw err;
+              }
+              if (res.statusCode === 200) {
+                var result = null;
+                try {
+                  result = JSON.parse(body);
+                } catch (e) {
+                  result = null;
+                }
+                console.log(chalk.green('  组件发布成功！'));
+                del.sync(tmpZipPath, {force: true});
+                // del.sync(scssImportsPath, {force: true});
+                del.sync(scssBuildCssFile, {force: true});
+                if (result && result.no === 0) {
+                  var data = result.data;
+                  console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
+                }
+              } else {
+                console.log(chalk.red('  组件发布失败，请重试！'));
+              }
+            });
+          });
+        }).catch(function(err) {
+          throw err;
+        })
       });
     }).catch(function(err) {
       if(err) {
