@@ -1004,16 +1004,25 @@ JavaScript代码检查。
 
 资源定位是为了可以自动化将资源引用链接替换成配置好的目标地址。
 
-在 `HTML` 模板中定位使用API
+在 `HTML` 模板中定位使用API `<%= uri() %>`
+
+定位css
 
 ```
 <%= uri('demo.css') %>
 ```
 
-在 `js` 中定位使用API
+定位图片等放在images目录下的资源，必须带上images目录作为标记
+
+```
+<%= uri('images/bg.png') %>
+```
+
+在 `js` 中定位使用API `__uri`
 
 ```
 __uri('demo.css')
+__uri('images/bg.png')
 ```
 
 ### 文件内联
@@ -1048,7 +1057,7 @@ module.exports = {
 ```
 `__inline('demo.css')` 将直接输出组件 `heheda`、`topbar` 的合并样式，并且 `<%= getCSS() %>` 输出的样式表中将不会包含这两个组件样式。
 
-在 `js` 中内联资源使用API
+在 `js` 中内联资源使用API `__inline`
 
 ```
 // 第一个参数是文件名，第二个参数是模块名，如果是当前模块，可省略
@@ -1293,9 +1302,9 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 
 ## CONTRIBUTORS
 
-[![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992)
-:---:|:---:|:---:|:---:
-[luckyadam](http://diao.li/) | [Simba Chen](https://github.com/Simbachen) | [adamchuan](https://github.com/adamchuan) | [Sky Cai](https://github.com/cnt1992)
+[![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992) | [![Manjiz](https://avatars0.githubusercontent.com/u/13447336?v=3&s=120)](https://github.com/Manjiz) | [![panxinwu](https://avatars1.githubusercontent.com/u/1515508?v=3&s=120)](https://github.com/panxinwu)
+:---:|:---:|:---:|:---:|:---:|:---:
+[luckyadam](http://diao.li/) | [Simba Chen](https://github.com/Simbachen) | [adamchuan](https://github.com/adamchuan) | [Sky Cai](https://github.com/cnt1992) | [Manjiz](https://github.com/Manjiz) | [panxinwu](https://github.com/panxinwu)
 
 ## LICENCE
 
