@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.1.15
+
+* update:编译时扫描代码检查页面引用组件中增加当前模块扫描
+* update:组件下载上传功能完善
+
 ## 1.1.14
 
 * update:widget.embed语法
