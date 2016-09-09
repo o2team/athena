@@ -1,5 +1,21 @@
 # ChangeLog
 
+## 1.1.15
+
+* update:编译时扫描代码检查页面引用组件中增加当前模块扫描
+* update:组件下载上传功能完善
+
+## 1.1.14
+
+* update:widget.embed语法
+* update:兼容页面没有任何引用的情况
+* update:编译时扫描代码检查页面引用组件中增加当前模块扫描
+* update:拉取远程公共模块map.json时与本地作对比，并给予提示
+
+## 1.1.13
+
+* fix:static中静态资源放置目录
+
 ## 1.1.12
 
 * fix:watch时inline失效
