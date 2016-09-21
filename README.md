@@ -1300,6 +1300,25 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 }
 ```
 
+配置中 `rootValue` 是控制当前模块全局的 `rem` 开关，如果想要指定某一处图片相关样式使用 `px` 或 `rem` 单位，可以在引用图片的地方通过参数指定，例如
+
+```css
+// 指定使用 `px` 单位
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1&__px');
+}
+
+// 指定使用 `rem` 单位
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1&__rem');
+}
+
+// 使用 `rem` 单位时同时指定自己的 `rootValue`
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1&__rem=20');
+}
+```
+
 ## CONTRIBUTORS
 
 [![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992) | [![Manjiz](https://avatars0.githubusercontent.com/u/13447336?v=3&s=120)](https://github.com/Manjiz) | [![panxinwu](https://avatars1.githubusercontent.com/u/1515508?v=3&s=120)](https://github.com/panxinwu) | [![Littly](https://avatars1.githubusercontent.com/u/5780093?v=3&s=120)](https://github.com/Littly)
