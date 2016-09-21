@@ -1,5 +1,22 @@
 # ChangeLog
 
+## 1.1.18
+
+* fix:修复抽离模板版本号计算的问题
+* update:增加抽取模板时自动抽取css到模板文件中的开关
+* update:server模式支持在js模板中使用 `widget.load` 调用组件
+* update:强制美化开关
+
+## 1.1.17
+
+* update:抽离模板有cmd和jsonp两种模式，默认为jsonp
+* update:抽离模板时增加模板编译
+* fix(lib/build/index.js): 移动tplget到athenaMate后 防止portal_floor_id被跳过渲染
+
+## 1.1.16
+
+* fix: watch gb 下的widget改动bug
+
 ## 1.1.15
 
 * update:编译时扫描代码检查页面引用组件中增加当前模块扫描
