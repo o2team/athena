@@ -608,23 +608,26 @@ program
               if (err) {
                 throw err;
               }
+              var result = null;
+              try {
+                result = JSON.parse(body);
+              } catch (e) {
+                result = null;
+              }
               if (res.statusCode === 200) {
-                var result = null;
-                try {
-                  result = JSON.parse(body);
-                } catch (e) {
-                  result = null;
-                }
                 console.log(chalk.green('  组件发布成功！'));
                 del.sync(tmpZipPath, {force: true});
-                // del.sync(scssImportsPath, {force: true});
                 del.sync(scssBuildCssFile, {force: true});
                 if (result && result.no === 0) {
                   var data = result.data;
                   console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
                 }
               } else {
-                console.log(chalk.red('  组件发布失败，请重试！'));
+                if(result && result.type == 'unauth') {
+                  console.log(chalk.red('  用户不在白名单之内，请联系管理人员。'));
+                } else {
+                  console.log(chalk.red('  组件发布失败，请重试！'));
+                }
               }
             });
           });
