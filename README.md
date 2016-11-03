@@ -1319,6 +1319,17 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 }
 ```
 
+配置中 `__widthHeight` 是控制关闭强制替换背景图width和height，例如
+
+```css
+// 强制使用 `__widthHeight` 来关闭width和height替换
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1&__widthHeight');
+  width:10px;
+  height:10px;
+}
+```
+
 ## CONTRIBUTORS
 
 [![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992) | [![Manjiz](https://avatars0.githubusercontent.com/u/13447336?v=3&s=120)](https://github.com/Manjiz) | [![panxinwu](https://avatars1.githubusercontent.com/u/1515508?v=3&s=120)](https://github.com/panxinwu) | [![Littly](https://avatars1.githubusercontent.com/u/5780093?v=3&s=120)](https://github.com/Littly)
