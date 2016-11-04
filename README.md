@@ -491,6 +491,7 @@ module.exports = {
       cssi: '/sinclude/cssi/fd/h5/qwd', // 上传页面片的目录
       assestPrefix: '/fd/h5/qwd', // 发布完静态资源后，静态资源路径
       shtmlPrefix: '/sinclude/cssi/fd/h5/qwd', // 发布完页面片后，静态资源路径
+      shtmlCommentPrefix: '/sinclude/cssi/fd/h5/qwd', // 生成页面片注释中的路径
       shtml: {  //针对服务器的页面片配置
         needCombo: true, // 页面片中链接是否合并
         needTimestamp: true //增加时间戳
@@ -507,6 +508,7 @@ module.exports = {
       cssi: '/export/paipai/resource/sinclude/cssi/fd/h5/hellokity', // 上传页面片的目录
       assestPrefix: '/static/fd/h5/hellokity', // 发布完静态资源后，静态资源路径
       shtmlPrefix: '/sinclude/cssi/fd/h5/hellokity', // 发布完页面片后，静态资源路径
+      shtmlCommentPrefix: '/sinclude/cssi/fd/h5/hellokity', // 生成页面片注释中的路径
       shtml: {  //针对服务器的页面片配置
         needCombo: true, // 页面片中链接是否合并
         needTimestamp: true //增加时间戳
