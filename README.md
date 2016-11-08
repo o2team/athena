@@ -1330,6 +1330,25 @@ h1 { background-image:url(../images/sprite.png); background-position:0 0;}
 }
 ```
 
+增加 `__widthHeight` 与 `__rem=20`同时配置使用
+
+```
+.a {
+  background-image: url('images/A.png?__sprite=sprite_1&__widthHeight&__rem=20');
+  width: 22px;
+  height: 30px;
+}
+```
+#### output.css
+```
+.a {
+    background-image: url('images/sprite_sprite_1.png');
+    background-position: -81.6rem -24.05rem;
+    background-repeat: no-repeat;
+    width: 1.1rem;
+    height: 1.5rem;
+}
+```
 ## CONTRIBUTORS
 
 [![luckyadam](https://avatars2.githubusercontent.com/u/1782542?v=3&s=120)](http://diao.li/) | [![Simba Chen](https://avatars2.githubusercontent.com/u/1519030?v=3&s=120)](https://github.com/Simbachen) | [![adamchuan](https://avatars0.githubusercontent.com/u/2565774?v=3&s=120)](https://github.com/adamchuan) | [![Sky Cai](https://avatars3.githubusercontent.com/u/3118988?v=3&s=120)](https://github.com/cnt1992) | [![Manjiz](https://avatars0.githubusercontent.com/u/13447336?v=3&s=120)](https://github.com/Manjiz) | [![panxinwu](https://avatars1.githubusercontent.com/u/1515508?v=3&s=120)](https://github.com/panxinwu) | [![Littly](https://avatars1.githubusercontent.com/u/5780093?v=3&s=120)](https://github.com/Littly)
