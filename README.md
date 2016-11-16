@@ -76,15 +76,15 @@ $ [sudo] npm i -g athena-html --registry=http://registry.npm.taobao.org --distur
 ```
 $ [sudo] gem install compass
 ```
-由于墙的缘故（你懂的），原始的gem源[https://rubygems.org/](https://rubygems.org/)几乎无法使用，建议将gem源替换成淘宝的源
+由于墙的缘故（你懂的），原始的gem源[https://rubygems.org/](https://rubygems.org/) 几乎无法使用，建议将gem源替换成 [ruby-china](http://gems.ruby-china.org) 的源
 
 ```
-$ gem sources --add https://ruby.taobao.org/ --remove https://rubygems.org/
+$ gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
 $ gem sources -l
 *** CURRENT SOURCES ***
 
-https://ruby.taobao.org
-# 请确保只有 ruby.taobao.org
+https://gems.ruby-china.org
+# 请确保只有 gems.ruby-china.org
 $ gem install compass
 ```
 
