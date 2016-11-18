@@ -536,10 +536,11 @@ program
                 })
                 .pipe(athenaMate.compass({
                   cwd: '../',
+                  module: moduleConf.module,
                   sasslib : [scssImportsPath]
                 }))
                 .on('data', function() {})
-                .on('finish', function() {
+                .on('end', function() {
                   vfs.src([path.join(widgetPath, '*.css')])
                     .pipe($.postcss([autoprefixer({browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']})]))
                     .pipe(vfs.dest(widgetPath))
