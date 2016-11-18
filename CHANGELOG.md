@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.1.24
+
+* update:sass编译提速，解决sass文件过多sass编译中断的问题
+
 ## 1.1.23
 
 * update:client模式发布支持发布单个页面资源，且可以跨模块发布资源
