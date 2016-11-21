@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 1.2.0
+
+* fix:sass编译watch的问题
+* update:雪碧图配置中去掉retina配置
+
 ## 1.1.24
 
 * update:sass编译提速，解决sass文件过多sass编译中断的问题

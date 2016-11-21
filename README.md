@@ -576,7 +576,6 @@ module.exports = {
     },
     csssprite: { //css雪碧图合并配置
       enable: true, // 是否开启
-      retina: true,  //是否支持retina
       rootValue: 40, // px转rem，若不想转rem，此处应为0
       padding: 10, // 图与图之间的距离
       spriteFolder: 'sprites' // 雪碧图放置目录，若不想将雪碧图单独放置目录，此处为空或不传
@@ -1207,13 +1206,12 @@ support : {
 
 ### CSS雪碧图合并
 
-将所有文件中`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，同时支持是否开启`retina`，需要在配置文件`module-conf.js`的`support`增加下面属性：
+将所有文件中`background`或者`background-image`引用到的带有`?__sprite`后缀的图片进行**雪碧图合并**，需要在配置文件`module-conf.js`的`support`增加下面属性：
 
 ```javascript
 support : {  
     csssprite: {
       enable: true, // 是否开启
-      retina: true,  //是否支持retina
       rootValue: 40, // px转rem
       padding: 10, // 图与图之间的距离
       spriteFolder: 'sprites' // 雪碧图放置目录
@@ -1222,7 +1220,7 @@ support : {
 ```
 
 > 上面的属性`rootValue`若设置为`0`表示不开启px转rem，若设置为非0正数，则表示`1rem=40px`，40为`rootValue`的值。
-> 同时，若开启了`retina`属性，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
+> 同时，若需要支持高清图样式适配，那么图片请自行修改为`@2x`,`@3x`后缀名，如：`help@2x.png`
 
 以上面的配置为例，下面为转换过程，更多[参考](https://github.com/o2team/postcss-athena-spritesmith)
 
