@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 1.2.1
+
+* update:组件发布功能完善，支持本地解析组件CSS
+
 ## 1.2.0
 
 * fix:sass编译watch的问题
