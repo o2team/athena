@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 1.2.2
+
+* fix:sass出错不会中断编译
+* update: widget中可以在json中设置默认值
+* update: 支持组件下载时图片重命名
+* update:上传组件时同时编译组件的html和js
+
 ## 1.2.1
 
 * update:组件发布功能完善，支持本地解析组件CSS

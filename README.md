@@ -112,6 +112,7 @@ $ gem install compass
     ├── page                    - 所有页面目录
     │   ├── page                - 某一页面目录
     │       ├── images          - 页面的图片目录
+    |       ├── page.json       - 页面的说明文件
     │       ├── page.css        - 页面级css
     │       ├── page.js         - 页面级js
     │       ├── page.html       - 页面html
@@ -124,6 +125,7 @@ $ gem install compass
     ├── widget                  - 所有widget目录
     │   ├── widget              - 某一widget目录
     │       ├── images          - widget的图片目录
+    |       ├── widget.json     - widget的说明文件
     │       ├── widget.css      - widget的css
     │       ├── widget.js       - widget的js
     │       ├── widget.html     - widget的html
@@ -383,6 +385,8 @@ module.exports = {
 <%= widget.load('user', null, 'gb') %>
 ```
 ``widget.load``可以方法接收三个参数，第一个参数是``widget``的名称，后面两个参数是可选参数，第二个是向``widget``传递的一些参数，第三个是``widget``所属的模块，如果是本模块，可以不传。
+
+在 `widget` 的目录下包含了一个该组件的json格式的说明文件，文件中的 `data` 字段可以用来定义组件所需接收的默认参数，在执行 `widget.load` 方法时 `data` 字段会作为参数的一部分，方法调用时传入的参数若和 `data` 有重叠，则会对 `data` 进行覆盖。
 
 ### 页面中API
 
@@ -792,6 +796,19 @@ $ athena widget-publish --widget [组件名字]
 ```
 $ ath wp [组件名字]
 $ ath wp -w [组件名字]
+```
+
+注意：使用组件发布功能时，若组件需要接收参数，则必须在组件的说文件 `组件名.json` 文件的 `data` 参数中填写组件所需接收的默认参数，否则组件编译将会报错，如下
+
+```
+// widget.json
+{
+  ...
+  "data": {
+    "param1": "test1",
+    "param2": "test2"
+  }
+}
 ```
 
 ### athena widget-load
