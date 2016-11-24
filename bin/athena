@@ -639,6 +639,7 @@ program
                           var vStart = '';
                           var vEnd = '';
                           var extname = path.extname(value);
+                          console.log(value);
                           if (value.indexOf('\"') >= 0 || value.indexOf('\'') >= 0) {
                             vStart = value[0];
                             vEnd = value[value.length - 1];
@@ -669,7 +670,7 @@ program
                                 try {
                                   size = fs.statSync(pathName).size;
                                   if (query.__inline || size < config.base64Opts.size) {
-                                    return Util.transform2DataURI(pathName);
+                                    return vStart + Util.transform2DataURI(pathName) + vEnd;
                                   }
                                 }
                                 catch (e) {
