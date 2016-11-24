@@ -512,7 +512,7 @@ program
         var scssImportsPath = path.join(copyFolder, '_imports');
         var scssBuildCssFolder = path.join(copyFolder, '_css');
         var scssBuildCssFile = path.join(copyFolder, '_build_' + widgetName + '.css');
-
+        del.sync(copyFolder, {force: true});
         Promise.resolve().then(function() {
           return new Promise(function(resolve, reject) {
             if(Util.existsSync(scssFilePath)) {
@@ -596,8 +596,8 @@ program
                   .on('data', function () {})
                   .on('end', function () {
                     var spriteImages = [];
-                    vfs.src(path.join(scssBuildCssFolder, '*.css'))
-                      .pipe(through2.obj(function (file, encoding, cb) {
+                    vfs.src([path.join(scssBuildCssFolder, '*.css'), path.join(copyFolder, '*.html'), path.join(copyFolder, '*.js')])
+                      .pipe($.if('*.css', through2.obj(function (file, encoding, cb) {
                         if (file.isNull() || file.isStream()) {
                           return cb(null);
                         }
@@ -623,15 +623,19 @@ program
                         });
                         this.push(file);
                         cb();
-                      }))
-                      .pipe($.postcss(processors))
-                      .pipe($.postcss([sprites(opts)]))
+                      })))
+                      .pipe($.if('*.html', athenaMate.scan({
+                        cwd: appPath,
+                        module: moduleConf.module,
+                        serve: true
+                      })))
+                      .pipe($.if('*.css', $.postcss(processors)))
+                      .pipe($.if('*.css', $.postcss([sprites(opts)])))
                       .pipe(through2.obj(function (file, encoding, cb) {
                         if (file.isNull() || file.isStream()) {
                           return cb(null);
                         }
-                        var fileContents = file.contents.toString();
-                        fileContents = Util.processCss(fileContents, function (value) {
+                        function getInline (value) {
                           var vStart = '';
                           var vEnd = '';
                           var extname = path.extname(value);
@@ -676,11 +680,27 @@ program
                             }
                           }
                           return vStart + value + vEnd;
-                        });
+                        }
+                        var fileContents = file.contents.toString();
+                        var fPath = file.path;
+                        if (Util.regexps.css.test(fPath)) {
+                          fileContents = Util.processCss(fileContents, function (value) {
+                            return getInline(value);
+                          });
+                        } else if (Util.regexps.js.test(fPath)) {
+                          fileContents = Util.processJs(fileContents, function (value) {
+                            return getInline(value);
+                          });
+                        } else if (Util.regexps.tpl.test(fPath)) {
+                          fileContents = Util.processHtml(fileContents, function (value) {
+                            return getInline(value);
+                          });
+                        }
                         file.contents = new Buffer(fileContents);
                         this.push(file);
                         cb();
                       }))
+                      .pipe(vfs.dest(copyFolder))
                       .pipe(through2.obj(function (file, encoding, cb) {
                         var dirname = path.dirname(file.path);
                         var basename = path.basename(file.path);
@@ -690,7 +710,6 @@ program
                         this.push(file);
                         cb();
                       }))
-                      .pipe(vfs.dest(scssBuildCssFolder))
                       .pipe(vfs.dest(copyFolder))
                       .on('finish', function() {
                         del.sync(scssBuildCssFolder, {force: true});
@@ -756,6 +775,8 @@ program
               formData: formData
             }, function(err, res, body) {
               if (err) {
+                del.sync(tmpZipPath, {force: true});
+                del.sync(copyFolder, {force: true});
                 throw err;
               }
               var result = null;
@@ -773,6 +794,8 @@ program
                   console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
                 }
               } else {
+                del.sync(tmpZipPath, {force: true});
+                del.sync(copyFolder, {force: true});
                 if(result && result.type == 'unauth') {
                   console.log(chalk.red('  用户不在白名单之内，请联系管理人员。'));
                 } else {
@@ -782,6 +805,8 @@ program
             });
           });
         }).catch(function(err) {
+          del.sync(tmpZipPath, {force: true});
+          del.sync(copyFolder, {force: true});
           throw err;
         })
       });
