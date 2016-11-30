@@ -624,11 +624,6 @@ program
                         this.push(file);
                         cb();
                       })))
-                      .pipe($.if('*.html', athenaMate.scan({
-                        cwd: appPath,
-                        module: moduleConf.module,
-                        serve: true
-                      })))
                       .pipe($.if('*.css', $.postcss(processors)))
                       .pipe($.if('*.css', $.postcss([sprites(opts)])))
                       .pipe(through2.obj(function (file, encoding, cb) {
@@ -639,7 +634,6 @@ program
                           var vStart = '';
                           var vEnd = '';
                           var extname = path.extname(value);
-                          console.log(value);
                           if (value.indexOf('\"') >= 0 || value.indexOf('\'') >= 0) {
                             vStart = value[0];
                             vEnd = value[value.length - 1];
