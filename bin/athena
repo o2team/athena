@@ -425,9 +425,11 @@ program
   .command('widget-publish [widgetName]')
   .alias('wp')
   .option('-w, --widget [widgetName]', '组件名称')
-  .description('发布组件到组件库')
+  .option('-i, --id [id]', '组件id')
+  .description('发布/更新组件到组件库')
   .action(function (widgetName, option) {
     widgetName = widgetName || option.widget;
+    widgetId = option.id;
     var mdouleConfPath = path.join(process.cwd(), 'module-conf.js');
     if (!Util.existsSync(mdouleConfPath)) {
       console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
@@ -753,9 +755,15 @@ program
                 }
               }
             };
-            if(answers.business) { formData.business = answers.business; }
-            if(answers.classify) { formData.classify = answers.classify; }
-  
+            if (answers.business) {
+              formData.business = answers.business;
+            }
+            if (answers.classify) {
+              formData.classify = answers.classify;
+            }
+            if (typeof widgetId === 'string' && widgetId.length) {
+              formData.widgetId = widgetId;
+            }
             var boundaryKey = Math.random().toString(16);
             request.post({
               url: setting.component_platform + '/api/push',
@@ -817,6 +825,7 @@ program
     console.log('');
     console.log('    $ athena widget-publish tab');
     console.log('    $ athena wp tab');
+    console.log('    $ athena wp tab --id');
     console.log();
   });
 
