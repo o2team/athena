@@ -444,7 +444,7 @@ program
     var appConf = require(path.join(appPath, 'app-conf.js'));
     var archiver = require('archiver');
     var archive = archiver.create('zip', {});
-    var tmpZipPath = path.join(modulePath, widgetName + '.zip');
+    var tmpZipPath = path.join(modulePath, 'widget', widgetName, widgetName + '.zip');
     var output = fs.createWriteStream(tmpZipPath);
 
     var prompts = [];
@@ -616,7 +616,7 @@ program
                             var spriteReg = /\?__sprite(.*)+/gi;
                             if (spriteReg.test(_value)) {
                               _value = _value.split('/').splice(imagesIndex).join('/').replace(spriteReg, '');
-                              spriteImages.push(path.join(copyFolder, _value));
+                              spriteImages.push(_value);
                             }
                           }
                           return value;
@@ -695,7 +695,6 @@ program
                         this.push(file);
                         cb();
                       }))
-                      .pipe(vfs.dest(copyFolder))
                       .pipe(through2.obj(function (file, encoding, cb) {
                         var dirname = path.dirname(file.path);
                         var basename = path.basename(file.path);
@@ -708,13 +707,9 @@ program
                       .pipe(vfs.dest(copyFolder))
                       .on('finish', function() {
                         del.sync(scssBuildCssFolder, {force: true});
-                        if (spriteImages.length > 0) {
-                          spriteImages.forEach(function (item) {
-                            if (Util.existsSync(item)) {
-                              del.sync(item, {force: true});
-                            }
-                          });
-                        }
+                        fs.writeFileSync(path.join(copyFolder, '_sprite_images.json'), JSON.stringify({
+                          sprites: spriteImages
+                        }, null, 2));
                         resolve();
                       })
                       .on('error', function(err) {
