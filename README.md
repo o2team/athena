@@ -1018,10 +1018,16 @@ JavaScript代码检查。
 
 在 `HTML` 模板中定位使用API `<%= uri() %>`
 
-定位css
+定位CSS文件
 
 ```
-<%= uri('demo.css') %>
+<%= uri('css/demo.css') %>
+```
+
+定位JS文件
+
+```
+<%= uri('js/demo.js') %>
 ```
 
 定位图片等放在images目录下的资源，必须带上images目录作为标记
@@ -1033,7 +1039,7 @@ JavaScript代码检查。
 在 `js` 中定位使用API `__uri`
 
 ```
-__uri('demo.css')
+__uri('css/demo.css')
 __uri('images/bg.png')
 ```
 
