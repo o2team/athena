@@ -1,7 +1,7 @@
 athena-html
 ===
-[![npm](https://img.shields.io/npm/v/athena-html.svg?maxAge=2592000&style=flat-square)](https://www.npmjs.com/package/athena-html)
-[![npm](https://img.shields.io/npm/dm/athena-html.svg?maxAge=2592000&style=flat-square)](https://npmjs.com/package/athena-html)
+[![npm](https://img.shields.io/npm/v/athena-html.svg?style=flat-square)](https://www.npmjs.com/package/athena-html)
+[![npm](https://img.shields.io/npm/dm/athena-html.svg?style=flat-square)](https://npmjs.com/package/athena-html)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/o2team/athena/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/o2team/athena.svg?style=flat-square)](https://github.com/o2team/athena/stargazers)
 
