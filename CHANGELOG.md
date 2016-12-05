@@ -1,5 +1,13 @@
 # ChangeLog
 
+## 1.2.5
+
+*	update:组件发布调整
+* update:增加更新组件功能
+* update:增加json文件的引用关系
+* update:client模式增加__hash API来获取资源md5重命名后资源名
+* update:client模式发布命令增加--allres参数来上传当前模块所有资源
+
 ## 1.2.4
 
 *	fix:发布项目跨模块发布时报错
