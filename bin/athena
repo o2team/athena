@@ -1275,6 +1275,7 @@ program
   .option('--verbose', '发布详细信息')
   .option('--remote [remoteName]', '目标机器，根据app-conf.js中的配置')
   .option('--all', '发布所有页面')
+  .option('--allres', '发布所有资源')
   .option('--debug', '打印调试信息')
   .option('--showall', '展示上线页面所有需要被上线的资源')
   .action(function (option) {
