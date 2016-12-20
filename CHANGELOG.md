@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 1.2.6
+
+*	update:增加抽离JS逻辑
+* update:svg引用图片资源定位
+* update:更新雪碧图包引用
+
 ## 1.2.5
 
 *	update:组件发布调整
