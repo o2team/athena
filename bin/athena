@@ -654,7 +654,11 @@ program
                             var query = Util.getQueryObj(pathName);
                             var size = 0;
                             pathName = pathName.split('?')[0];
-                            if (Util.regexps.images.test(path.basename(pathName)) && Util.existsSync(pathName)) {
+                            if (!Util.existsSync(pathName)) {
+                              console.log(chalk.red('  文件' + path.basename(file.path) + '中引用的资源' + value + '不存在，请检查！'));
+                              return vStart + value + vEnd;
+                            }
+                            if (Util.regexps.images.test(path.basename(pathName))) {
                               // 判断是否有__inline标或者是打开了base64开关被excluded
                               var base64Opts = moduleConf.support.base64 || {
                                 enable: false,
