@@ -109,6 +109,66 @@ function checkAthenaVersion (successCb, errorCb) {
     }
   });
 }
+// 新版本更新提醒功能
+function remindNewVersion (cb) {
+  var remindFile = path.join(Util.getAthenaPath(), '.remind.json');
+  var remindInfo = {};
+  if (Util.existsSync(remindFile)) {
+    try {
+      remindInfo = JSON.parse(String(fs.readFileSync(remindFile)));
+    } catch (ex) {
+      remindInfo = {};
+    }
+  }
+  if (!remindInfo.update) {
+    remindInfo.update = {};
+  }
+  var updateInfo = remindInfo.update;
+  if (!updateInfo.date || !Util.isToday(updateInfo.date)) {
+    checkAthenaVersion(function (versionServer, versionNative, compareResult) {
+      if (compareResult === 1) {
+        var prompt = [];
+        prompt.push({
+          type: 'confirm',
+          name: 'isUpdate',
+          message: '检测到有新版本的Athena，版本号为' + versionServer + '，在修复问题的同时，新增了许多实用功能，你不想更新一下么？',
+          default: true
+        });
+        inquirer.prompt(prompt, function (answers) {
+          if (answers.isUpdate) {
+            console.log();
+            console.log(chalk.green('  正在自动安装更新...'));
+            installAthena({
+              version: versionServer,
+              isDebug: false,
+              onSuccess: function () {
+                remindInfo.update.date = new Date().getTime();
+                fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+                cb();
+              },
+              onError: function () {
+                remindInfo.update.date = new Date().getTime();
+                fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));                
+              }
+            });
+          } else {
+            remindInfo.update.date = new Date().getTime();
+            fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+            cb();
+          }
+        });
+      } else {
+        remindInfo.update.date = new Date().getTime();
+        fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
+        cb();
+      }
+    }, function () {
+      cb();
+    });
+  } else {
+    cb();
+  }
+}
 
 // 安装某一版本athena
 function installAthena (installParams) {
@@ -153,39 +213,41 @@ program
   .command('init [url]')
   .description('初始化Athena')
   .action(function (url) {
-    console.log(chalk.magenta('  Allo ' + userName + '! 开始愉快工作吧~'));
-    if (!url) {
-      url = process.cwd();
-      console.log('  即将设置工作目录为当前目录！');
-    } else {
-      console.log('  即将设置工作目录为：', url);
-    }
-    console.log();
-    var prompt = [];
-    if (!config.work_space) {
-      config.work_space = url;
-    } else {
-      if (config.work_space !== url) {
+    remindNewVersion(function () {
+      console.log(chalk.magenta('  Allo ' + userName + '! 开始愉快工作吧~'));
+        if (!url) {
+          url = process.cwd();
+          console.log('  即将设置工作目录为当前目录！');
+        } else {
+          console.log('  即将设置工作目录为：', url);
+        }
+        console.log();
+        var prompt = [];
+        if (!config.work_space) {
+          config.work_space = url;
+        } else {
+          if (config.work_space !== url) {
+            prompt.push({
+              type: 'confirm',
+              name: 'needNewWorkSpace',
+              message: '已经设置过工作目录' + config.work_space + '，是否要以新目录为工作目录？',
+              default: false
+            });
+          }
+        }
         prompt.push({
-          type: 'confirm',
-          name: 'needNewWorkSpace',
-          message: '已经设置过工作目录' + config.work_space + '，是否要以新目录为工作目录？',
-          default: false
+          type: 'input',
+          name: 'userName',
+          message: '雁过留声，人过留名~~',
+          default: userName
         });
-      }
-    }
-    prompt.push({
-      type: 'input',
-      name: 'userName',
-      message: '雁过留声，人过留名~~',
-      default: userName
-    });
-    inquirer.prompt(prompt, function (answers) {
-      if (answers.needNewWorkSpace) {
-        config.work_space = url;
-      }
-      config.user_name = answers.userName;
-      Util.setConfig(config);
+        inquirer.prompt(prompt, function (answers) {
+          if (answers.needNewWorkSpace) {
+            config.work_space = url;
+          }
+          config.user_name = answers.userName;
+          Util.setConfig(config);
+        });
     });
   }).on('--help', function() {
     console.log('  Examples:');
@@ -206,31 +268,32 @@ program
   .option('--template [templateName]', '设置模板')
   .option('--debug', '打印调试信息')
   .action(function(appName, option) {
-    var app = new App({
-      appName: appName || option.name,
-      description: option.description,
-      sass: option.sass,
-      less: option.less,
-      tmpName: option.template
-    });
-    // 创建完项目后进行数据上报
-    app.create(function () {
-      var argv = [].slice.call(arguments);
-      report('app', addReportPath, argv, function (params) {
-        var appConfPath = app.destinationPath(argv[0], 'app-conf.js');
-        var commonModuleConfPath = app.destinationPath(argv[0], 'gb', 'module-conf.js');
-        var commonModuleConf = require(commonModuleConfPath);
-        params.appName = argv[0];
-        params.appId = require(appConfPath).appId;
-        params.commonModuleId = commonModuleConf.moduleId;
-        params.commonModuleName = commonModuleConf.module;
-      }, function (body) {
-        if (option.debug) {
-          console.log(body);
-        }
+    remindNewVersion(function () {
+      var app = new App({
+        appName: appName || option.name,
+        description: option.description,
+        sass: option.sass,
+        less: option.less,
+        tmpName: option.template
+      });
+      // 创建完项目后进行数据上报
+      app.create(function () {
+        var argv = [].slice.call(arguments);
+        report('app', addReportPath, argv, function (params) {
+          var appConfPath = app.destinationPath(argv[0], 'app-conf.js');
+          var commonModuleConfPath = app.destinationPath(argv[0], 'gb', 'module-conf.js');
+          var commonModuleConf = require(commonModuleConfPath);
+          params.appName = argv[0];
+          params.appId = require(appConfPath).appId;
+          params.commonModuleId = commonModuleConf.moduleId;
+          params.commonModuleName = commonModuleConf.module;
+        }, function (body) {
+          if (option.debug) {
+            console.log(body);
+          }
+        });
       });
     });
-
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -250,28 +313,30 @@ program
   .option('--less', '启用less')
   .option('--debug', '打印调试信息')
   .action(function(moduleName, option) {
-    if (moduleName) {
-      // 支持一次性创建多个模块
-      var moduleList = moduleName.split(',');
-      var promises = [];
-      promises = moduleList.map(function (item) {
-        return createModule.bind(null, item, option);
-      });
-      promises.reduce(function (prev, curr) {
-        return prev.then(function () {
-          return curr();
+    remindNewVersion(function () {
+      if (moduleName) {
+        // 支持一次性创建多个模块
+        var moduleList = moduleName.split(',');
+        var promises = [];
+        promises = moduleList.map(function (item) {
+          return createModule.bind(null, item, option);
         });
-      }, Promise.resolve('start')).catch(function (e) {
-        if (e) {
-          console.log(e.plugin);
-          if (e.stack) {
-            console.log(e.stack);
+        promises.reduce(function (prev, curr) {
+          return prev.then(function () {
+            return curr();
+          });
+        }, Promise.resolve('start')).catch(function (e) {
+          if (e) {
+            console.log(e.plugin);
+            if (e.stack) {
+              console.log(e.stack);
+            }
           }
-        }
-      });
-    } else {
-      createModule(moduleName, option);
-    }
+        });
+      } else {
+        createModule(moduleName, option);
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -329,37 +394,39 @@ program
   .option('--remote [remoteName]', '选择域')
   .option('--debug', '打印调试信息')
   .action(function(pageName, option) {
-    var page = new Page({
-      pageName: pageName || option.name,
-      description: option.description,
-      sass: option.sass,
-      less: option.less,
-      remote: option.remote
-    });
-    var moduleConfPath = page.destinationPath('module-conf.js');
-    var appConfPath = path.join(path.resolve(page.destinationRoot(), '..'), 'app-conf.js');
-    if (!fs.existsSync(moduleConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-      return;
-    }
-    // 创建完页面后提交统计
-    page.create(function () {
-      var argv = [].slice.call(arguments);
-      var appConf = require(appConfPath);
-      var moduleConf = require(moduleConfPath);
-      if (appConf) {
-        report('page', addReportPath, argv, function (params) {
-          params.moduleName = moduleConf.module;
-          params.moduleId = moduleConf.moduleId;
-          params.appName = appConf.app;
-          params.appId = appConf.appId;
-          params.page = argv[0];
-        }, function (body) {
-          if (option.debug) {
-            console.log(body);
-          }
-        });
+    remindNewVersion(function () {
+      var page = new Page({
+        pageName: pageName || option.name,
+        description: option.description,
+        sass: option.sass,
+        less: option.less,
+        remote: option.remote
+      });
+      var moduleConfPath = page.destinationPath('module-conf.js');
+      var appConfPath = path.join(path.resolve(page.destinationRoot(), '..'), 'app-conf.js');
+      if (!fs.existsSync(moduleConfPath)) {
+        console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+        return;
       }
+      // 创建完页面后提交统计
+      page.create(function () {
+        var argv = [].slice.call(arguments);
+        var appConf = require(appConfPath);
+        var moduleConf = require(moduleConfPath);
+        if (appConf) {
+          report('page', addReportPath, argv, function (params) {
+            params.moduleName = moduleConf.module;
+            params.moduleId = moduleConf.moduleId;
+            params.appName = appConf.app;
+            params.appId = appConf.appId;
+            params.page = argv[0];
+          }, function (body) {
+            if (option.debug) {
+              console.log(body);
+            }
+          });
+        }
+      });
     });
   }).on('--help', function() {
     console.log('  Examples:');
@@ -381,36 +448,38 @@ program
   .option('--debug', '打印调试信息')
   .description('创建新的组件')
   .action(function(widgetName, option) {
-    var widget = new Widget({
-      widgetName: widgetName || option.name,
-      description: option.description,
-      sass: option.sass,
-      less: option.less,
-      cms: option.cms
-    });
-    var moduleConfPath = widget.destinationPath('module-conf.js');
-    var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
-    if (!fs.existsSync(moduleConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-      return;
-    }
-    widget.create(function () {
-      var argv = [].slice.call(arguments);
-      var appConf = require(appConfPath);
-      var moduleConf = require(moduleConfPath);
-      if (appConf) {
-        report('widget', addReportPath, argv, function (params) {
-          params.moduleName = moduleConf.module;
-          params.moduleId = moduleConf.moduleId;
-          params.appName = appConf.app;
-          params.appId = appConf.appId;
-          params.widget = argv[0];
-        }, function (body) {
-          if (option.debug) {
-            console.log(body);
-          }
-        });
+    remindNewVersion(function () {
+      var widget = new Widget({
+        widgetName: widgetName || option.name,
+        description: option.description,
+        sass: option.sass,
+        less: option.less,
+        cms: option.cms
+      });
+      var moduleConfPath = widget.destinationPath('module-conf.js');
+      var appConfPath = path.join(path.resolve(widget.destinationRoot(), '..'), 'app-conf.js');
+      if (!fs.existsSync(moduleConfPath)) {
+        console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+        return;
       }
+      widget.create(function () {
+        var argv = [].slice.call(arguments);
+        var appConf = require(appConfPath);
+        var moduleConf = require(moduleConfPath);
+        if (appConf) {
+          report('widget', addReportPath, argv, function (params) {
+            params.moduleName = moduleConf.module;
+            params.moduleId = moduleConf.moduleId;
+            params.appName = appConf.app;
+            params.appId = appConf.appId;
+            params.widget = argv[0];
+          }, function (body) {
+            if (option.debug) {
+              console.log(body);
+            }
+          });
+        }
+      });
     });
   }).on('--help', function() {
     console.log('  Examples:');
@@ -428,401 +497,403 @@ program
   .option('-i, --id [id]', '组件id')
   .description('发布/更新组件到组件库')
   .action(function (widgetName, option) {
-    widgetName = widgetName || option.widget;
-    widgetId = option.id;
-    var mdouleConfPath = path.join(process.cwd(), 'module-conf.js');
-    if (!Util.existsSync(mdouleConfPath)) {
-      console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
-      return;
-    }
-    var modulePath = process.cwd();
-    var moduleConf = require(mdouleConfPath);
-    var widgetPath = path.join(modulePath, 'widget', widgetName);
-    if (!Util.existsSync(widgetPath)) {
-      console.log(chalk.red('  出错了，当前模块没有组件' + widgetName + '！'));
-      return;
-    }
-    var appPath = path.join(path.resolve(modulePath, '..'));
-    var appConf = require(path.join(appPath, 'app-conf.js'));
-    var archiver = require('archiver');
-    var archive = archiver.create('zip', {});
-    var tmpZipPath = path.join(modulePath, 'widget', widgetName, widgetName + '.zip');
-    var output = fs.createWriteStream(tmpZipPath);
-
-    var prompts = [];
-    var tmpchoices = [];
-    // 请求业务清单
-    var requestBusinessPromise = new Promise(function(resolve, reject) {
-      request.get(setting.component_platform + '/api/business/list', function(err, res, body) {
-        if(!err && res.statusCode === 200) {
-          resolve( JSON.parse(body) );
-        } else {
-          reject(err);
-        }
-      });
-    });
-    // 请求类别清单
-    var requestClassifyPromise = new Promise(function(resolve, reject) {
-      request.get(setting.component_platform + '/api/classify/list', function(err, res, body) {
-        if(!err && res.statusCode === 200) {
-          resolve( JSON.parse(body) );
-        } else {
-          reject(err);
-        }
-      });
-    });
-    Promise.resolve().then(function() {
-      return requestBusinessPromise;
-    }).then(function(business) {
-      if(business.length>0) {
-        business.forEach(function (o, i) {
-          tmpchoices.push({
-            name : o.name,
-            value: o.objectId
-          });
-        });
-        prompts.push({
-          type: 'list',
-          name: 'business',
-          message: '请选择所属业务',
-          choices: tmpchoices
-        });
+    remindNewVersion(function () {
+      widgetName = widgetName || option.widget;
+      widgetId = option.id;
+      var mdouleConfPath = path.join(process.cwd(), 'module-conf.js');
+      if (!Util.existsSync(mdouleConfPath)) {
+        console.log(chalk.red('  出错了，当前目录没有module-conf.js，请检查当前目录是否是一个模块目录！'));
+        return;
       }
-
-      return requestClassifyPromise;
-    }).then(function(classify) {
-      if(classify.length>0) {
-        tmpchoices = [];
-        classify.forEach(function (o, i) {
-          tmpchoices.push({
-            name : o.name,
-            value: o.objectId
-          });
-        });
-        prompts.push({
-          type: 'list',
-          name: 'classify',
-          message: '请选择所属类别',
-          choices: tmpchoices
-        });
+      var modulePath = process.cwd();
+      var moduleConf = require(mdouleConfPath);
+      var widgetPath = path.join(modulePath, 'widget', widgetName);
+      if (!Util.existsSync(widgetPath)) {
+        console.log(chalk.red('  出错了，当前模块没有组件' + widgetName + '！'));
+        return;
       }
+      var appPath = path.join(path.resolve(modulePath, '..'));
+      var appConf = require(path.join(appPath, 'app-conf.js'));
+      var archiver = require('archiver');
+      var archive = archiver.create('zip', {});
+      var tmpZipPath = path.join(modulePath, 'widget', widgetName, widgetName + '.zip');
+      var output = fs.createWriteStream(tmpZipPath);
 
-      inquirer.prompt(prompts, function (answers) {
-        
-        var scssFilePath = path.join(widgetPath, widgetName + '.scss');
-        var copyFolder = path.join(widgetPath, '_');
-        var scssImportsPath = path.join(copyFolder, '_imports');
-        var scssBuildCssFolder = path.join(copyFolder, '_css');
-        var scssBuildCssFile = path.join(copyFolder, '_build_' + widgetName + '.css');
-        del.sync(copyFolder, {force: true});
-        Promise.resolve().then(function() {
-          return new Promise(function(resolve, reject) {
-            if(Util.existsSync(scssFilePath)) {
-              // 编译SCSS并处理CSS
-              var vfs = require('vinyl-fs');
-              var through2 = require('through2');
-              var sprites = require('athena-spritesmith');
-              var pxtorem = require('postcss-pxtorem');
-              var athenaMate = require('../lib/build/athena_mate');
-              //是否开启px转rem
-              var px2rem = moduleConf.support.px2rem;
-              //是否开启雪碧图合并
-              var csssprite = moduleConf.support.csssprite;
+      var prompts = [];
+      var tmpchoices = [];
+      // 请求业务清单
+      var requestBusinessPromise = new Promise(function(resolve, reject) {
+        request.get(setting.component_platform + '/api/business/list', function(err, res, body) {
+          if(!err && res.statusCode === 200) {
+            resolve( JSON.parse(body) );
+          } else {
+            reject(err);
+          }
+        });
+      });
+      // 请求类别清单
+      var requestClassifyPromise = new Promise(function(resolve, reject) {
+        request.get(setting.component_platform + '/api/classify/list', function(err, res, body) {
+          if(!err && res.statusCode === 200) {
+            resolve( JSON.parse(body) );
+          } else {
+            reject(err);
+          }
+        });
+      });
+      Promise.resolve().then(function() {
+        return requestBusinessPromise;
+      }).then(function(business) {
+        if(business.length>0) {
+          business.forEach(function (o, i) {
+            tmpchoices.push({
+              name : o.name,
+              value: o.objectId
+            });
+          });
+          prompts.push({
+            type: 'list',
+            name: 'business',
+            message: '请选择所属业务',
+            choices: tmpchoices
+          });
+        }
 
-              var platform = appConf.platform ? appConf.platform : 'mobile';
+        return requestClassifyPromise;
+      }).then(function(classify) {
+        if(classify.length>0) {
+          tmpchoices = [];
+          classify.forEach(function (o, i) {
+            tmpchoices.push({
+              name : o.name,
+              value: o.objectId
+            });
+          });
+          prompts.push({
+            type: 'list',
+            name: 'classify',
+            message: '请选择所属类别',
+            choices: tmpchoices
+          });
+        }
 
-              var autoprefixerConf = moduleConf.support.autoprefixer;
-              var browsers = [];
-              if (autoprefixerConf) {
-                browsers = autoprefixerConf[platform];
-              } else {
-                browsers = ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1'];
-              }
+        inquirer.prompt(prompts, function (answers) {
+          
+          var scssFilePath = path.join(widgetPath, widgetName + '.scss');
+          var copyFolder = path.join(widgetPath, '_');
+          var scssImportsPath = path.join(copyFolder, '_imports');
+          var scssBuildCssFolder = path.join(copyFolder, '_css');
+          var scssBuildCssFile = path.join(copyFolder, '_build_' + widgetName + '.css');
+          del.sync(copyFolder, {force: true});
+          Promise.resolve().then(function() {
+            return new Promise(function(resolve, reject) {
+              if(Util.existsSync(scssFilePath)) {
+                // 编译SCSS并处理CSS
+                var vfs = require('vinyl-fs');
+                var through2 = require('through2');
+                var sprites = require('athena-spritesmith');
+                var pxtorem = require('postcss-pxtorem');
+                var athenaMate = require('../lib/build/athena_mate');
+                //是否开启px转rem
+                var px2rem = moduleConf.support.px2rem;
+                //是否开启雪碧图合并
+                var csssprite = moduleConf.support.csssprite;
 
-              var processors = [
-                autoprefixer({browsers: browsers})
-              ];
+                var platform = appConf.platform ? appConf.platform : 'mobile';
 
-              if( px2rem && px2rem.enable !== false ){
-                processors.push(pxtorem({
-                  root_value: px2rem.root_value,
-                  unit_precision: px2rem.unit_precision,
-                  prop_white_list: px2rem.prop_white_list,
-                  selector_black_list: px2rem.selector_black_list,
-                  replace: px2rem.replace,
-                  media_query: px2rem.media_query
-                }));
-              }
+                var autoprefixerConf = moduleConf.support.autoprefixer;
+                var browsers = [];
+                if (autoprefixerConf) {
+                  browsers = autoprefixerConf[platform];
+                } else {
+                  browsers = ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1'];
+                }
 
-              if(csssprite && csssprite.enable !== false){
-                var opts = {
-                  outputDimensions: true,
-                  stylesheetPath: scssBuildCssFolder,
-                  imageFolder: 'images',
-                  spritePath: path.join(copyFolder, 'images', 'sprite.png'),
-                  retina: csssprite.retina || false,
-                  rootValue: csssprite.rootValue,
-                  padding: csssprite.padding,
-                  groupBy: function (image) {
-                    return image.urlSpe;
-                  }
-                };
-              }
-              // 先拷贝组件所有内容
-              vfs.src(path.join(widgetPath, '**'))
-                .pipe(vfs.dest(copyFolder))
-                .on('finish', function () {
-                  // 索引 SCSS Imports
-                  console.log(chalk.magenta('  正在解析SCSS引用'));
-                  var imports = Util.mapScssImports(scssFilePath);
-                  // 清空/创建
-                  fse.emptydirSync(scssImportsPath);
-                  if(imports.length > 0) {
-                    imports.forEach(function (e) {
-                      console.log(chalk.green(e.path));
-                      var basename = path.basename(e.path);
-                      fse.copySync(e.path, path.join(scssImportsPath, e.dir, basename));
-                    });
-                  }
-                  vfs.src([path.join(copyFolder, '*.scss'), path.join(copyFolder, '*.sass')])
+                var processors = [
+                  autoprefixer({browsers: browsers})
+                ];
+
+                if( px2rem && px2rem.enable !== false ){
+                  processors.push(pxtorem({
+                    root_value: px2rem.root_value,
+                    unit_precision: px2rem.unit_precision,
+                    prop_white_list: px2rem.prop_white_list,
+                    selector_black_list: px2rem.selector_black_list,
+                    replace: px2rem.replace,
+                    media_query: px2rem.media_query
+                  }));
+                }
+
+                if(csssprite && csssprite.enable !== false){
+                  var opts = {
+                    outputDimensions: true,
+                    stylesheetPath: scssBuildCssFolder,
+                    imageFolder: 'images',
+                    spritePath: path.join(copyFolder, 'images', 'sprite.png'),
+                    retina: csssprite.retina || false,
+                    rootValue: csssprite.rootValue,
+                    padding: csssprite.padding,
+                    groupBy: function (image) {
+                      return image.urlSpe;
+                    }
+                  };
+                }
+                // 先拷贝组件所有内容
+                vfs.src(path.join(widgetPath, '**'))
+                  .pipe(vfs.dest(copyFolder))
                   .on('finish', function () {
-                    console.log(chalk.magenta('  开始组件SASS本地编译任务'));
-                  })
-                  .pipe(athenaMate.compass({
-                    cwd: appPath,
-                    module: moduleConf.module,
-                    sass: copyFolder,
-                    css: scssBuildCssFolder,
-                    sasslib : [scssImportsPath]
-                  }))
-                  .on('data', function () {})
-                  .on('end', function () {
-                    var spriteImages = [];
-                    vfs.src([path.join(scssBuildCssFolder, '*.css'), path.join(copyFolder, '*.html'), path.join(copyFolder, '*.js')])
-                      .pipe($.if('*.css', through2.obj(function (file, encoding, cb) {
-                        if (file.isNull() || file.isStream()) {
-                          return cb(null);
-                        }
-                        var fileContents = file.contents.toString();
-                        Util.processCss(fileContents, function (value) {
-                          var _value = value.replace(/\"/g, '').replace(/\'/g, '');
-                          var extname = path.extname(_value);
-                          var dirname = path.dirname(value);
-                          var dirnameArr = dirname.split('/');
-                          var imagesIndex = dirnameArr.indexOf('images');
-                          if (!Util.regexps.url.test(value) && value.length > 0
-                            && value.indexOf('data:image') < 0
-                            && typeof extname === 'string'
-                            && extname.length > 0
-                            && imagesIndex >= 0) {
-                            var spriteReg = /\?__sprite(.*)+/gi;
-                            if (spriteReg.test(_value)) {
-                              _value = _value.split('/').splice(imagesIndex).join('/').replace(spriteReg, '');
-                              spriteImages.push(_value);
-                            }
+                    // 索引 SCSS Imports
+                    console.log(chalk.magenta('  正在解析SCSS引用'));
+                    var imports = Util.mapScssImports(scssFilePath);
+                    // 清空/创建
+                    fse.emptydirSync(scssImportsPath);
+                    if(imports.length > 0) {
+                      imports.forEach(function (e) {
+                        console.log(chalk.green(e.path));
+                        var basename = path.basename(e.path);
+                        fse.copySync(e.path, path.join(scssImportsPath, e.dir, basename));
+                      });
+                    }
+                    vfs.src([path.join(copyFolder, '*.scss'), path.join(copyFolder, '*.sass')])
+                    .on('finish', function () {
+                      console.log(chalk.magenta('  开始组件SASS本地编译任务'));
+                    })
+                    .pipe(athenaMate.compass({
+                      cwd: appPath,
+                      module: moduleConf.module,
+                      sass: copyFolder,
+                      css: scssBuildCssFolder,
+                      sasslib : [scssImportsPath]
+                    }))
+                    .on('data', function () {})
+                    .on('end', function () {
+                      var spriteImages = [];
+                      vfs.src([path.join(scssBuildCssFolder, '*.css'), path.join(copyFolder, '*.html'), path.join(copyFolder, '*.js')])
+                        .pipe($.if('*.css', through2.obj(function (file, encoding, cb) {
+                          if (file.isNull() || file.isStream()) {
+                            return cb(null);
                           }
-                          return value;
-                        });
-                        this.push(file);
-                        cb();
-                      })))
-                      .pipe($.if('*.css', $.postcss(processors)))
-                      .pipe($.if('*.css', $.postcss([sprites(opts)])))
-                      .pipe(through2.obj(function (file, encoding, cb) {
-                        if (file.isNull() || file.isStream()) {
-                          return cb(null);
-                        }
-                        function getInline (value) {
-                          var vStart = '';
-                          var vEnd = '';
-                          var extname = path.extname(value);
-                          if (value.indexOf('\"') >= 0 || value.indexOf('\'') >= 0) {
-                            vStart = value[0];
-                            vEnd = value[value.length - 1];
-                            value = value.replace(/\"/g, '').replace(/\'/g, '');
-                          }
-                          var dirname = path.dirname(value);
-                          var dirnameArr = dirname.split('/');
-                          var imagesIndex = dirnameArr.indexOf('images');
-                          if (!Util.regexps.url.test(value) && value.length > 0
-                            && value.indexOf('data:image') < 0
-                            && typeof extname === 'string'
-                            && extname.length > 0
-                            && imagesIndex >= 0) {
-                            value = value.split('/').splice(imagesIndex).join('/');
-                            var pathName = path.join(copyFolder, value);
-                            var query = Util.getQueryObj(pathName);
-                            var size = 0;
-                            pathName = pathName.split('?')[0];
-                            if (!Util.existsSync(pathName)) {
-                              console.log(chalk.red('  文件' + path.basename(file.path) + '中引用的资源' + value + '不存在，请检查！'));
-                              return vStart + value + vEnd;
+                          var fileContents = file.contents.toString();
+                          Util.processCss(fileContents, function (value) {
+                            var _value = value.replace(/\"/g, '').replace(/\'/g, '');
+                            var extname = path.extname(_value);
+                            var dirname = path.dirname(value);
+                            var dirnameArr = dirname.split('/');
+                            var imagesIndex = dirnameArr.indexOf('images');
+                            if (!Util.regexps.url.test(value) && value.length > 0
+                              && value.indexOf('data:image') < 0
+                              && typeof extname === 'string'
+                              && extname.length > 0
+                              && imagesIndex >= 0) {
+                              var spriteReg = /\?__sprite(.*)+/gi;
+                              if (spriteReg.test(_value)) {
+                                _value = _value.split('/').splice(imagesIndex).join('/').replace(spriteReg, '');
+                                spriteImages.push(_value);
+                              }
                             }
-                            if (Util.regexps.images.test(path.basename(pathName))) {
-                              // 判断是否有__inline标或者是打开了base64开关被excluded
-                              var base64Opts = moduleConf.support.base64 || {
-                                enable: false,
-                                exclude: [],
-                                size: 5000
-                              };
-                              var baseExclude = base64Opts.exclude;
-                              if (query.__inline || base64Opts.enable && (!baseExclude || _.isArray(baseExclude) && baseExclude.indexOf(value) === -1)) {
-                                try {
-                                  size = fs.statSync(pathName).size;
-                                  if (query.__inline || size < config.base64Opts.size) {
-                                    return vStart + Util.transform2DataURI(pathName) + vEnd;
+                            return value;
+                          });
+                          this.push(file);
+                          cb();
+                        })))
+                        .pipe($.if('*.css', $.postcss(processors)))
+                        .pipe($.if('*.css', $.postcss([sprites(opts)])))
+                        .pipe(through2.obj(function (file, encoding, cb) {
+                          if (file.isNull() || file.isStream()) {
+                            return cb(null);
+                          }
+                          function getInline (value) {
+                            var vStart = '';
+                            var vEnd = '';
+                            var extname = path.extname(value);
+                            if (value.indexOf('\"') >= 0 || value.indexOf('\'') >= 0) {
+                              vStart = value[0];
+                              vEnd = value[value.length - 1];
+                              value = value.replace(/\"/g, '').replace(/\'/g, '');
+                            }
+                            var dirname = path.dirname(value);
+                            var dirnameArr = dirname.split('/');
+                            var imagesIndex = dirnameArr.indexOf('images');
+                            if (!Util.regexps.url.test(value) && value.length > 0
+                              && value.indexOf('data:image') < 0
+                              && typeof extname === 'string'
+                              && extname.length > 0
+                              && imagesIndex >= 0) {
+                              value = value.split('/').splice(imagesIndex).join('/');
+                              var pathName = path.join(copyFolder, value);
+                              var query = Util.getQueryObj(pathName);
+                              var size = 0;
+                              pathName = pathName.split('?')[0];
+                              if (!Util.existsSync(pathName)) {
+                                console.log(chalk.red('  文件' + path.basename(file.path) + '中引用的资源' + value + '不存在，请检查！'));
+                                return vStart + value + vEnd;
+                              }
+                              if (Util.regexps.images.test(path.basename(pathName))) {
+                                // 判断是否有__inline标或者是打开了base64开关被excluded
+                                var base64Opts = moduleConf.support.base64 || {
+                                  enable: false,
+                                  exclude: [],
+                                  size: 5000
+                                };
+                                var baseExclude = base64Opts.exclude;
+                                if (query.__inline || base64Opts.enable && (!baseExclude || _.isArray(baseExclude) && baseExclude.indexOf(value) === -1)) {
+                                  try {
+                                    size = fs.statSync(pathName).size;
+                                    if (query.__inline || size < config.base64Opts.size) {
+                                      return vStart + Util.transform2DataURI(pathName) + vEnd;
+                                    }
                                   }
-                                }
-                                catch (e) {
-                                  gutil.log(gutil.colors.red('无法转base64，文件' + pathName + '没有找到！'));
-                                  return vStart + value + vEnd;
+                                  catch (e) {
+                                    gutil.log(gutil.colors.red('无法转base64，文件' + pathName + '没有找到！'));
+                                    return vStart + value + vEnd;
+                                  }
                                 }
                               }
                             }
+                            return vStart + value + vEnd;
                           }
-                          return vStart + value + vEnd;
-                        }
-                        var fileContents = file.contents.toString();
-                        var fPath = file.path;
-                        if (Util.regexps.css.test(fPath)) {
-                          fileContents = Util.processCss(fileContents, function (value) {
-                            return getInline(value);
-                          });
-                        } else if (Util.regexps.js.test(fPath)) {
-                          fileContents = Util.processJs(fileContents, function (value) {
-                            return getInline(value);
-                          });
-                        } else if (Util.regexps.tpl.test(fPath)) {
-                          fileContents = Util.processHtml(fileContents, function (value) {
-                            return getInline(value);
-                          });
-                        }
-                        file.contents = new Buffer(fileContents);
-                        this.push(file);
-                        cb();
-                      }))
-                      .pipe(through2.obj(function (file, encoding, cb) {
-                        var dirname = path.dirname(file.path);
-                        var basename = path.basename(file.path);
-                        if(!/_build_/.test(basename)) {
-                          file.path = path.join(dirname, '_build_' + basename);
-                        }
-                        this.push(file);
-                        cb();
-                      }))
-                      .pipe(vfs.dest(copyFolder))
-                      .on('finish', function() {
-                        del.sync(scssBuildCssFolder, {force: true});
-                        fs.writeFileSync(path.join(copyFolder, '_sprite_images.json'), JSON.stringify({
-                          sprites: spriteImages
-                        }, null, 2));
-                        resolve();
-                      })
-                      .on('error', function(err) {
-                        console.log('编译过程发生错误');
-                        reject();
-                      });
-                  })
-                  .on('error', function (err) {
-                    console.log('编译过程发生错误');
-                    throw err;
+                          var fileContents = file.contents.toString();
+                          var fPath = file.path;
+                          if (Util.regexps.css.test(fPath)) {
+                            fileContents = Util.processCss(fileContents, function (value) {
+                              return getInline(value);
+                            });
+                          } else if (Util.regexps.js.test(fPath)) {
+                            fileContents = Util.processJs(fileContents, function (value) {
+                              return getInline(value);
+                            });
+                          } else if (Util.regexps.tpl.test(fPath)) {
+                            fileContents = Util.processHtml(fileContents, function (value) {
+                              return getInline(value);
+                            });
+                          }
+                          file.contents = new Buffer(fileContents);
+                          this.push(file);
+                          cb();
+                        }))
+                        .pipe(through2.obj(function (file, encoding, cb) {
+                          var dirname = path.dirname(file.path);
+                          var basename = path.basename(file.path);
+                          if(!/_build_/.test(basename)) {
+                            file.path = path.join(dirname, '_build_' + basename);
+                          }
+                          this.push(file);
+                          cb();
+                        }))
+                        .pipe(vfs.dest(copyFolder))
+                        .on('finish', function() {
+                          del.sync(scssBuildCssFolder, {force: true});
+                          fs.writeFileSync(path.join(copyFolder, '_sprite_images.json'), JSON.stringify({
+                            sprites: spriteImages
+                          }, null, 2));
+                          resolve();
+                        })
+                        .on('error', function(err) {
+                          console.log('编译过程发生错误');
+                          reject();
+                        });
+                    })
+                    .on('error', function (err) {
+                      console.log('编译过程发生错误');
+                      throw err;
+                    });
                   });
-                });
-            } else {
-              resolve();
-            }
-          })
-        }).then(function() {
-          console.log(chalk.magenta('  正在发布组件，请稍等...'));
-          archive.on('error', function(err){
-            throw err;
-          });
-          archive.pipe(output);
-          archive.bulk([
-            {
-              expand: true,
-              cwd: copyFolder,
-              src: ['**/*']
-            }
-          ]).finalize();
-          output.on('close', function () {
-            var formData = {
-              appId: appConf.appId,
-              moduleId: moduleConf.moduleId,
-              platform: appConf.platform,
-              author: config.user_name,
-              widget: {
-                value: fs.createReadStream(tmpZipPath),
-                options: {
-                  filename: widgetName + '.zip',
-                  contentType: 'application/zip'
-                }
-              }
-            };
-            if (answers.business) {
-              formData.business = answers.business;
-            }
-            if (answers.classify) {
-              formData.classify = answers.classify;
-            }
-            if (typeof widgetId === 'string' && widgetId.length) {
-              formData.widgetId = widgetId;
-            }
-            var boundaryKey = Math.random().toString(16);
-            request.post({
-              url: setting.component_platform + '/api/push',
-              headers: {
-                'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
-              },
-              formData: formData
-            }, function(err, res, body) {
-              if (err) {
-                del.sync(tmpZipPath, {force: true});
-                del.sync(copyFolder, {force: true});
-                throw err;
-              }
-              var result = null;
-              try {
-                result = JSON.parse(body);
-              } catch (e) {
-                result = null;
-              }
-              if (res.statusCode === 200) {
-                console.log(chalk.green('  组件发布成功！'));
-                del.sync(tmpZipPath, {force: true});
-                del.sync(copyFolder, {force: true});
-                if (result && result.no === 0) {
-                  var data = result.data;
-                  console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
-                }
               } else {
-                del.sync(tmpZipPath, {force: true});
-                del.sync(copyFolder, {force: true});
-                if(result && result.type == 'unauth') {
-                  console.log(chalk.red('  用户不在白名单之内，请联系管理人员。'));
-                } else {
-                  console.log(chalk.red('  组件发布失败，请重试！'));
-                }
+                resolve();
               }
+            })
+          }).then(function() {
+            console.log(chalk.magenta('  正在发布组件，请稍等...'));
+            archive.on('error', function(err){
+              throw err;
             });
-          });
-        }).catch(function(err) {
-          del.sync(tmpZipPath, {force: true});
-          del.sync(copyFolder, {force: true});
-          throw err;
-        })
-      });
-    }).catch(function(err) {
-      if(err) {
-        if(err.code) {
-          console.log(chalk.red('  ' + err.code));
+            archive.pipe(output);
+            archive.bulk([
+              {
+                expand: true,
+                cwd: copyFolder,
+                src: ['**/*']
+              }
+            ]).finalize();
+            output.on('close', function () {
+              var formData = {
+                appId: appConf.appId,
+                moduleId: moduleConf.moduleId,
+                platform: appConf.platform,
+                author: config.user_name,
+                widget: {
+                  value: fs.createReadStream(tmpZipPath),
+                  options: {
+                    filename: widgetName + '.zip',
+                    contentType: 'application/zip'
+                  }
+                }
+              };
+              if (answers.business) {
+                formData.business = answers.business;
+              }
+              if (answers.classify) {
+                formData.classify = answers.classify;
+              }
+              if (typeof widgetId === 'string' && widgetId.length) {
+                formData.widgetId = widgetId;
+              }
+              var boundaryKey = Math.random().toString(16);
+              request.post({
+                url: setting.component_platform + '/api/push',
+                headers: {
+                  'Content-Type': 'multipart/form-data; boundary="'+ boundaryKey +'"'
+                },
+                formData: formData
+              }, function(err, res, body) {
+                if (err) {
+                  del.sync(tmpZipPath, {force: true});
+                  del.sync(copyFolder, {force: true});
+                  throw err;
+                }
+                var result = null;
+                try {
+                  result = JSON.parse(body);
+                } catch (e) {
+                  result = null;
+                }
+                if (res.statusCode === 200) {
+                  console.log(chalk.green('  组件发布成功！'));
+                  del.sync(tmpZipPath, {force: true});
+                  del.sync(copyFolder, {force: true});
+                  if (result && result.no === 0) {
+                    var data = result.data;
+                    console.log(chalk.green('  请访问：' + setting.component_platform + '/#!/detail/' + data.id));
+                  }
+                } else {
+                  del.sync(tmpZipPath, {force: true});
+                  del.sync(copyFolder, {force: true});
+                  if(result && result.type == 'unauth') {
+                    console.log(chalk.red('  用户不在白名单之内，请联系管理人员。'));
+                  } else {
+                    console.log(chalk.red('  组件发布失败，请重试！'));
+                  }
+                }
+              });
+            });
+          }).catch(function(err) {
+            del.sync(tmpZipPath, {force: true});
+            del.sync(copyFolder, {force: true});
+            throw err;
+          })
+        });
+      }).catch(function(err) {
+        if(err) {
+          if(err.code) {
+            console.log(chalk.red('  ' + err.code));
+          } else {
+            console.log(err);
+            throw err;
+          }
         } else {
-          console.log(err);
-          throw err;
+          console.log(chalk.red('  请求列表数据时出错'));
         }
-      } else {
-        console.log(chalk.red('  请求列表数据时出错'));
-      }
+      });
     });
   }).on('--help', function() {
     console.log('  Examples:');
@@ -841,14 +912,16 @@ program
   .option('-a, --alias [widgetAlias]', '组件重命名')
   .description('加载一个远程的组件')
   .action(function (uuid, option) {
-    uuid = uuid || option.id;
-    if (typeof uuid !== 'string') {
-      console.log(chalk.red('  参数有误，必须告知组件id！'));
-      return;
-    }
-    var alias = typeof option.alias === 'string' ? option.alias : null;
-    var remoteUrl = setting.component_platform + '/api/pull/' + uuid;
-    loadRemoteWidget(remoteUrl, uuid, option);
+    remindNewVersion(function () {
+      uuid = uuid || option.id;
+      if (typeof uuid !== 'string') {
+        console.log(chalk.red('  参数有误，必须告知组件id！'));
+        return;
+      }
+      var alias = typeof option.alias === 'string' ? option.alias : null;
+      var remoteUrl = setting.component_platform + '/api/pull/' + uuid;
+      loadRemoteWidget(remoteUrl, uuid, option);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -865,10 +938,12 @@ program
   .option('--debug', '打印调试信息')
   .description('加载一个远程的组件')
   .action(function(widgetName, option) {
-    widgetName = widgetName || option.widget;
-    var wname = widgetName.split('~');
-    var remoteUrl = setting.remote_widget_url + '?cate=' + wname[0] + '&filename=' + wname[1];
-    loadRemoteWidget(remoteUrl, widgetName, option);
+    remindNewVersion(function () {
+      widgetName = widgetName || option.widget;
+      var wname = widgetName.split('~');
+      var remoteUrl = setting.remote_widget_url + '?cate=' + wname[0] + '&filename=' + wname[1];
+      loadRemoteWidget(remoteUrl, widgetName, option);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -950,140 +1025,142 @@ program
   .option('-w, --widget [widgetName]', '组件名称')
   .description('删除操作')
   .action(function (option) {
-    var appName = option.app;
-    var moduleName = option.module;
-    var pageName = option.page;
-    var widgetName = option.widget;
-    if (typeof(appName) !== 'string' && typeof(moduleName) !== 'string'
-      && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
-      console.log(chalk.red('  请输入参数！'));
-      console.log();
-      console.log(chalk.red('  通过命令 ath del -h 可查看帮助'));
-      console.log();
-    } else {
-      // 判断当前是否是项目路径或模块路径
-      var cwd = process.cwd();
-      var appConfPath = path.join(cwd, 'app-conf.js');
-      var moduleConfPath = path.join(cwd, 'module-conf.js');
-      var deleteTypes = [];
-      var deletePlace = '';
-      var appConf = null;
-      var moduleConf = null;
-      if (Util.existsSync(appConfPath)) { // 项目根目录
-        if (typeof(moduleName) !== 'string') {
-          console.log(chalk.red('  在项目目录下，必须告知模块名！'));
-          return;
-        }
-        appConf = require(appConfPath);
+    remindNewVersion(function () {
+      var appName = option.app;
+      var moduleName = option.module;
+      var pageName = option.page;
+      var widgetName = option.widget;
+      if (typeof(appName) !== 'string' && typeof(moduleName) !== 'string'
+        && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
+        console.log(chalk.red('  请输入参数！'));
+        console.log();
+        console.log(chalk.red('  通过命令 ath del -h 可查看帮助'));
+        console.log();
+      } else {
+        // 判断当前是否是项目路径或模块路径
+        var cwd = process.cwd();
+        var appConfPath = path.join(cwd, 'app-conf.js');
+        var moduleConfPath = path.join(cwd, 'module-conf.js');
+        var deleteTypes = [];
+        var deletePlace = '';
+        var appConf = null;
+        var moduleConf = null;
+        if (Util.existsSync(appConfPath)) { // 项目根目录
+          if (typeof(moduleName) !== 'string') {
+            console.log(chalk.red('  在项目目录下，必须告知模块名！'));
+            return;
+          }
+          appConf = require(appConfPath);
 
-        moduleConfPath = path.join(cwd, moduleName, 'module-conf.js');
-        if (!Util.existsSync(moduleConfPath)) {
-          console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
-          return;
-        }
-        moduleConf = require(moduleConfPath);
-        deletePlace = 'app';
-        // 删除模块
-        if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
-          deleteTypes.push('mod');
-        } else {
+          moduleConfPath = path.join(cwd, moduleName, 'module-conf.js');
+          if (!Util.existsSync(moduleConfPath)) {
+            console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
+            return;
+          }
+          moduleConf = require(moduleConfPath);
+          deletePlace = 'app';
+          // 删除模块
+          if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
+            deleteTypes.push('mod');
+          } else {
+            if (typeof(pageName) === 'string') {
+              if (!Util.existsSync(path.join(cwd, moduleName, 'page', pageName))) {
+                console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+                return;
+              }
+              deleteTypes.push('page');
+            }
+            if (typeof(widgetName) === 'string') {
+              if (!Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName))) {
+                console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
+                return;
+              }
+              deleteTypes.push('widget');
+            }
+          }
+        } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
+          if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
+            console.log(chalk.red('  在模块目录下，必须告页面名或组件名！'));
+            return;
+          }
+          appConf = require(path.join(path.resolve(cwd, '..'), 'app-conf'));
+          moduleConf = require(moduleConfPath);
+          deletePlace = 'module';
           if (typeof(pageName) === 'string') {
-            if (!Util.existsSync(path.join(cwd, moduleName, 'page', pageName))) {
+            if (!Util.existsSync(path.join(cwd, 'page', pageName))) {
               console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
               return;
             }
             deleteTypes.push('page');
           }
           if (typeof(widgetName) === 'string') {
-            if (!Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName))) {
+            if (!Util.existsSync(path.join(cwd, 'widget', widgetName))) {
               console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
               return;
             }
             deleteTypes.push('widget');
           }
-        }
-      } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
-        if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
-          console.log(chalk.red('  在模块目录下，必须告页面名或组件名！'));
-          return;
-        }
-        appConf = require(path.join(path.resolve(cwd, '..'), 'app-conf'));
-        moduleConf = require(moduleConfPath);
-        deletePlace = 'module';
-        if (typeof(pageName) === 'string') {
-          if (!Util.existsSync(path.join(cwd, 'page', pageName))) {
-            console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+        } else {
+          if (typeof(appName) !== 'string') {
+            console.log(chalk.red('  请输入项目名！'));
             return;
           }
-          deleteTypes.push('page');
-        }
-        if (typeof(widgetName) === 'string') {
-          if (!Util.existsSync(path.join(cwd, 'widget', widgetName))) {
-            console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
-            return;
-          }
-          deleteTypes.push('widget');
-        }
-      } else {
-        if (typeof(appName) !== 'string') {
-          console.log(chalk.red('  请输入项目名！'));
-          return;
-        }
-        var appPath = path.join(cwd, appName);
-        // 项目外删除
-        if (Util.existsSync(appPath)) {
-          deletePlace = 'outside';
-          appConf = require(path.join(appPath, 'app-conf'));
-          if (typeof(moduleName) !== 'string'
-            && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
-            deleteTypes.push('app');
-          } else {
-            if (typeof(moduleName) !== 'string') {
-              console.log(chalk.red('  请输入模块名！'));
-              return;
+          var appPath = path.join(cwd, appName);
+          // 项目外删除
+          if (Util.existsSync(appPath)) {
+            deletePlace = 'outside';
+            appConf = require(path.join(appPath, 'app-conf'));
+            if (typeof(moduleName) !== 'string'
+              && typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
+              deleteTypes.push('app');
             } else {
-              moduleConfPath = path.join(appPath, moduleName, 'module-conf.js');
-              if (!Util.existsSync(moduleConfPath)) {
-                console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
+              if (typeof(moduleName) !== 'string') {
+                console.log(chalk.red('  请输入模块名！'));
                 return;
-              }
-              moduleConf = require(moduleConfPath);
-              if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
-                deleteTypes.push('mod');
               } else {
-                if (typeof(pageName) === 'string') {
-                  if (!Util.existsSync(path.join(appPath, moduleName, 'page', pageName))) {
-                    console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
-                    return;
-                  }
-                  deleteTypes.push('page');
+                moduleConfPath = path.join(appPath, moduleName, 'module-conf.js');
+                if (!Util.existsSync(moduleConfPath)) {
+                  console.log(chalk.red('  没有找到模块' + moduleName + '，请检查当前目录是否符合规范！'));
+                  return;
                 }
-                if (typeof(widgetName) === 'string') {
-                  if (!Util.existsSync(path.join(appPath, moduleName, 'widget', widgetName))) {
-                    console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
-                    return;
+                moduleConf = require(moduleConfPath);
+                if (typeof(pageName) !== 'string' && typeof(widgetName) !== 'string') {
+                  deleteTypes.push('mod');
+                } else {
+                  if (typeof(pageName) === 'string') {
+                    if (!Util.existsSync(path.join(appPath, moduleName, 'page', pageName))) {
+                      console.log(chalk.red('  没有找到页面' + pageName + '，请检查当前目录是否符合规范！'));
+                      return;
+                    }
+                    deleteTypes.push('page');
                   }
-                  deleteTypes.push('widget');
+                  if (typeof(widgetName) === 'string') {
+                    if (!Util.existsSync(path.join(appPath, moduleName, 'widget', widgetName))) {
+                      console.log(chalk.red('  没有找到组件' + widgetName + '，请检查当前目录是否符合规范！'));
+                      return;
+                    }
+                    deleteTypes.push('widget');
+                  }
                 }
               }
             }
+          } else {
+            console.log(chalk.red('  没有找到相应项目，请检查当前目录是否符合规范！'));
+            return;
           }
-        } else {
-          console.log(chalk.red('  没有找到相应项目，请检查当前目录是否符合规范！'));
-          return;
         }
+        deleteOperation({
+          deleteTypes: deleteTypes,
+          deletePlace: deletePlace,
+          appName: appName,
+          moduleName: moduleName,
+          pageName: pageName,
+          widgetName: widgetName,
+          appConf: appConf,
+          moduleConf: moduleConf
+        });
       }
-      deleteOperation({
-        deleteTypes: deleteTypes,
-        deletePlace: deletePlace,
-        appName: appName,
-        moduleName: moduleName,
-        pageName: pageName,
-        widgetName: widgetName,
-        appConf: appConf,
-        moduleConf: moduleConf
-      });
-    }
+    });
   }).on('--help', function () {
     console.log('  Examples:');
     console.log('');
@@ -1210,18 +1287,20 @@ program
   .option('--release', '发布功能')
   .option('--allin', '压缩文件，server模式专用')
   .action(function (option) {
-    var app = null;
-    var mod = null;
-    // 带参数
-    if (option) {
-      if (typeof option.app === 'string') {
-        app = option.app;
+    remindNewVersion(function () {
+      var app = null;
+      var mod = null;
+      // 带参数
+      if (option) {
+        if (typeof option.app === 'string') {
+          app = option.app;
+        }
+        if (option.module && typeof option.module.sort === 'function') {
+          mod = option.module;
+        }
       }
-      if (option.module && typeof option.module.sort === 'function') {
-        mod = option.module;
-      }
-    }
-    builder.build(app, mod, option);
+      builder.build(app, mod, option);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1244,18 +1323,20 @@ program
   .option('--dist', '预览经过完整编译流程后的文件')
   .option('-s, --silence', '静默不主动开启浏览器')
   .action(function (option) {
-    var app = null;
-    var mod = null;
-    // 带参数
-    if (option) {
-      if (typeof option.app === 'string') {
-        app = option.app;
+    remindNewVersion(function () {
+      var app = null;
+      var mod = null;
+      // 带参数
+      if (option) {
+        if (typeof option.app === 'string') {
+          app = option.app;
+        }
+        if (option.module && typeof option.module.sort === 'function') {
+          mod = option.module;
+        }
       }
-      if (option.module && typeof option.module.sort === 'function') {
-        mod = option.module;
-      }
-    }
-    builder.serve(app, mod, option);
+      builder.serve(app, mod, option);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1283,91 +1364,93 @@ program
   .option('--debug', '打印调试信息')
   .option('--showall', '展示上线页面所有需要被上线的资源')
   .action(function (option) {
-    var app = null;
-    var mod = null;
-    var isDebug = false;
-    // 带参数
-    if (option) {
-      isDebug = option.debug ? true : false;
-      if (typeof option.app === 'string') {
-        app = option.app;
+    remindNewVersion(function () {
+      var app = null;
+      var mod = null;
+      var isDebug = false;
+      // 带参数
+      if (option) {
+        isDebug = option.debug ? true : false;
+        if (typeof option.app === 'string') {
+          app = option.app;
+        }
+        if (option.module && typeof option.module.sort === 'function') {
+          mod = option.module;
+        }
       }
-      if (option.module && typeof option.module.sort === 'function') {
-        mod = option.module;
-      }
-    }
-    function checkVersionControl () {
-      return new Promise(function (resolve, reject) {
-        var cwd = process.cwd();
-        var appConfPath = path.join(cwd, 'app-conf.js');
-        var moduleConfPath = path.join(cwd, 'module-conf.js');
-        var appConf = null;
-        var versionControl = null;
-        if (Util.existsSync(appConfPath)) {
-          // 项目根目录
-          appConf = require(appConfPath);
-        } else if (Util.existsSync(moduleConfPath)) {
-          // 模块目录
-          appConfPath = path.join(path.resolve(cwd, '..'), 'app-conf.js');
+      function checkVersionControl () {
+        return new Promise(function (resolve, reject) {
+          var cwd = process.cwd();
+          var appConfPath = path.join(cwd, 'app-conf.js');
+          var moduleConfPath = path.join(cwd, 'module-conf.js');
+          var appConf = null;
+          var versionControl = null;
           if (Util.existsSync(appConfPath)) {
+            // 项目根目录
             appConf = require(appConfPath);
+          } else if (Util.existsSync(moduleConfPath)) {
+            // 模块目录
+            appConfPath = path.join(path.resolve(cwd, '..'), 'app-conf.js');
+            if (Util.existsSync(appConfPath)) {
+              appConf = require(appConfPath);
+            }
           }
-        }
-        if (appConf !== null) {
-          versionControl = appConf.versionControl;
-          if (typeof versionControl === 'string' && versionControl === 'git') {
-            return resolve();
+          if (appConf !== null) {
+            versionControl = appConf.versionControl;
+            if (typeof versionControl === 'string' && versionControl === 'git') {
+              return resolve();
+            }
           }
-        }
-        return reject('Version control check error');
-      });
-    }
-    checkVersionControl()
-      .then(getGitStatus).then(function (status) {
-      if (!status.remoteBranch) {
-        console.log();
-        console.log(chalk.red('  检测到当前项目并未设置远程仓库，或者已经设置但并未提交代码！'));
-        console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
-        console.log();
-        throw new Error('git interrupt');
+          return reject('Version control check error');
+        });
       }
-      if (status.clean) {
-        if (typeof status.remoteDiff === 'string' && status.remoteDiff.indexOf('ahead') >= 0) {
+      checkVersionControl()
+        .then(getGitStatus).then(function (status) {
+        if (!status.remoteBranch) {
           console.log();
-          console.log(chalk.red('  检测到你有本地提交，但并未将代码提交至远程仓库！'));
+          console.log(chalk.red('  检测到当前项目并未设置远程仓库，或者已经设置但并未提交代码！'));
           console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
           console.log();
           throw new Error('git interrupt');
         }
-      } else {
-        console.log();
-        console.log(chalk.red('  检测到你本地有代码改动！'));
-        console.log();
-        if (status.files.length > 0) {
-          status.files.forEach(function (item) {
-            console.log(chalk.red('    ' + item));
+        if (status.clean) {
+          if (typeof status.remoteDiff === 'string' && status.remoteDiff.indexOf('ahead') >= 0) {
+            console.log();
+            console.log(chalk.red('  检测到你有本地提交，但并未将代码提交至远程仓库！'));
+            console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
+            console.log();
+            throw new Error('git interrupt');
+          }
+        } else {
+          console.log();
+          console.log(chalk.red('  检测到你本地有代码改动！'));
+          console.log();
+          if (status.files.length > 0) {
+            status.files.forEach(function (item) {
+              console.log(chalk.red('    ' + item));
+            });
+          }
+          console.log();
+          console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
+          console.log();
+          throw new Error('git interrupt');
+        }
+      }, function (err) {
+        if (isDebug) {
+          console.log(err);
+        }
+      }).then(builder.publish.bind(null, app, mod, option)).then(function (argv) {
+        var args = argv.files;
+        if (argv.appConf) {
+          report('publish', addReportPath, args, function (params) {
+            params.appId = argv.appConf.appId;
           });
         }
-        console.log();
-        console.log(chalk.red('  请将代码push到远程仓库后再进行发布！'));
-        console.log();
-        throw new Error('git interrupt');
-      }
-    }, function (err) {
-      if (isDebug) {
-        console.log(err);
-      }
-    }).then(builder.publish.bind(null, app, mod, option)).then(function (argv) {
-      var args = argv.files;
-      if (argv.appConf) {
-        report('publish', addReportPath, args, function (params) {
-          params.appId = argv.appConf.appId;
-        });
-      }
-    }).catch(function (e) {
-      if (e.message !== 'git interrupt') {
-        console.log(e.stack);
-      }
+      }).catch(function (e) {
+        if (e.message !== 'git interrupt') {
+          console.log(e.stack);
+        }
+      });
     });
   }).on('--help', function() {
     console.log('  Examples:');
@@ -1384,22 +1467,24 @@ program
   .option('-f, --from [source]', '来源模块')
   .option('-t, --to [dest]', '目标模块，不写则当前目录')
   .action(function (widget, option) {
-    if (widget === undefined) {
-      gutil.log(gutil.colors.red('请输入widgetName'));
-      return;
-    }
-    var source = null;
-    var dest = null;
-    // 带参数
-    if (option) {
-      if (typeof option.from === 'string') {
-        source = option.from;
+    remindNewVersion(function () {
+      if (widget === undefined) {
+        gutil.log(gutil.colors.red('请输入widgetName'));
+        return;
       }
-      if (typeof option.to === 'string') {
-        dest = option.to;
+      var source = null;
+      var dest = null;
+      // 带参数
+      if (option) {
+        if (typeof option.from === 'string') {
+          source = option.from;
+        }
+        if (typeof option.to === 'string') {
+          dest = option.to;
+        }
       }
-    }
-    builder.clone(widget, source, dest);
+      builder.clone(widget, source, dest);
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1415,82 +1500,84 @@ program
   .option('-m, --module [moduleName]', '模块选项')
   .option('-w, --widget [widgetName]', '组件选项')
   .action(function (option) {
-    var moduleName = option.module;
-    var widgetName = option.widget;
-    if (typeof(moduleName) !== 'string' && typeof(widgetName) !== 'string') {
-      console.log(chalk.red('  请输入参数！'));
-      console.log();
-      console.log(chalk.red('  通过命令 ath map -h 可查看帮助'));
-      console.log();
-    } else {
-      // 判断当前是否是项目路径或模块路径
-      var cwd = process.cwd();
-      var appConfPath = path.join(cwd, 'app-conf.js');
-      var moduleConfPath = path.join(cwd, 'module-conf.js');
-      var appConf = null;
-      var moduleConf = null;
-      var appPath = '';
-      if (Util.existsSync(appConfPath)) { // 项目根目录
-        if (typeof(moduleName) !== 'string') {
-          console.log(chalk.red('  在项目目录下，必须告知模块名！'));
-          return;
-        }
-        if (typeof(widgetName) !== 'string') {
-          console.log(chalk.red('  请告知组件名称！'));
-          return;
-        }
-        var isWidgetExist = Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName));
-        if (!isWidgetExist) {
-          console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
-          return;
-        }
-        appConf = require(appConfPath);
-        appPath = cwd;
-      } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
-        if (typeof(widgetName) !== 'string') {
-          console.log(chalk.red('  请告知组件名称！'));
-          return;
-        }
-        var isWidgetExist = Util.existsSync(path.join(cwd, 'widget', widgetName));
-        if (!isWidgetExist) {
-          console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
-          return;
-        }
-        appPath = path.resolve(cwd, '..');
-        appConf = require(path.join(appPath, 'app-conf.js'));
-        moduleConf = require(moduleConfPath);
-        moduleName = moduleConf.module;
+    remindNewVersion(function () {
+      var moduleName = option.module;
+      var widgetName = option.widget;
+      if (typeof(moduleName) !== 'string' && typeof(widgetName) !== 'string') {
+        console.log(chalk.red('  请输入参数！'));
+        console.log();
+        console.log(chalk.red('  通过命令 ath map -h 可查看帮助'));
+        console.log();
       } else {
-        console.log(chalk.red('  当前目录既不是项目目录也不是模块目录！'));
-        return;
-      }
-      var dependencyList = [];
-      if (moduleName === appConf.common) {
-        var moduleList = appConf.moduleList;
-        moduleList.forEach(function (item) {
-          var dependencyListArr = getModuleMapDenpencyByWidget(appPath, item, widgetName);
-          dependencyList = dependencyList.concat(dependencyListArr);
+        // 判断当前是否是项目路径或模块路径
+        var cwd = process.cwd();
+        var appConfPath = path.join(cwd, 'app-conf.js');
+        var moduleConfPath = path.join(cwd, 'module-conf.js');
+        var appConf = null;
+        var moduleConf = null;
+        var appPath = '';
+        if (Util.existsSync(appConfPath)) { // 项目根目录
+          if (typeof(moduleName) !== 'string') {
+            console.log(chalk.red('  在项目目录下，必须告知模块名！'));
+            return;
+          }
+          if (typeof(widgetName) !== 'string') {
+            console.log(chalk.red('  请告知组件名称！'));
+            return;
+          }
+          var isWidgetExist = Util.existsSync(path.join(cwd, moduleName, 'widget', widgetName));
+          if (!isWidgetExist) {
+            console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
+            return;
+          }
+          appConf = require(appConfPath);
+          appPath = cwd;
+        } else if (Util.existsSync(moduleConfPath)) { // 模块根目录
+          if (typeof(widgetName) !== 'string') {
+            console.log(chalk.red('  请告知组件名称！'));
+            return;
+          }
+          var isWidgetExist = Util.existsSync(path.join(cwd, 'widget', widgetName));
+          if (!isWidgetExist) {
+            console.log(chalk.red('  该模块下并不存在组件' + widgetName + '！'));
+            return;
+          }
+          appPath = path.resolve(cwd, '..');
+          appConf = require(path.join(appPath, 'app-conf.js'));
+          moduleConf = require(moduleConfPath);
+          moduleName = moduleConf.module;
+        } else {
+          console.log(chalk.red('  当前目录既不是项目目录也不是模块目录！'));
+          return;
+        }
+        var dependencyList = [];
+        if (moduleName === appConf.common) {
+          var moduleList = appConf.moduleList;
+          moduleList.forEach(function (item) {
+            var dependencyListArr = getModuleMapDenpencyByWidget(appPath, item, widgetName);
+            dependencyList = dependencyList.concat(dependencyListArr);
+          });
+        } else {
+          dependencyList = getModuleMapDenpencyByWidget(appPath, moduleName, widgetName);
+        }
+        if (dependencyList.length === 0) {
+          return;
+        }
+        // 画出依赖表格
+        var table = new Table({
+          head: ['module', 'page'],
+          colWidths: [20, 40],
+          style: { head: ['bgGreen'] }
         });
-      } else {
-        dependencyList = getModuleMapDenpencyByWidget(appPath, moduleName, widgetName);
+        dependencyList.forEach(function (item) {
+          table.push([item.module, item.page]);
+        });
+        console.log();
+        console.log(chalk.green(moduleName + '模块组件' + widgetName + '被以下页面所引用：'));
+        console.log(table.toString());
+        console.log();
       }
-      if (dependencyList.length === 0) {
-        return;
-      }
-      // 画出依赖表格
-      var table = new Table({
-        head: ['module', 'page'],
-        colWidths: [20, 40],
-        style: { head: ['bgGreen'] }
-      });
-      dependencyList.forEach(function (item) {
-        table.push([item.module, item.page]);
-      });
-      console.log();
-      console.log(chalk.green(moduleName + '模块组件' + widgetName + '被以下页面所引用：'));
-      console.log(table.toString());
-      console.log();
-    }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1531,78 +1618,80 @@ program
   .option('-a, --app [appName]', '项目')
   .option('-m, --module [moduleName]', '模块')
   .action(function (option) {
-    var athenaPath = Util.getAthenaPath();
-    var athenaCachePath = path.join(athenaPath, 'cache');
-    if (typeof option !== 'object') {
-      console.log();
-      console.log(chalk.red('  输入参数有误！'));
-      console.log(chalk.red('  请通过 ath clear -h 查看帮助！'));
-      console.log();
-      return;
-    }
-    if (option.publish || option.template || option.sass || option.image) {
-      var cwd = process.cwd();
-      var appConfPath = path.join(cwd, 'app-conf.js');
-      var moduleConfPath = path.join(cwd, 'module-conf.js');
-      var mod = option.module ? option.module : null;
-      if (option.publish) {
-        var publish = option.publish;
-        if (Util.existsSync(appConfPath)) {
-          if (mod !== null) {
-            if (typeof publish === 'string') {
-              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, publish + '_filter.json'), { force: true });
+    remindNewVersion(function () {
+      var athenaPath = Util.getAthenaPath();
+      var athenaCachePath = path.join(athenaPath, 'cache');
+      if (typeof option !== 'object') {
+        console.log();
+        console.log(chalk.red('  输入参数有误！'));
+        console.log(chalk.red('  请通过 ath clear -h 查看帮助！'));
+        console.log();
+        return;
+      }
+      if (option.publish || option.template || option.sass || option.image) {
+        var cwd = process.cwd();
+        var appConfPath = path.join(cwd, 'app-conf.js');
+        var moduleConfPath = path.join(cwd, 'module-conf.js');
+        var mod = option.module ? option.module : null;
+        if (option.publish) {
+          var publish = option.publish;
+          if (Util.existsSync(appConfPath)) {
+            if (mod !== null) {
+              if (typeof publish === 'string') {
+                del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, publish + '_filter.json'), { force: true });
+              } else {
+                del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+              }
             } else {
-              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
+            }
+          } else if (Util.existsSync(moduleConfPath)) {
+            if (typeof publish === 'string') {
+              del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, publish + '_filter.json'), { force: true });
+            } else {
+              del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
             }
           } else {
-            del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
+            del.sync(path.join(athenaPath, 'publish'), { force: true });
           }
-        } else if (Util.existsSync(moduleConfPath)) {
-          if (typeof publish === 'string') {
-            del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, publish + '_filter.json'), { force: true });
+        } else if (option.sass) {
+          if (Util.existsSync(appConfPath)) {
+            if (mod !== null) {
+              del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app, mod), { force: true });
+            } else {
+              del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app), { force: true });
+            }
+          } else if (Util.existsSync(moduleConfPath)) {
+            del.sync(path.join(athenaCachePath, 'build', 'sass', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
           } else {
-            del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+            del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
           }
-        } else {
-          del.sync(path.join(athenaPath, 'publish'), { force: true });
-        }
-      } else if (option.sass) {
-        if (Util.existsSync(appConfPath)) {
-          if (mod !== null) {
-            del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app, mod), { force: true });
-          } else {
-            del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app), { force: true });
-          }
-        } else if (Util.existsSync(moduleConfPath)) {
-          del.sync(path.join(athenaCachePath, 'build', 'sass', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
-        } else {
-          del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
-        }
-      } else if (option.image) {
-        if (Util.existsSync(appConfPath)) {
-          if (mod !== null) {
-            del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app, mod), { force: true });
-          } else {
+        } else if (option.image) {
+          if (Util.existsSync(appConfPath)) {
+            if (mod !== null) {
+              del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app, mod), { force: true });
+            } else {
+              del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+            }
             del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+          } else if (Util.existsSync(moduleConfPath)) {
+            del.sync(path.join(athenaCachePath, 'build', 'images', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+          } else {
+            del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
           }
-          del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
-        } else if (Util.existsSync(moduleConfPath)) {
-          del.sync(path.join(athenaCachePath, 'build', 'images', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
-        } else {
-          del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
+        } else if (option.template) {
+          del.sync(path.join(athenaPath, 'tmp'), { force: true });
         }
-      } else if (option.template) {
+      } else {
+        del.sync(path.join(athenaPath, 'publish'), { force: true });
         del.sync(path.join(athenaPath, 'tmp'), { force: true });
+        del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
+        del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
       }
-    } else {
-      del.sync(path.join(athenaPath, 'publish'), { force: true });
-      del.sync(path.join(athenaPath, 'tmp'), { force: true });
-      del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
-      del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
-    }
-    console.log();
-    console.log(chalk.green('  清除成功！'));
-    console.log();
+      console.log();
+      console.log(chalk.green('  清除成功！'));
+      console.log();
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1668,11 +1757,13 @@ program
   .alias('lc')
   .description('列出配置项')
   .action(function () {
-    var config = Util.getConfig();
-    console.log('  配置地址：' + path.join(Util.getAthenaPath(), 'config.json'));
-    for (var i in config) {
-      console.log('  ' + i + '=' + config[i]);
-    }
+    remindNewVersion(function () {
+      var config = Util.getConfig();
+      console.log('  配置地址：' + path.join(Util.getAthenaPath(), 'config.json'));
+      for (var i in config) {
+        console.log('  ' + i + '=' + config[i]);
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1686,11 +1777,13 @@ program
   .alias('ls')
   .description('列出设置项')
   .action(function () {
-    var setting = Util.getSetting();
-    console.log('  设置地址：' + path.join(Util.getRootPath(), '.setting.json'));
-    for (var i in setting) {
-      console.log('  ' + i + '=' + setting[i]);
-    }
+    remindNewVersion(function () {
+      var setting = Util.getSetting();
+      console.log('  设置地址：' + path.join(Util.getRootPath(), '.setting.json'));
+      for (var i in setting) {
+        console.log('  ' + i + '=' + setting[i]);
+      }
+    });
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
@@ -1705,69 +1798,9 @@ program
     console.log('    ' + chalk.red('没有该命令哟，请通过 athena -h 查看帮助！'));
   });
 
-// 新版本更新提醒功能
-var remindFile = path.join(Util.getAthenaPath(), '.remind.json');
-var remindInfo = {};
-if (Util.existsSync(remindFile)) {
-  try {
-    remindInfo = JSON.parse(String(fs.readFileSync(remindFile)));
-  } catch (ex) {
-    remindInfo = {};
-  }
-}
-if (!remindInfo.update) {
-  remindInfo.update = {};
-}
-var updateInfo = remindInfo.update;
-if (!updateInfo.date || !Util.isToday(updateInfo.date)) {
-  checkAthenaVersion(function (versionServer, versionNative, compareResult) {
-    if (compareResult === 1) {
-      var prompt = [];
-      prompt.push({
-        type: 'confirm',
-        name: 'isUpdate',
-        message: '检测到有新版本的Athena，版本号为' + versionServer + '，在修复问题的同时，新增了许多实用功能，你不想更新一下么？',
-        default: true
-      });
-      inquirer.prompt(prompt, function (answers) {
-        if (answers.isUpdate) {
-          console.log();
-          console.log(chalk.green('  正在自动安装更新...'));
-          installAthena({
-            version: versionServer,
-            isDebug: false,
-            onSuccess: function () {
-              remindInfo.update.date = new Date().getTime();
-              fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
-            },
-            onError: function () {
-              remindInfo.update.date = new Date().getTime();
-              fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
-            }
-          });
-        } else {
-          remindInfo.update.date = new Date().getTime();
-          fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
-        }
-      });
-    } else {
-      program.parse(process.argv);
-      printNoCommand();
-      remindInfo.update.date = new Date().getTime();
-      fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
-    }
-  }, function () {
-    program.parse(process.argv);
-    printNoCommand();
-  });
-} else {
-  program.parse(process.argv);
-  printNoCommand();
-}
+program.parse(process.argv);
 
-function printNoCommand () {
-  if (!process.argv.slice(2).length) {
-    printAthena();
-    program.outputHelp();
-  }
+if (!process.argv.slice(2).length) {
+  printAthena();
+  program.outputHelp();
 }
