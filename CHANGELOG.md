@@ -1,5 +1,32 @@
 # ChangeLog
 
+## 1.2.12
+
+*	feat:支持babel转换，并支持到IE8
+* feat:增加对jsxPragma的配置
+* feat:增加对使用Nerv框架的项目进行js处理
+* update:模块出错直接中断
+
+## 1.2.11
+
+*	udpate:模板抽离去掉时间戳
+* update:增加获取模板文件md5戳的方法__getTplSourceMap
+
+## 1.2.10
+
+*	update:固定依赖包的版本
+* update:gb没有编译报错
+* update:更新版本提醒形式
+
+## 1.2.9
+
+*	update:去掉--harmony
+* update:将CSS中svg的压缩默认关闭
+
+## 1.2.8
+
+*	fix:地址替换时候会将地址中间的引号给替换掉
+
 ## 1.2.7
 
 *	update:组件上传时资源找不到给予提示
