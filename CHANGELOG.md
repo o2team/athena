@@ -1,5 +1,16 @@
 # ChangeLog
 
+## 1.2.13
+
+*	feat:支持JS依赖扫描，通过require/requireAsync追踪JS文件依赖
+* update:根据对widget.load依赖的分析支持异步依赖模块剥离
+* update:将require.async的依赖记录到懒加载异步依赖中，因为它不一定是渲染的必要依赖
+* update:将JS文件依赖写入map.json
+* update:支持serve时修改异步文件对应关系HashMap
+* update:跟踪依赖时去除注释
+* fix:stripComments&&URL格式依赖不加入ASYNC_HASH_MAP
+* fix:空文件不用写入模块化内容
+
 ## 1.2.12
 
 *	feat:支持babel转换，并支持到IE8
