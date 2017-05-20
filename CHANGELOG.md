@@ -1,5 +1,28 @@
 # ChangeLog
 
+## 1.2.18
+
+* fix:771e9e1 提交存在bug，做回退处理
+
+## 1.2.17
+
+* fix:避免匹配到Vue语法中:src
+* feat:针对Nerv框架处理，支持处理static内容，并且可以进行配置
+
+## 1.2.16
+
+* feat:针对Nerv框架追踪js依赖时，支持相对路径，以及WIDGET/STATIC的前缀
+
+## 1.2.15
+
+* fix:Nerv框架处理支持引用static中的资源
+* fix:去掉Nerv框架处理对不使用Nerv框架的项目的影响
+
+## 1.2.14
+
+* fix:server模式修改page的js预览bug
+* feat:创建时渲染模板，模板中可以访问到lodash方法
+
 ## 1.2.13
 
 *	feat:支持JS依赖扫描，通过require/requireAsync追踪JS文件依赖
