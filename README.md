@@ -23,7 +23,6 @@ athena-html
 - [x] 根据组件加载情况生成资源依赖表
 - [x] 页面、组件html编译
 - [x] Sass/less 编译
-- [x] csslint/jshint 代码检查
 - [x] CSS合并压缩
 - [x] CSS prefix，px转rem
 - [x] JS合并压缩
@@ -537,12 +536,6 @@ module.exports = {
     useHash: {
       enable: true // 是否启用文件hash
     },
-    csslint: {
-      enable: true //是否开启
-    },
-    jshint: {
-      enable: true //是否开启
-    },
     imagemin: { // 图片压缩的配置
       exclude: ['banner.png'] // 图片压缩排除的图片
     },
@@ -961,24 +954,6 @@ report_url=http://aotu.jd.com/athena
 ```
 
 ## 部分功能使用方法
-
-### 代码检查
-
-#### CSSLint
-
-CSS代码检查。
-
-通过配置 `module-conf.js` 里面的 `support` 中的 `csslint` 属性可以控制是否开启对本模块CSS代码进行检查，代码检查会在**编译**、**发布**时候进行。
-
-CSSLint规则可以通过在项目目录下增加 `.csslintrc` 文件来进行配置，具体配置请见 [CSSLint Rules](https://github.com/CSSLint/csslint/wiki/Rules)。
-
-代码检查的结果会生成进入当前模块目录下的 `csslint_error.html` 文件。
-
-#### JSHint
-
-JavaScript代码检查。
-
-通过配置 `module-conf.js` 里面的 `support` 中的 `jshint` 属性可以控制是否开启对本模块JavaScript代码进行检查，代码检查会在**编译**、**发布**时候进行。
 
 ### 文件md5重命名
 
