@@ -1,5 +1,38 @@
 # ChangeLog
 
+## 1.3.4
+
+* refactor(组件平台): 配合后端改动
+* fix:删去没用的console.log
+* feat:使用新的图片压缩工具，在新增支持jpg/gif格式图片压缩的同时，可以兼容到高版本的node
+* feat:client模式增加babel编译
+* feat:指定压缩图片格式后缀不需要带.
+
+## 1.3.3
+
+* fix:去掉无用的log
+* fix:兼容较低版本node
+* fix:若模块被公共模块指定为依赖模块之一，则该模块的编译不受公共模块的约束
+
+## 1.3.2
+
+* fix:babel编译忽略注释
+* feat:server模式支持引用除gb模块外的资源
+
+## 1.3.1
+
+* feat:css压缩增加默认配置
+* feat:compass编译在完全编译模式下编译出错直接中断
+
+## 1.3.0
+
+* feat:去掉老旧的CSSLint和JSHint检查
+
+## 1.2.19
+
+* fix:路径处理兼容windows
+* update:保证sass编译时依赖的目录存在
+
 ## 1.2.18
 
 * fix:771e9e1 提交存在bug，做回退处理
