@@ -148,7 +148,7 @@ function remindNewVersion (cb) {
               },
               onError: function () {
                 remindInfo.update.date = new Date().getTime();
-                fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));                
+                fs.writeFileSync(remindFile, JSON.stringify(remindInfo, null, 2));
               }
             });
           } else {
@@ -200,7 +200,7 @@ function installAthena (installParams) {
       console.log();
       console.log(chalk.green('  安装成功，当前Athena版本' + installParams.version));
       console.log();
-      installParams.onSuccess && installParams.onSuccess();    
+      installParams.onSuccess && installParams.onSuccess();
     });
 }
 
@@ -515,8 +515,8 @@ program
       var appPath = path.join(path.resolve(modulePath, '..'));
       var appConf = require(path.join(appPath, 'app-conf.js'));
       var archiver = require('archiver');
-      var archive = archiver.create('zip', {});
-      var tmpZipPath = path.join(modulePath, 'widget', widgetName, widgetName + '.zip');
+      var archive = archiver('tar', { gzip: {level: 9} });
+      var tmpZipPath = path.join(modulePath, 'widget', widgetName, widgetName + '.tgz');
       var output = fs.createWriteStream(tmpZipPath);
 
       var prompts = [];
@@ -578,7 +578,7 @@ program
         }
 
         inquirer.prompt(prompts, function (answers) {
-          
+
           var scssFilePath = path.join(widgetPath, widgetName + '.scss');
           var copyFolder = path.join(widgetPath, '_');
           var scssImportsPath = path.join(copyFolder, '_imports');
@@ -824,8 +824,8 @@ program
                 widget: {
                   value: fs.createReadStream(tmpZipPath),
                   options: {
-                    filename: widgetName + '.zip',
-                    contentType: 'application/zip'
+                    filename: widgetName + '.tgz',
+                    contentType: 'application/x-compressed'
                   }
                 }
               };
@@ -955,7 +955,7 @@ program
 function loadRemoteWidget (remoteUrl, widgetName, option) {
   var widgetName = widgetName || option.widget;
   var widgetAlias = option.alias;
-  var remoteWidgetNameUrl = setting.component_platform + '/api/detail?id=' + widgetName;
+  var remoteWidgetNameUrl = setting.component_platform + '/api/widget/detail/' + widgetName;
   var widgetOriginName = '';
 
   function loadWidgetName () {
@@ -975,7 +975,7 @@ function loadRemoteWidget (remoteUrl, widgetName, option) {
               return resolve();
             }
           });
-        
+
       });
     }
   loadWidgetName()
@@ -1605,7 +1605,7 @@ function getModuleMapDenpencyByWidget (appPath, moduleName, widgetName) {
   } else {
     console.log(chalk.red('  项目' + moduleName + '还没被编译，无法列出依赖关系，请先编译！'));
   }
-  return dependencyList;  
+  return dependencyList;
 }
 
 program
