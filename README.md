@@ -961,6 +961,90 @@ report_url=http://aotu.jd.com/athena
 
 ## 部分功能使用方法
 
+### 文件压缩
+
+文件压缩的配置位于每个**模块**的`module-conf.js`文件中，在`support`下使用`compress`进行相关配置
+
+```javascript
+// moudle-conf.js
+support: {
+  compress: {
+    css: {
+      mergeRules: false,
+      mergeIdents: false,
+      reduceIdents: false,
+      discardUnused: false,
+      minifySelectors: false
+    },
+    js: {
+      mangle: {
+        except: ['require', 'exports', 'module', 'e'],
+        screw_ie8: false
+      }
+    },
+    img: {
+      extensions: ['png', 'jpg', 'jpeg', 'gif'],
+      png: {
+        quantity: '80-100'
+      },
+      jpg: {
+        quantity: '90'
+      }
+    }
+  }
+}
+
+```
+
+#### CSS文件压缩
+
+CSS文件采用 [cssnano](https://www.npmjs.com/package/cssnano) 工具进行压缩，可以在 `support -> compress -> css` 下进行相关配置，配置项可以参考 [cssnano](http://cssnano.co/guides/optimisations/)
+
+#### JS文件压缩
+
+JS文件采用 [uglify-js](https://www.npmjs.com/package/uglify-js) 工具进行压缩，可以在 `support -> compress -> js` 下进行相关配置，配置项可以参考 [uglify-js](http://lisperator.net/uglifyjs/)
+
+#### 图片压缩
+
+目前可以对**png/jpg/gif**格式的图片进行压缩，可以在 `support -> compress -> img` 下进行相关配置
+
+目前有如下配置项
+
+`extensions` 配置需要进行压缩的图片后缀名，如 `['png', 'jpg']` 表示需要对 `png/jpg/` 格式的图片进行压缩，目前支持的后缀有 `['png', 'jpg', 'jpeg', 'gif']`，如不设置 `extensions` 则将**压缩所有支持格式的图片**
+
+`png` 针对png格式图片压缩配置，目前支持配置压缩质量，如 `{quality: '60-80'}` ，`quality` 默认为 `60-80`，取值应为一个范围，此配置请参考 [imagemin-pngquant](https://github.com/imagemin/imagemin-pngquant) 中的 `quality` 配置项进行配置
+
+`jpg` 针对jpg格式的图片压缩配置，目前支持配置压缩质量，如 `{quality: '80'}` ，`quality` 默认为 `80`，此配置请参考 [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) 中的 `quality` 配置项进行配置
+
+`gif`图片不支持设置图片压缩质量配置
+
+完整的压缩配置见上述示例代码。
+
+同时我们可以选择**排除**掉不需要压缩的图片，配置`module-conf.js`里面的 `support` 中的 `imagemin` 属性如下即可：
+
+```javascript
+support : {  
+  imagemin: {
+    exclude: ['banner.png']
+  }
+}
+```
+
+### babel转换
+
+支持对 后缀为`js`的文件进行babel转换，使用的预设有 `babel-preset-es2015` 和 `babel-preset-stage-0`，同时支持对`jsx` 语法进行转换，以便使用类React的框架进行开发
+
+需要开启的话，在 `module-conf.js` 中进行配置
+
+```javascript
+support : {  
+  useBabel: {
+    enable: true,
+    jsxPragma: 'Nerv.createElement' // jsx转换支持，默认为 React.createElement
+  }
+}
+```
+
 ### 文件md5重命名
 
 通过配置 `module-conf.js` 里面的 `support` 中的 `useHash` 属性可以控制是否开启对文件做md5重命名
@@ -1110,18 +1194,6 @@ support : {
     enable: false, // 表示是否开启统一转换
     exclude: [], // 排除图片
     size: 5000 // 小于5000b的图片就会转
-  }
-}
-```
-
-### 图片压缩
-
-目前主要针对png图片进行压缩，使用 [pngquant](https://pngquant.org/) 内核。我们可以选择**排除**掉不需要压缩的图片，配置`module-conf.js`里面的 `support` 中的 `imagemin` 属性如下即可：
-
-```javascript
-support : {  
-  imagemin: {
-    exclude: ['banner.png']
   }
 }
 ```
