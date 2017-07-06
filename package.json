@@ -13,7 +13,14 @@
   "keywords": [
     "build"
   ],
-  "author": "luckyadam",
+  "author": {
+    "name": "luckyadam",
+    "email": "weitaozsh@gmail.com",
+    "url": "github.com/luckyadam"
+  },
+  "engines": {
+    "node": ">=4"
+  },
   "license": "MIT",
   "bin": {
     "ath": "bin/athena",
@@ -54,7 +61,7 @@
     "gulp-rename": "1.2.2",
     "gulp-util": "3.0.8",
     "ignore": "3.2.4",
-    "image-compress": "0.0.1",
+    "image-compress": "0.0.2",
     "inquirer": "0.11.4",
     "js-beautify": "1.6.11",
     "jsftp": "1.5.5",
