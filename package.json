@@ -76,7 +76,7 @@
     "path-is-absolute": "1.0.1",
     "postcss-pxtorem": "4.0.0",
     "request": "2.80.0",
-    "require-dir": "0.3.1",
+    "require-dir": "0.3.2",
     "ssh2": "0.5.4",
     "sync-request": "4.0.1",
     "tempy": "0.1.0",
