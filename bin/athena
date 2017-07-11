@@ -1610,6 +1610,7 @@ function getModuleMapDenpencyByWidget (appPath, moduleName, widgetName) {
 
 program
   .command('clear')
+  .alias('cl')
   .description('清除缓存')
   .option('-p, --publish [remoteName]', '清除发布时的缓存')
   .option('-t, --template', '清除模板缓存')
@@ -1619,8 +1620,8 @@ program
   .option('-m, --module [moduleName]', '模块')
   .action(function (option) {
     remindNewVersion(function () {
-      var athenaPath = Util.getAthenaPath();
-      var athenaCachePath = path.join(athenaPath, 'cache');
+      var athenaPath = Util.getAthenaPath()
+      var cacheRootPath = null
       if (typeof option !== 'object') {
         console.log();
         console.log(chalk.red('  输入参数有误！'));
@@ -1628,65 +1629,79 @@ program
         console.log();
         return;
       }
+      var cwd = process.cwd();
+      var appConfPath = path.join(cwd, 'app-conf.js');
+      var moduleConfPath = path.join(cwd, 'module-conf.js');
+      if (Util.existsSync(appConfPath)) {
+        cacheRootPath = path.join(cwd, Util.CACHE)
+      } else if (Util.existsSync(moduleConfPath)) {
+        cacheRootPath = path.join(path.resolve(cwd, '..'), Util.CACHE)
+      } else {
+        console.log();
+        console.log(chalk.red('  必须在项目或模块目录下执行此命令！'));
+        console.log();
+        return;
+      }
+      var mod = option.module ? option.module : null;
       if (option.publish || option.template || option.sass || option.image) {
-        var cwd = process.cwd();
-        var appConfPath = path.join(cwd, 'app-conf.js');
-        var moduleConfPath = path.join(cwd, 'module-conf.js');
-        var mod = option.module ? option.module : null;
         if (option.publish) {
           var publish = option.publish;
           if (Util.existsSync(appConfPath)) {
             if (mod !== null) {
               if (typeof publish === 'string') {
-                del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod, publish + '_filter.json'), { force: true });
+                del.sync(path.join(cacheRootPath, 'publish', mod, publish + '_filter.json'), { force: true });
               } else {
-                del.sync(path.join(athenaPath, 'publish', require(appConfPath).app, mod), { force: true });
+                del.sync(path.join(cacheRootPath, 'publish', mod), { force: true });
               }
             } else {
-              del.sync(path.join(athenaPath, 'publish', require(appConfPath).app), { force: true });
+              del.sync(path.join(cacheRootPath, 'publish'), { force: true });
             }
           } else if (Util.existsSync(moduleConfPath)) {
             if (typeof publish === 'string') {
-              del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module, publish + '_filter.json'), { force: true });
+              del.sync(path.join(cacheRootPath, 'publish', require(moduleConfPath).module, publish + '_filter.json'), { force: true });
             } else {
-              del.sync(path.join(athenaPath, 'publish', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
+              del.sync(path.join(cacheRootPath, 'publish', require(moduleConfPath).module), { force: true });
             }
-          } else {
-            del.sync(path.join(athenaPath, 'publish'), { force: true });
           }
         } else if (option.sass) {
           if (Util.existsSync(appConfPath)) {
             if (mod !== null) {
-              del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app, mod), { force: true });
+              del.sync(path.join(cacheRootPath, 'sass', mod), { force: true });
             } else {
-              del.sync(path.join(athenaCachePath, 'build', 'sass', require(appConfPath).app), { force: true });
+              del.sync(path.join(cacheRootPath, 'sass'), { force: true });
             }
           } else if (Util.existsSync(moduleConfPath)) {
-            del.sync(path.join(athenaCachePath, 'build', 'sass', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
-          } else {
-            del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
+            del.sync(path.join(cacheRootPath, 'sass', require(moduleConfPath).module), { force: true });
           }
         } else if (option.image) {
           if (Util.existsSync(appConfPath)) {
             if (mod !== null) {
-              del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app, mod), { force: true });
+              del.sync(path.join(cacheRootPath, 'images', mod), { force: true });
             } else {
-              del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+              del.sync(path.join(cacheRootPath, 'images'), { force: true });
             }
-            del.sync(path.join(athenaCachePath, 'build', 'images', require(appConfPath).app), { force: true });
+            del.sync(path.join(cacheRootPath, 'images'), { force: true });
           } else if (Util.existsSync(moduleConfPath)) {
-            del.sync(path.join(athenaCachePath, 'build', 'images', require(moduleConfPath).app, require(moduleConfPath).module), { force: true });
-          } else {
-            del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
+            del.sync(path.join(cacheRootPath, 'images', require(moduleConfPath).module), { force: true });
           }
         } else if (option.template) {
           del.sync(path.join(athenaPath, 'tmp'), { force: true });
         }
       } else {
-        del.sync(path.join(athenaPath, 'publish'), { force: true });
         del.sync(path.join(athenaPath, 'tmp'), { force: true });
-        del.sync(path.join(athenaCachePath, 'build', 'sass'), { force: true });
-        del.sync(path.join(athenaCachePath, 'build', 'images'), { force: true });
+        if (Util.existsSync(appConfPath)) {
+          if (mod !== null) {
+            del.sync(path.join(cacheRootPath, 'publish', mod), { force: true });
+            del.sync(path.join(cacheRootPath, 'sass', mod), { force: true });
+            del.sync(path.join(cacheRootPath, 'images', mod), { force: true });
+          } else {
+            del.sync(cacheRootPath, { force: true });
+          }
+        } else if (Util.existsSync(moduleConfPath)) {
+          del.sync(path.join(cacheRootPath, 'publish', require(moduleConfPath).module), { force: true });
+          del.sync(path.join(cacheRootPath, 'sass', require(moduleConfPath).module), { force: true });
+          del.sync(path.join(cacheRootPath, 'images', require(moduleConfPath).module), { force: true });
+        }
       }
       console.log();
       console.log(chalk.green('  清除成功！'));
@@ -1695,16 +1710,16 @@ program
   }).on('--help', function() {
     console.log('  Examples:');
     console.log('');
-    console.log('    $ athena delete --publish preview');
-    console.log('    $ ath del -p preview');
-    console.log('    $ athena delete --template');
-    console.log('    $ ath del -t');
-    console.log('    $ athena delete --sass');
-    console.log('    $ ath del -s');
-    console.log('    $ athena delete --image');
-    console.log('    $ ath del -i');
-    console.log('    $ athena delete --image --module home');
-    console.log('    $ ath del -i -m home');
+    console.log('    $ athena clear --publish preview');
+    console.log('    $ ath cl -p preview');
+    console.log('    $ athena clear --template');
+    console.log('    $ ath cl -t');
+    console.log('    $ athena clear --sass');
+    console.log('    $ ath cl -s');
+    console.log('    $ athena clear --image');
+    console.log('    $ ath cl -i');
+    console.log('    $ athena clear --image --module home');
+    console.log('    $ ath cl -i -m home');
     console.log();
   });
 
