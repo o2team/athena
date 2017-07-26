@@ -1041,7 +1041,10 @@ support : {
 support : {  
   useBabel: {
     enable: true,
-    jsxPragma: 'Nerv.createElement' // jsx转换支持，默认为 React.createElement
+    jsxPragma: 'Nerv.createElement', // jsx转换支持，默认为 React.createElement
+    exclude: [ // 排除掉不需要转义的文件
+      'static/js/o2.js'
+    ]
   }
 }
 ```
