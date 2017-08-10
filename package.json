@@ -79,7 +79,6 @@
     "postcss-pxtorem": "4.0.0",
     "request": "2.80.0",
     "require-dir": "0.3.2",
-    "resolve": "1.4.0",
     "ssh2": "0.5.4",
     "sync-request": "4.0.1",
     "tempy": "0.1.0",
