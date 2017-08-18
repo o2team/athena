@@ -1,6 +1,6 @@
 {
   "name": "athena-html",
-  "version": "1.4.1",
+  "version": "2.0.0-alpha.0",
   "description": "O2前端流程工具",
   "main": "index.js",
   "scripts": {
@@ -52,7 +52,7 @@
     "decompress": "4.0.0",
     "del": "2.2.2",
     "event-stream": "3.3.4",
-    "extract-text-webpack-plugin": "^3.0.0",
+    "extract-text-webpack-plugin": "3.0.0",
     "fontmin": "0.9.6",
     "fs-extra": "2.0.0",
     "glob": "7.1.1",
@@ -83,7 +83,7 @@
     "request": "2.80.0",
     "require-dir": "0.3.2",
     "ssh2": "0.5.4",
-    "style-loader": "^0.18.2",
+    "style-loader": "0.18.2",
     "sync-request": "4.0.1",
     "tempy": "0.1.0",
     "through2": "2.0.3",
@@ -96,7 +96,7 @@
     "vinyl-sourcemaps-apply": "0.2.1",
     "webpack": "3.5.4",
     "webpack-dev-server": "2.6.1",
-    "webpack-merge": "^4.1.0",
+    "webpack-merge": "4.1.0",
     "which": "1.2.11"
   }
 }
