@@ -1,7 +1,7 @@
 {
-  "name": "athena-html",
-  "version": "2.0.0-alpha.7",
-  "description": "O2前端流程工具",
+  "name": "athena-beta",
+  "version": "1.0.0",
+  "description": "O2前端流程工具（非正式版）",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,8 +23,8 @@
   },
   "license": "MIT",
   "bin": {
-    "ath": "bin/athena",
-    "athena": "bin/athena"
+    "athb": "bin/athena",
+    "athenab": "bin/athena"
   },
   "bugs": {
     "url": "https://github.com/o2team/athena/issues"
