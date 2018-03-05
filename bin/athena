@@ -1301,6 +1301,7 @@ program
           mod = option.module;
         }
       }
+      process.env.NODE_ENV = 'build'
       builder.build(app, mod, option);
     });
   }).on('--help', function() {
@@ -1337,6 +1338,7 @@ program
           mod = option.module;
         }
       }
+      process.env.NODE_ENV = 'development'
       builder.serve(app, mod, option);
     });
   }).on('--help', function() {
@@ -1380,6 +1382,7 @@ program
           mod = option.module;
         }
       }
+      process.env.NODE_ENV = 'production'
       function checkVersionControl () {
         return new Promise(function (resolve, reject) {
           var cwd = process.cwd();
