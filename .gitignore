@@ -32,3 +32,4 @@ _cache.json
 
 # editor config
 .vscode/
+.idea/
